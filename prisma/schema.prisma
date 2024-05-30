@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  uuid        String     @unique
+  email       String     @unique
+  username    String     @unique
+  password    String
+  salted      Boolean    @default(false)
+  verified    Boolean    @default(false)
+  regDate     DateTime   @default(now())
+  lastPlayed  DateTime?
+  role        Role       @default(PLAYER)
+  permissions String[]
+  donations   Donation[]
+  sessions    Session[]
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  token        String   @unique
+  refreshToken String   @unique
+  name         String
+  ip           String
+  ipLocation   String?
+  lastLogin    DateTime @default(now())
+  serverId     String?
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String   @db.ObjectId
+  expiresAt    DateTime
+}
+
+model Server {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  version     String
+  description String
+  status      ServerStatus @default(HIDDED)
+  mods        Mod[]        @relation(fields: [modIds], references: [id])
+  modIds      String[]     @db.ObjectId
+  ip          String
+  port        Int
+  icon        String
+}
+
+model Mod {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  link      String
+  type      ModType
+  Servers   Server[] @relation(fields: [serverIds], references: [id])
+  serverIds String[] @db.ObjectId
+}
+
+model Donation {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  amount Float
+  date   DateTime @default(now())
+  user   User?    @relation(fields: [userId], references: [id])
+  userId String?  @db.ObjectId
+}
+
+enum ServerStatus {
+  STOPPED
+  RUNNING
+  HIDDED
+  ARCHIVED
+}
+
+enum ModType {
+  GLOBAL
+  ADDON
+  LIB
+  UTIL
+  CLIENT
+}
+
+enum Role {
+  PLAYER
+  MODERATOR
+  ADMIN
+}
