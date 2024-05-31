@@ -85,5 +85,14 @@ export async function POST({ request }) {
 		},
 	};
 
+	db.user.update({
+		where: {
+			id: session.user.id
+		},
+		data: {
+			lastPlayed: new Date()
+		}
+	})
+
 	return json(user);
 }
