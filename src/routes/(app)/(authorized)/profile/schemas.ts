@@ -6,10 +6,10 @@ export const skinSchema = z.object({
 		.instanceof(File, { message: "Please upload a file." })
 		.refine((f) => f.type == "image/png", "Файл должен быть в PNG формате.")
 		.refine(async (f) => {
-			let file = (await f.stream().getReader().read()).value;
-			if(file != undefined){
-				let size = sizeOf(file);
-				return size.height == 64 && size.width == 64
+			const file = (await f.stream().getReader().read()).value;
+			if (file != undefined) {
+				const size = sizeOf(file);
+				return size.height == 64 && size.width == 64;
 			}
 
 			return false;
@@ -23,11 +23,11 @@ export const capeSchema = z.object({
 });
 
 export const skinRemoveSchema = z.object({
-	skinRemove: z.string().includes("remove")
+	skinRemove: z.string().includes("remove"),
 });
 
 export const capeRemoveSchema = z.object({
-	capeRemove: z.string().includes("remove")
+	capeRemove: z.string().includes("remove"),
 });
 
 export const sessionRemoveSchema = z.object({

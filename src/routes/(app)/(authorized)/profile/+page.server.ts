@@ -4,7 +4,14 @@ import fs from "fs";
 import { deleteSkin, getUser, saveSkin } from "$lib/util.server.js";
 import { redirect } from "@sveltejs/kit";
 import db from "$lib/db";
-import { capeRemoveSchema, capeSchema, sessionRemoveSchema, skinRemoveSchema, skinSchema, usernameChangeSchema } from "./schemas";
+import {
+	capeRemoveSchema,
+	capeSchema,
+	sessionRemoveSchema,
+	skinRemoveSchema,
+	skinSchema,
+	usernameChangeSchema,
+} from "./schemas";
 
 export const load = async ({ parent }) => {
 	const skinChangeForm = await superValidate(zod(skinSchema));
@@ -17,7 +24,16 @@ export const load = async ({ parent }) => {
 	const user = (await parent()).user;
 	const currentSession = (await parent()).currentSession;
 
-	return { skinChangeForm, capeChangeForm, sessionRemoveForm, usernameChangeForm, skinRemoveForm, capeRemoveForm, user, currentSession };
+	return {
+		skinChangeForm,
+		capeChangeForm,
+		sessionRemoveForm,
+		usernameChangeForm,
+		skinRemoveForm,
+		capeRemoveForm,
+		user,
+		currentSession,
+	};
 };
 
 export const actions = {
@@ -77,7 +93,7 @@ export const actions = {
 		}
 
 		const form = await superValidate(request, zod(skinRemoveSchema));
-		
+
 		if (!form.valid) {
 			return fail(400, { form });
 		}
@@ -93,7 +109,7 @@ export const actions = {
 		}
 
 		const form = await superValidate(request, zod(capeRemoveSchema));
-		
+
 		if (!form.valid) {
 			return fail(400, { form });
 		}
@@ -126,7 +142,3 @@ export const actions = {
 		return message(form, "You changed your username!");
 	},
 };
-function deleteCape(id: string) {
-	throw new Error("Function not implemented.");
-}
-

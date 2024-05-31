@@ -146,18 +146,23 @@
 				</form>
 			{:else}
 				<div class="skin-buttons mb-1 gap-1">
-					<button class="button w-full h-full" on:click={() => {skinEditing = true}}>Изменить скин</button>
+					<button
+						class="button w-full h-full"
+						on:click={() => {
+							skinEditing = true;
+						}}>Изменить скин</button
+					>
 					<form method="POST" action="?/deleteSkin" use:skinRemoveEnhance>
-						<input type="hidden" name="skinRemove" value="remove">
+						<input type="hidden" name="skinRemove" value="remove" />
 						<button class="button aspect-square h-full">
 							{#if $skinRemoveDelayed}
-									<img
-										class="h-full w-full"
-										width="20"
-										height="20"
-										src={spiner}
-										alt="Spiner icon"
-									/>
+								<img
+									class="h-full w-full"
+									width="20"
+									height="20"
+									src={spiner}
+									alt="Spiner icon"
+								/>
 							{:else}
 								<Icon class="h-full w-full" size="20" src={Trash} theme="solid" />
 							{/if}
@@ -221,18 +226,23 @@
 				</form>
 			{:else}
 				<div class="skin-buttons mb-1 gap-1">
-					<button class="button w-full h-full" on:click={() => {capeEditing = true}}>Изменить плащ</button>
+					<button
+						class="button w-full h-full"
+						on:click={() => {
+							capeEditing = true;
+						}}>Изменить плащ</button
+					>
 					<form method="POST" action="?/deleteCape" use:capeRemoveEnhance>
-						<input type="hidden" name="capeRemove" value="remove">
+						<input type="hidden" name="capeRemove" value="remove" />
 						<button class="button aspect-square h-full">
 							{#if $capeRemoveDelayed}
-									<img
-										class="h-full w-full"
-										width="20"
-										height="20"
-										src={spiner}
-										alt="Spiner icon"
-									/>
+								<img
+									class="h-full w-full"
+									width="20"
+									height="20"
+									src={spiner}
+									alt="Spiner icon"
+								/>
 							{:else}
 								<Icon class="h-full w-full" size="20" src={Trash} theme="solid" />
 							{/if}
@@ -349,13 +359,17 @@
 			</div>
 			<div>
 				<span>Дата регистрации</span>
-				<span>{DateTime.fromJSDate(data.user.regDate).setLocale('ru').toLocaleString({})}</span>
+				<span
+					>{DateTime.fromJSDate(data.user.regDate)
+						.setLocale("ru")
+						.toLocaleString({})}</span
+				>
 			</div>
 			<div>
 				<span>Последняя активность</span>
 				<span>
 					{#if data.user.lastPlayed}
-						{DateTime.fromJSDate(data.user.lastPlayed).setLocale('ru').toLocaleString()}
+						{DateTime.fromJSDate(data.user.lastPlayed).setLocale("ru").toLocaleString()}
 					{:else}
 						Отсуцтвует
 					{/if}
@@ -380,7 +394,9 @@
 							{#if data.currentSession == session.token}
 								<span class="text-accent"> Текущая </span>
 							{:else}
-								{DateTime.fromJSDate(session.lastLogin).setLocale('ru').toRelativeCalendar()}
+								{DateTime.fromJSDate(session.lastLogin)
+									.setLocale("ru")
+									.toRelativeCalendar()}
 							{/if}</span
 						>
 						{#if $sessionRemoveDelayed && $sessionRemoveFormId == session.token}
@@ -470,7 +486,7 @@
 
 	.inline-change-form {
 		display: grid;
-		grid-template-columns:  1fr max-content max-content;
+		grid-template-columns: 1fr max-content max-content;
 		gap: 0.25rem;
 	}
 

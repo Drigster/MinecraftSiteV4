@@ -1,6 +1,27 @@
 import { ADMIN_PASSWORD, ADMIN_USERNAME, ORIGIN } from "$env/static/private";
 import bcrypt from "bcrypt";
 import { error, json, text } from "@sveltejs/kit";
+import db from "$lib/db.ts";
+import dotenv from "dotenv";
+dotenv.config();
+
+const user = await db.user.findUnique({
+	where: {
+		uuid: "7943cf5b-6d20-462a-9eac-d5dc70d2456a",
+	},
+});
+
+if (user == null) {
+	await db.user.create({
+		data: {
+			uuid: "7943cf5b-6d20-462a-9eac-d5dc70d2456a",
+			email: "admin@foxy.town",
+			username: ADMIN_USERNAME,
+			password: bcrypt.hashSync(ADMIN_PASSWORD + "7943cf5b-6d20-462a-9eac-d5dc70d2456a", 12),
+			salted: true,
+		},
+	});
+}
 
 function isContentType(request: Request, ...types: string[]) {
 	const type = request.headers.get("content-type")?.split(";", 1)[0].trim() ?? "";
