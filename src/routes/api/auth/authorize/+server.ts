@@ -1,3 +1,4 @@
+import { ORIGIN } from "$env/static/private";
 import db from "$lib/db.js";
 import { generateToken } from "$lib/util.server";
 import { json } from "@sveltejs/kit";
@@ -63,7 +64,7 @@ export async function POST({ request }) {
 		});
 	}
 
-	const skinUrl = "https://" + request.headers.get("host") + "/api/skin/" + user.username;
+	const skinUrl = ORIGIN + "/api/skin/" + user.username;
 	let skin;
 	if (user !== null && fs.existsSync("./files/skins/" + user.id.toString() + ".png")) {
 		skin = fs.readFileSync("./files/skins/" + user.id.toString() + ".png");
