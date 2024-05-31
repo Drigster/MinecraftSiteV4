@@ -41,7 +41,7 @@ export const actions = {
 			return fail(400, { form });
 		}
 
-		const user = await db.user.findFirst({
+		let user = await db.user.findFirst({
 			where: {
 				OR: [
 					{
@@ -62,8 +62,25 @@ export const actions = {
 
 		if (user == null) {
 			return setError(form, "username", "Пользователь не найден!");
-		} else if (!bcrypt.compareSync(form.data.password + user.uuid, user.password)) {
+		} 
+
+		if (user.salted && !bcrypt.compareSync(form.data.password + user.salt, user.password)) {
 			return setError(form, "password", "Пароль не верен!");
+		} else if (!bcrypt.compareSync(form.data.password, user.password)) {
+			return setError(form, "password", "Пароль не верен!");
+		}
+
+		if(!user.salted) {
+			user = await db.user.update({
+				where: {
+					id: user.id
+				},
+				data: {
+					salted: true,
+					salt: user.uuid.replaceAll("-", ""),
+					password: bcrypt.hashSync(form.data.password + user.uuid.replaceAll("-", ""), 12)
+				}
+			})
 		}
 
 		await db.session.deleteMany({

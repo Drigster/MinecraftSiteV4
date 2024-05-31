@@ -7,9 +7,9 @@
 	--secondary: rgb(163, 163, 163);
 	--accent: rgb(252, 111, 83);
 	--background: rgb(0, 0, 0, 0.6);
-	--warning: "yellow";
-	--error: "red";
-	--success: "green";
+	--warning: yellow;
+	--error: red;
+	--success: green;
 }
 
 html {
@@ -82,10 +82,73 @@ body {
 	grid-template-columns: inherit;
 }
 
+.contentBlock {
+	background-color: color-mix(in oklab, var(--background) 100%, transparent 20%);
+	border-radius: 0.5rem;
+	backdrop-filter: blur(0.35rem);
+}
+
 .center {
 	margin: auto;
 }
 
 .errorMessage {
 	color: var(--error);
+}
+
+.authForm {
+	padding: 2.5rem;
+}
+
+.authForm > form {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.authForm button {
+	background-color: var(--accent);
+	color: black;
+	font-size: 1.25rem;
+	padding: 0.75rem;
+	border-radius: 0.25rem;
+}
+
+.authForm button:active {
+	background-color: color-mix(in oklab, var(--accent) 80%, black 20%);
+}
+
+.inputBox {
+	position: relative;
+}
+
+.inputBox > input {
+	padding-inline: 0.75rem;
+	padding-top: 1.4rem;
+	padding-bottom: 0.35rem;
+	margin-inline: auto;
+	background-color: var(--background);
+	border-radius: 0.25rem;
+	width: 100%;
+}
+.inputBox ~ .errorMessage {
+	position: absolute;
+	font-size: 0.9rem;
+	padding-left: 0.25rem;
+}
+
+.inputBox > label {
+	position: absolute;
+	left: 0;
+	padding-left: 0.75rem;
+	margin-block: .87rem;
+	color: var(--secondary);
+	transition: 0.5s;
+}
+
+.inputBox input:valid ~ label, 
+.inputBox input:focus ~ label {
+	transform: translateY(-0.5rem);
+	font-size: 0.8em;
+	color: var(--primary);
 }

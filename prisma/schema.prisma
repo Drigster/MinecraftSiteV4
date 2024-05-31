@@ -17,6 +17,7 @@ model User {
   username    String     @unique
   password    String
   salted      Boolean    @default(false)
+  salt        String?
   verified    Boolean    @default(false)
   regDate     DateTime   @default(now())
   lastPlayed  DateTime?

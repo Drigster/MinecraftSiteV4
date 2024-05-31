@@ -1,7 +1,7 @@
 import { fail, message, superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import fs from "fs";
-import { deleteSkin, getUser, saveSkin } from "$lib/util.server.js";
+import { deleteCape, deleteSkin, getUser, saveSkin } from "$lib/util.server.js";
 import { redirect } from "@sveltejs/kit";
 import db from "$lib/db";
 import {

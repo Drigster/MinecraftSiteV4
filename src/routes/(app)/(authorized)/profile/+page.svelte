@@ -76,7 +76,7 @@
 
 <div class="profile">
 	<div class="flex gap-4">
-		<div class="profileBlock overflow-hidden w-1/4 flex flex-col">
+		<div class="contentBlock p-4 overflow-hidden w-1/4 flex flex-col">
 			<div class="w-full aspect-square mb-4" bind:clientWidth={w}>
 				<noscript>
 					<div class="w-full aspect-square">
@@ -257,7 +257,7 @@
 				</span>
 			{/if}
 		</div>
-		<div class="profileBlock profileInfo grow">
+		<div class="contentBlock p-4 profileInfo grow">
 			<div>
 				<span class="py-[2px]">Никнейм</span>
 				<span>
@@ -377,10 +377,10 @@
 			</div>
 		</div>
 	</div>
-	<div class="profileBlock w-full">
+	<div class="contentBlock p-4 w-full">
 		<div class="">
 			<h2 class="text-2xl">Активные сессии</h2>
-			<h2 class="text-secondary text-md">
+			<h2 class="text-secondary text-[0.9rem]">
 				Сессии автоматически удаляются после месяца неактивности.
 			</h2>
 		</div>
@@ -443,13 +443,6 @@
 
 	.sessionList li:nth-of-type(n + 2) {
 		border-top: solid 1px;
-	}
-
-	.profileBlock {
-		border: solid 2px var(--accent);
-		border-radius: 1rem;
-		background-color: var(--background);
-		padding: 1rem;
 	}
 
 	.profileInfo {
