@@ -7,9 +7,8 @@
 	--secondary: rgb(163, 163, 163);
 	--accent: rgb(252, 111, 83);
 	--background: rgb(0, 0, 0, 0.6);
-	--warning: yellow;
 	--error: red;
-	--success: green;
+	--notify: yellow;
 }
 
 html {
@@ -96,6 +95,10 @@ body {
 	color: var(--error);
 }
 
+.notifyMessage {
+	color: var(--notify);
+}
+
 .authForm {
 	padding: 2.5rem;
 }
@@ -141,12 +144,12 @@ body {
 	position: absolute;
 	left: 0;
 	padding-left: 0.75rem;
-	margin-block: .87rem;
+	margin-block: 0.87rem;
 	color: var(--secondary);
 	transition: 0.5s;
 }
 
-.inputBox input:valid ~ label, 
+.inputBox input:valid ~ label,
 .inputBox input:focus ~ label {
 	transform: translateY(-0.5rem);
 	font-size: 0.8em;

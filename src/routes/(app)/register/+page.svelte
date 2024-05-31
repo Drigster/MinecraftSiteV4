@@ -1,10 +1,11 @@
 <script lang="ts">
-	import SuperDebug, { superForm } from "sveltekit-superforms";
+	import { superForm } from "sveltekit-superforms";
 	import type { PageData } from "./$types";
+	import spiner from "$lib/assets/spiner.svg";
 
 	export let data: PageData;
 
-	const { form, enhance, errors, message } = superForm(data.form);
+	const { form, enhance, errors, delayed } = superForm(data.form);
 </script>
 
 <div class="center authForm contentBlock full-top min-w-96">
@@ -13,8 +14,8 @@
 	<form method="POST" use:enhance>
 		<div>
 			<div class="inputBox">
-				<input type="text" name="username" bind:value={$form.username} required/>
-				<label for="username">Логин</label>
+				<input type="text" name="username" bind:value={$form.username} required />
+				<label for="username">Никнейм</label>
 			</div>
 			{#if $errors.username}
 				<span class="errorMessage">{$errors.username}</span>
@@ -23,7 +24,7 @@
 
 		<div>
 			<div class="inputBox">
-				<input type="email" name="email" bind:value={$form.email} required/>
+				<input type="email" name="email" bind:value={$form.email} required />
 				<label for="email">Почта</label>
 			</div>
 			{#if $errors.email}
@@ -33,50 +34,37 @@
 
 		<div>
 			<div class="inputBox">
-				<input type="password" name="password" bind:value={$form.password} required/>
+				<input type="password" name="password" bind:value={$form.password} required />
 				<label for="password">Пароль</label>
 			</div>
 			<div class="inputBox pt-2">
-				<input type="password" name="password2" bind:value={$form.password2} required/>
+				<input type="password" name="password2" bind:value={$form.password2} required />
 				<label for="password2">Повторить пароль</label>
 			</div>
 			{#if $errors.password || $errors.password2}
-				<span class="errorMessage">{$errors.password} {$errors.password2}</span>
+				<span class="errorMessage">{$errors.password}{$errors.password2}</span>
 			{/if}
 		</div>
 
-		<div class="flex justify-between"><a href="/recovery">Забыл пароль</a><a class="text-accent" href="/register">Регистрация</a></div>
+		<div class="flex justify-between">
+			<span></span><a class="text-accent" href="/login">Вход</a>
+		</div>
 
-		<button type="submit">Войти</button>
+		<button type="submit">
+			{#if $delayed}
+				<span class="relative">
+					Зарегистрироватся
+					<img
+						class="h-full mx-2 absolute left-full top-0"
+						width="20"
+						height="20"
+						src={spiner}
+						alt="Spiner icon"
+					/>
+				</span>
+			{:else}
+				Зарегистрироватся
+			{/if}
+		</button>
 	</form>
 </div>
-
-<!-- <div class="center authForm full-top min-w-96">
-	{#if data.hasToken}
-		<span>Вы уже залогинены</span>
-		<span>Профиль</span>
-		<span>Выйти</span>
-	{:else}
-		<form class="flex flex-col m-auto" method="POST" use:enhance>
-			<label for="username">Username</label>
-			<input type="text" name="username" bind:value={$form.username} required />
-			{#if $errors.username}
-				<span class="errorMessage">{$errors.username}</span>
-			{/if}
-
-			<label for="password">Password</label>
-			<input type="text" name="password" bind:value={$form.password} required />
-			{#if $errors.password}
-				<span class="errorMessage">{$errors.password}</span>
-			{/if}
-
-			<button
-				class="button"
-				type="submit">Submit</button
-			>
-		</form>
-	{/if}
-</div> -->
-
-<style>
-</style>

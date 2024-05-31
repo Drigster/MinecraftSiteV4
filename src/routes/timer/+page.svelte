@@ -14,7 +14,6 @@
 		.setLocale("ru")
 		.setZone("Europe/Tallinn")
 		.set({ year: 2024, month: 6, day: 1, hour: 12, minute: 0, second: 0 });
-	//let target = DateTime.now().plus({ seconds: 5 })
 
 	let interval = target.diff(DateTime.now(), ["days", "hours", "minutes", "seconds"]).toObject();
 
@@ -24,7 +23,6 @@
 	seconds = Math.floor(interval.seconds);
 
 	onMount(() => {
-		// Update the count down every 1 second
 		var x = setInterval(function () {
 			let interval = target
 				.diff(DateTime.now(), ["days", "hours", "minutes", "seconds"])

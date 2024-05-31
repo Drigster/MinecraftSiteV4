@@ -3,6 +3,49 @@ import { DateTime } from "luxon";
 import crypto from "crypto";
 import fs from "fs";
 import sharp from "sharp";
+import jwt from "jsonwebtoken";
+import {
+	JWT_SECRET,
+	NODE_ENV,
+	ORIGIN,
+	SMTP_HOST,
+	SMTP_PASSWORD,
+	SMTP_PORT,
+	SMTP_USER,
+} from "$env/static/private";
+import logo from "$lib/assets/logo.svg";
+import type { User } from "@prisma/client";
+import nodemailer from "nodemailer";
+import type { SentMessageInfo } from "nodemailer/lib/smtp-transport";
+
+let transporter: nodemailer.Transporter<SentMessageInfo>;
+try {
+	if (NODE_ENV === "development") {
+		const testAccount = await nodemailer.createTestAccount();
+		transporter = nodemailer.createTransport({
+			host: "smtp.ethereal.email",
+			port: 587,
+			secure: false,
+			auth: {
+				user: testAccount.user,
+				pass: testAccount.pass,
+			},
+		});
+	} else {
+		transporter = nodemailer.createTransport({
+			host: SMTP_HOST,
+			port: SMTP_PORT,
+			secure: true,
+			auth: {
+				user: SMTP_USER,
+				pass: SMTP_PASSWORD,
+			},
+		});
+	}
+	console.log("INFO", "Transport ready");
+} catch (error) {
+	console.log("ERROR", error);
+}
 
 export async function getUser(token: string | undefined) {
 	if (token != undefined) {
@@ -152,4 +195,126 @@ export function deleteCape(filename: string) {
 	fs.rmSync("./files/capes/" + filename + ".png", {
 		force: true,
 	});
+}
+
+function buildEmail(
+	title: string,
+	username: string,
+	url: string,
+	body: string,
+	buttonText: string,
+	body2: string,
+): string {
+	let file = fs.readFileSync("./src/lib/assets/emailBase.html").toString();
+	file = file.replaceAll("{{sender}}", "Foxy.town");
+	file = file.replaceAll("{{homeUrl}}", ORIGIN);
+	file = file.replaceAll("{{logoUrl}}", ORIGIN + logo);
+	file = file.replaceAll("{{title}}", title);
+	file = file.replaceAll("{{username}}", username);
+	file = file.replaceAll("{{url}}", url);
+	file = file.replaceAll("{{body}}", body);
+	file = file.replaceAll("{{buttonText}}", buttonText);
+	file = file.replaceAll("{{body2}}", body2);
+	return file;
+}
+
+export function verifyToken(token: string) {
+	try {
+		return jwt.verify(token, JWT_SECRET);
+	} catch {
+		return false;
+	}
+}
+
+export async function sendVerificationEmail(user: User) {
+	const token = jwt.sign({ email: user.email }, JWT_SECRET, {
+		expiresIn: "15m",
+	});
+
+	const url = ORIGIN + "/register/verify/" + token;
+
+	const info = await transporter.sendMail({
+		from: '"Foxy.town" <auth@foxy.town>',
+		to: user.email,
+		subject: "Подтвердить регистрацию!",
+		html: buildEmail(
+			"Подтверждение регистрации",
+			user.username,
+			url,
+			"Для завершения регистарции необходимо подвердить почту.",
+			"Подтвердить почту",
+			"Если вы не создавали аккаунт на foxy.town, то проигнорируйте это сообщение. Не подтверждённые аккаунты удаляются через 24 часа.",
+		),
+		headers: {
+			"X-Entity-Ref-ID": Math.random().toString().substring(2),
+		},
+	});
+
+	console.log(JSON.stringify(info));
+
+	if (process.env.NODE_ENV === "development") {
+		console.log("DEBUG", "Preview URL: " + nodemailer.getTestMessageUrl(info));
+	}
+}
+
+export async function sendChangePasswordEmail(user: User) {
+	const token = jwt.sign({ email: user.email }, JWT_SECRET, {
+		expiresIn: "15m",
+	});
+
+	const url = ORIGIN + "/change/password/" + token;
+
+	const info = await transporter.sendMail({
+		from: '"Foxy.town" <auth@foxy.town>',
+		to: user.email,
+		subject: "Смена пароля!",
+		html: buildEmail(
+			"Смена пароля",
+			user.username,
+			url,
+			"Нами был получен запрос на смену пароля. Для продолжения нажмите кнопку ниже.",
+			"Сменить пароль",
+			"Если вы не запрашивали смену пароля, то проигнорируйте это сообщение. Запрос активен только в течение 15 минут.",
+		),
+		headers: {
+			"X-Entity-Ref-ID": Math.random().toString().substring(2),
+		},
+	});
+
+	console.log(JSON.stringify(info));
+
+	if (process.env.NODE_ENV === "development") {
+		console.log("DEBUG", "Preview URL: " + nodemailer.getTestMessageUrl(info));
+	}
+}
+
+export async function sendChangeEmailEmail(user: User) {
+	const token = jwt.sign({ email: user.email }, JWT_SECRET, {
+		expiresIn: "15m",
+	});
+
+	const url = ORIGIN + "/change/email/" + token;
+
+	const info = await transporter.sendMail({
+		from: '"Foxy.town" <auth@foxy.town>',
+		to: user.email,
+		subject: "Смена почты!",
+		html: buildEmail(
+			"Смена почты",
+			user.username,
+			url,
+			"Нами был получен запрос на смену почты. Для продолжения нажмите кнопку ниже.",
+			"Сменить почту",
+			"Если вы не запрашивали смену почты, то проигнорируйте это сообщение. Запрос активен только в течение 15 минут.",
+		),
+		headers: {
+			"X-Entity-Ref-ID": Math.random().toString().substring(2),
+		},
+	});
+
+	console.log(JSON.stringify(info));
+
+	if (process.env.NODE_ENV === "development") {
+		console.log("DEBUG", "Preview URL: " + nodemailer.getTestMessageUrl(info));
+	}
 }

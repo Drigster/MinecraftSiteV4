@@ -1,12 +1,23 @@
 import { fail, message, superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import fs from "fs";
-import { deleteCape, deleteSkin, getUser, saveSkin } from "$lib/util.server.js";
+import {
+	deleteCape,
+	deleteSkin,
+	getUser,
+	saveSkin,
+	sendChangeEmailEmail,
+	sendChangePasswordEmail,
+	sendVerificationEmail,
+} from "$lib/util.server.js";
 import { redirect } from "@sveltejs/kit";
 import db from "$lib/db";
 import {
 	capeRemoveSchema,
 	capeSchema,
+	emailChangeSchema,
+	emailVerifySchema,
+	passwordChangeSchema,
 	sessionRemoveSchema,
 	skinRemoveSchema,
 	skinSchema,
@@ -20,6 +31,9 @@ export const load = async ({ parent }) => {
 	const usernameChangeForm = await superValidate(zod(usernameChangeSchema));
 	const skinRemoveForm = await superValidate(zod(skinRemoveSchema));
 	const capeRemoveForm = await superValidate(zod(capeRemoveSchema));
+	const emailChangeForm = await superValidate(zod(emailChangeSchema));
+	const passwordChangeForm = await superValidate(zod(passwordChangeSchema));
+	const emailVerifyForm = await superValidate(zod(emailVerifySchema));
 
 	const user = (await parent()).user;
 	const currentSession = (await parent()).currentSession;
@@ -31,6 +45,9 @@ export const load = async ({ parent }) => {
 		usernameChangeForm,
 		skinRemoveForm,
 		capeRemoveForm,
+		emailChangeForm,
+		passwordChangeForm,
+		emailVerifyForm,
 		user,
 		currentSession,
 	};
@@ -51,7 +68,7 @@ export const actions = {
 
 		await saveSkin(form.data.skin, user.id);
 
-		return message(form, "You have uploaded a valid file!");
+		return message(form, "Скин был изменён!");
 	},
 	changeCape: async ({ request, cookies }) => {
 		const user = await getUser(cookies.get("sessionToken"));
@@ -70,7 +87,7 @@ export const actions = {
 			Buffer.from(await form.data.cape.arrayBuffer()),
 		);
 
-		return message(form, "You have uploaded a valid file!");
+		return message(form, "Плащ был изменён!");
 	},
 	removeSession: async ({ request }) => {
 		const form = await superValidate(request, zod(sessionRemoveSchema));
@@ -84,7 +101,7 @@ export const actions = {
 			});
 		}
 
-		return message(form, "You have removed a session!");
+		return message(form, "Сессия была удалена!");
 	},
 	deleteSkin: async ({ request, cookies }) => {
 		const user = await getUser(cookies.get("sessionToken"));
@@ -100,7 +117,7 @@ export const actions = {
 
 		deleteSkin(user.id);
 
-		return message(form, "You removed your skin!");
+		return message(form, "Скин был удалён!");
 	},
 	deleteCape: async ({ request, cookies }) => {
 		const user = await getUser(cookies.get("sessionToken"));
@@ -116,7 +133,7 @@ export const actions = {
 
 		deleteCape(user.id);
 
-		return message(form, "You removed your cape!");
+		return message(form, "Плащ был удалён!");
 	},
 	changeUsername: async ({ request, cookies }) => {
 		const user = await getUser(cookies.get("sessionToken"));
@@ -139,6 +156,55 @@ export const actions = {
 			},
 		});
 
-		return message(form, "You changed your username!");
+		return message(form, "Никнейм был изменён!");
+	},
+	changeEmail: async ({ request, cookies }) => {
+		const user = await getUser(cookies.get("sessionToken"));
+		if (user == null) {
+			return redirect(303, `/logout?redirectTo=/login`);
+		}
+
+		const form = await superValidate(request, zod(emailChangeSchema));
+
+		if (!form.valid) {
+			return fail(400, { form });
+		}
+
+		sendChangeEmailEmail(user);
+
+		return message(form, "На почту было отправлено сообщение с изменением почты!");
+	},
+	changePassword: async ({ request, cookies }) => {
+		const user = await getUser(cookies.get("sessionToken"));
+		if (user == null) {
+			return redirect(303, `/logout?redirectTo=/login`);
+		}
+
+		const form = await superValidate(request, zod(passwordChangeSchema));
+
+		if (!form.valid) {
+			return fail(400, { form });
+		}
+
+		sendChangePasswordEmail(user);
+
+		return message(form, "На почту было отправлено сообщение с изменением пароля!");
+	},
+	verifyEmail: async ({ request, cookies }) => {
+		console.log(123);
+		const user = await getUser(cookies.get("sessionToken"));
+		if (user == null) {
+			return redirect(303, `/logout?redirectTo=/login`);
+		}
+
+		const form = await superValidate(request, zod(emailVerifySchema));
+
+		if (!form.valid) {
+			return fail(400, { form });
+		}
+
+		sendVerificationEmail(user);
+
+		return message(form, "На почту было отправлено сообщение с подтверждением почты!");
 	},
 };

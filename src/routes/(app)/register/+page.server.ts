@@ -4,12 +4,13 @@ import { zod } from "sveltekit-superforms/adapters";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import db from "$lib/db.js";
-import { v4 as uuidv4 } from 'uuid';
-import validate from "deep-email-validator"
+import { v4 as uuidv4 } from "uuid";
+import { validate } from "deep-email-validator";
+import { sendVerificationEmail } from "$lib/util.server.js";
 
 const schema = z.object({
-	username: 
-		z.string()
+	username: z
+		.string()
 		.min(1, "Никнейм не может быть пустым")
 		.max(16, "Никнейм не может быть длинее 16 символов")
 		.regex(/[a-zA-Z0-9_]+/, "Никнейм имеет недопустимые символы"),
@@ -18,18 +19,17 @@ const schema = z.object({
 	password2: z.string().min(1, "Пароль не может быть пустым"),
 });
 
-export const load = async ({ }) => {
+export const load = async () => {
 	const form = await superValidate(zod(schema));
 
 	return { form };
 };
 
 export const actions = {
-	default: async ({ request, cookies, url, getClientAddress }) => {
+	default: async ({ request }) => {
 		const form = await superValidate(request, zod(schema));
 
 		if (!form.valid) {
-			// Again, return { form } and things will just work.
 			return fail(400, { form });
 		}
 
@@ -37,26 +37,25 @@ export const actions = {
 			where: {
 				OR: [
 					{
-						username: form.data.username
+						username: form.data.username,
 					},
 					{
-						email: form.data.email
-					}
-				]
-			}
-		})
+						email: form.data.email,
+					},
+				],
+			},
+		});
 
-		if(user != null){
-			if(user.username == form.data.username){
+		if (user != null) {
+			if (user.username == form.data.username) {
 				return setError(form, "username", "Никнейм занят!");
-			}
-			else if(user.email == form.data.email){
+			} else if (user.email == form.data.email) {
 				return setError(form, "email", "Почта занята!");
 			}
 		}
 
-		let res = await validate('asdf@gmail.com')
-		if(!res.valid){
+		const res = await validate(form.data.email);
+		if (!res.valid) {
 			switch (res.reason) {
 				case "regex":
 					return setError(form, "email", "Неверный формат почты!");
@@ -65,28 +64,30 @@ export const actions = {
 				case "typo":
 				case "mx":
 				case "smtp":
-					return setError(form, "email", "Ошибка сервера, почта не действительна!");
+					return setError(form, "email", "Почта не существует или не действительна!");
 				default:
 					break;
 			}
 		}
 
-		if(form.data.password != form.data.password2){
+		if (form.data.password != form.data.password2) {
 			return setError(form, "password", "Пароли не совпадают!");
 		}
 
-		let uuid = uuidv4()
-		let salt = uuid.replaceAll("-", "");
-		db.user.create({
+		const uuid = uuidv4();
+		const salt = uuid.replaceAll("-", "");
+		user = await db.user.create({
 			data: {
 				uuid: uuid,
 				email: form.data.email,
 				username: form.data.username,
 				password: bcrypt.hashSync(form.data.password + salt, 12),
 				salt: salt,
-				salted: true
-			}
-		})
+				salted: true,
+			},
+		});
+
+		sendVerificationEmail(user);
 
 		return redirect(303, "/login");
 	},

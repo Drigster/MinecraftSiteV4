@@ -17,19 +17,44 @@
 		resetForm: true,
 	});
 
+	const { enhance: skinRemoveEnhance, delayed: skinRemoveDelayed } = superForm(
+		data.skinRemoveForm,
+		{
+			resetForm: true,
+		},
+	);
+
+	const { enhance: capeRemoveEnhance, delayed: capeRemoveDelayed } = superForm(
+		data.capeRemoveForm,
+		{
+			resetForm: true,
+		},
+	);
+
 	const {
-		formId: skinRemoveFormId,
-		enhance: skinRemoveEnhance,
-		delayed: skinRemoveDelayed,
-	} = superForm(data.skinRemoveForm, {
+		enhance: emailChangeEnhance,
+		delayed: emailChangeDelayed,
+		errors: emailChangeErrors,
+		message: emailChangeMessage,
+	} = superForm(data.emailChangeForm, {
 		resetForm: true,
 	});
 
 	const {
-		formId: capeRemoveFormId,
-		enhance: capeRemoveEnhance,
-		delayed: capeRemoveDelayed,
-	} = superForm(data.capeRemoveForm, {
+		enhance: passwordChangeEnhance,
+		delayed: passwordChangeDelayed,
+		errors: passwordChangeErrors,
+		message: passwordChangeMessage,
+	} = superForm(data.passwordChangeForm, {
+		resetForm: true,
+	});
+
+	const {
+		enhance: emailVerifyEnhance,
+		delayed: emailVerifyDelayed,
+		errors: emailVerifyErrors,
+		message: emailVerifyMessage,
+	} = superForm(data.emailVerifyForm, {
 		resetForm: true,
 	});
 
@@ -260,7 +285,7 @@
 		<div class="contentBlock p-4 profileInfo grow">
 			<div>
 				<span class="py-[2px]">Никнейм</span>
-				<span>
+				<span class="flex gap-1">
 					{#if usernameEditing}
 						<form
 							class="inline-change-form"
@@ -329,33 +354,102 @@
 			</div>
 			<div>
 				<span>Почта</span>
-				<span>
+				<span class="flex gap-1 relative">
 					<span>
 						{data.user.email}
 					</span>
-					<button type="button" class="change-button">Изменить</button>
+					<form method="POST" action="?/changeEmail" use:emailChangeEnhance>
+						<input type="hidden" name="changeEmail" value="changeEmail" />
+						<button class="change-button">
+							{#if $emailChangeDelayed}
+								<span class="relative">
+									Изменить
+									<img
+										class="h-full mx-1 absolute left-full top-0"
+										width="20"
+										height="20"
+										src={spiner}
+										alt="Spiner icon"
+									/>
+								</span>
+							{:else}
+								Изменить
+							{/if}
+						</button>
+					</form>
 				</span>
+				{#if $emailChangeErrors.changeEmail}
+					<span class="errorMessage">{$emailChangeErrors.changeEmail}</span>
+				{/if}
+				{#if $emailChangeMessage}
+					<span class="notifyMessage">{$emailChangeMessage}</span>
+				{/if}
 			</div>
 			<div>
 				<span>Пароль</span>
-				<span>
+				<span class="flex gap-1 relative">
 					<span> ●●●●●●●● </span>
-					<button type="button" class="change-button">Изменить</button>
+					<form method="POST" action="?/changePassword" use:passwordChangeEnhance>
+						<input type="hidden" name="changePassword" value="changePassword" />
+						<button class="change-button">
+							{#if $passwordChangeDelayed}
+								<span class="relative">
+									Изменить
+									<img
+										class="h-full mx-1 absolute left-full top-0"
+										width="20"
+										height="20"
+										src={spiner}
+										alt="Spiner icon"
+									/>
+								</span>
+							{:else}
+								Изменить
+							{/if}
+						</button>
+					</form>
 				</span>
+				{#if $passwordChangeErrors.changePassword}
+					<span class="errorMessage">{$passwordChangeErrors.changePassword}</span>
+				{/if}
+				{#if $passwordChangeMessage}
+					<span class="notifyMessage">{$passwordChangeMessage}</span>
+				{/if}
 			</div>
 			<div>
 				<span>Статус аккаунта</span>
-				<span>
+				<span class="flex gap-1 relative">
 					{#if data.user.verified}
-						<span class="text-success"> Верифицирован </span>
+						<span class="text-[#26c90a]"> Верифицирован </span>
 					{:else}
-						<span class="text-warning"> Не верифицирован </span>
-						<button type="button" class="change-button"> Верифицировать </button>
+						<span class="text-[#e5e106]"> Не верифицирован </span>
+						<form method="POST" action="?/verifyEmail" use:emailVerifyEnhance>
+							<input type="hidden" name="verifyEmail" value="verifyEmail" />
+							<button class="change-button">
+								{#if $emailVerifyDelayed}
+									<span class="relative">
+										Верифицировать
+										<img
+											class="h-full mx-1 absolute left-full top-0"
+											width="20"
+											height="20"
+											src={spiner}
+											alt="Spiner icon"
+										/>
+									</span>
+								{:else}
+									Верифицировать
+								{/if}
+							</button>
+						</form>
 					{/if}
 				</span>
-				<!-- <span class="text-red-500">
-					Забанен
-				</span> -->
+				{#if $emailVerifyErrors.verifyEmail}
+					<span class="errorMessage">{$emailVerifyErrors.verifyEmail}</span>
+				{/if}
+				{#if $emailVerifyMessage}
+					<span class="notifyMessage">{$emailVerifyMessage}</span>
+				{/if}
 			</div>
 			<div>
 				<span>Дата регистрации</span>
@@ -389,7 +483,7 @@
 				{#each data.user.sessions as session, i}
 					<li class={data.currentSession == session.token ? "" : ""}>
 						<span>{session.name}</span>
-						<span>{session.ip}</span>
+						<span class="text-center">{session.ip}</span>
 						<span>
 							{#if data.currentSession == session.token}
 								<span class="text-accent"> Текущая </span>

@@ -8,7 +8,7 @@ import db from "$lib/db.js";
 import { generateToken } from "$lib/util.server";
 
 const schema = z.object({
-	username: z.string().min(1, "Никнейм не может быть пустым"),
+	login: z.string().min(1, "Никнейм не может быть пустым"),
 	password: z.string().min(1, "Пароль не может быть пустым"),
 });
 
@@ -37,7 +37,6 @@ export const actions = {
 		const form = await superValidate(request, zod(schema));
 
 		if (!form.valid) {
-			// Again, return { form } and things will just work.
 			return fail(400, { form });
 		}
 
@@ -46,13 +45,13 @@ export const actions = {
 				OR: [
 					{
 						username: {
-							equals: form.data.username,
+							equals: form.data.login,
 							mode: "insensitive",
 						},
 					},
 					{
 						email: {
-							equals: form.data.username,
+							equals: form.data.login,
 							mode: "insensitive",
 						},
 					},
@@ -61,26 +60,31 @@ export const actions = {
 		});
 
 		if (user == null) {
-			return setError(form, "username", "Пользователь не найден!");
-		} 
+			return setError(form, "login", "Пользователь не найден!");
+		}
 
-		if (user.salted && !bcrypt.compareSync(form.data.password + user.salt, user.password)) {
-			return setError(form, "password", "Пароль не верен!");
+		if (user.salted) {
+			if (!bcrypt.compareSync(form.data.password + user.salt, user.password)) {
+				return setError(form, "password", "Пароль не верен!");
+			}
 		} else if (!bcrypt.compareSync(form.data.password, user.password)) {
 			return setError(form, "password", "Пароль не верен!");
 		}
 
-		if(!user.salted) {
+		if (!user.salted) {
 			user = await db.user.update({
 				where: {
-					id: user.id
+					id: user.id,
 				},
 				data: {
 					salted: true,
 					salt: user.uuid.replaceAll("-", ""),
-					password: bcrypt.hashSync(form.data.password + user.uuid.replaceAll("-", ""), 12)
-				}
-			})
+					password: bcrypt.hashSync(
+						form.data.password + user.uuid.replaceAll("-", ""),
+						12,
+					),
+				},
+			});
 		}
 
 		await db.session.deleteMany({

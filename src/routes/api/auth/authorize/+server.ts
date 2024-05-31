@@ -5,7 +5,7 @@ import { json } from "@sveltejs/kit";
 import bcrypt from "bcrypt";
 import { createHash } from "crypto";
 import fs from "fs";
-import { DateTime } from "luxon";
+import { DateTime, Interval } from "luxon";
 
 interface Request {
 	login: string;
@@ -101,7 +101,7 @@ export async function POST({ request }) {
 			expiresAt: DateTime.now().plus({ week: 1 }).toJSDate(),
 			userId: user.id,
 			name: "Launcher",
-			ip: "",
+			ip: "–",
 		},
 	});
 
@@ -109,7 +109,9 @@ export async function POST({ request }) {
 		id: session.id,
 		accessToken: session.token,
 		refreshToken: session.refreshToken,
-		expire: 1, //Math.floor(Interval.fromDateTimes(DateTime.now(), session.expiresAt).length("seconds")),
+		expire: Math.floor(
+			Interval.fromDateTimes(DateTime.now(), session.expiresAt).length("seconds"),
+		),
 		user: userObj,
 	};
 

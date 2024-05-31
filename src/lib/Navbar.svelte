@@ -13,8 +13,8 @@
 		</a>
 		<ul class="nav-list">
 			<li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
-			<li class="nav-item"><a class="nav-link" href="/rules">Правила</a></li>
-			<li class="nav-item"><a class="nav-link" href="/servers">Сервера</a></li>
+			<li class="nav-item line-through">Правила</li>
+			<li class="nav-item line-through">Сервера</li>
 			<li class="nav-item rainbow">
 				<a class="nav-link" href="/download">Скачать лаунчер</a>
 			</li>

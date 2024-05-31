@@ -3,7 +3,6 @@
 
 	export let data;
 
-	// Client API:
 	const { form } = superForm(data.form);
 </script>
 

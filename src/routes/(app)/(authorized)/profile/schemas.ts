@@ -23,11 +23,11 @@ export const capeSchema = z.object({
 });
 
 export const skinRemoveSchema = z.object({
-	skinRemove: z.string().includes("remove"),
+	skinRemove: z.string(),
 });
 
 export const capeRemoveSchema = z.object({
-	capeRemove: z.string().includes("remove"),
+	capeRemove: z.string(),
 });
 
 export const sessionRemoveSchema = z.object({
@@ -39,5 +39,13 @@ export const usernameChangeSchema = z.object({
 });
 
 export const emailChangeSchema = z.object({
-	username: z.string().min(1, "Никнейм не может быть пустым"),
+	changeEmail: z.string(),
+});
+
+export const passwordChangeSchema = z.object({
+	changePassword: z.string(),
+});
+
+export const emailVerifySchema = z.object({
+	verifyEmail: z.string(),
 });
