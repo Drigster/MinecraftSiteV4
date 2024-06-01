@@ -21,8 +21,9 @@
 			{#if data.user?.role == "ADMIN"}
 				<li class="nav-item"><a class="nav-link" href="/admin">Админка</a></li>
 			{/if}
-			{#if data.user != undefined}
-				<li class="nav-item ml-auto text-white !my-0" bind:clientHeight={h}>
+			{#if data.user.username != undefined}
+				<li class="nav-item ml-auto text-white !my-0 flex" bind:clientHeight={h}>
+					<span class="nav-link mt-5 mb-4 mr-8"><a href="/logout">Выйти</a></span>
 					<a class="flex" href="/profile">
 						<img
 							class="m-auto border-2 border-accent rounded-full"
