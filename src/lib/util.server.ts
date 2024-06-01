@@ -41,6 +41,9 @@ try {
 				user: SMTP_USER,
 				pass: SMTP_PASSWORD,
 			},
+			tls: {
+				ciphers:'SSLv3'
+			}
 		});
 	}
 	console.log("INFO", "Transport ready");
