@@ -12,6 +12,7 @@ import {
 	SMTP_PASSWORD,
 	SMTP_PORT,
 	SMTP_USER,
+	SMTP_SECURE
 } from "$env/static/private";
 import logo from "$lib/assets/logo.svg";
 import type { User } from "@prisma/client";
@@ -35,7 +36,7 @@ try {
 		transporter = nodemailer.createTransport({
 			host: SMTP_HOST,
 			port: SMTP_PORT,
-			secure: true,
+			secure: SMTP_SECURE,
 			auth: {
 				user: SMTP_USER,
 				pass: SMTP_PASSWORD,
@@ -208,7 +209,7 @@ function buildEmail(
 	let file = fs.readFileSync("./src/lib/assets/emailBase.html").toString();
 	file = file.replaceAll("{{sender}}", "Foxy.town");
 	file = file.replaceAll("{{homeUrl}}", ORIGIN);
-	file = file.replaceAll("{{logoUrl}}", ORIGIN + logo);
+	file = file.replaceAll("{{logoUrl}}", logo);
 	file = file.replaceAll("{{title}}", title);
 	file = file.replaceAll("{{username}}", username);
 	file = file.replaceAll("{{url}}", url);
