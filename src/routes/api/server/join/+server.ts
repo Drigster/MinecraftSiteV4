@@ -68,5 +68,15 @@ export async function POST({ request }) {
 		},
 	});
 
-	return new Response("OK", { status: 200 });
+	const error = {
+		message: "OK",
+		code: 200,
+	};
+
+	return new Response(JSON.stringify(error), {
+		headers: {
+			"Content-Type": "application/json",
+		},
+		status: error.code,
+	});
 }
