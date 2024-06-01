@@ -50,14 +50,38 @@ export async function POST({ request }) {
 		});
 	}
 
-	await db.session.update({
+	const skinUrl = "https://" + request.headers.get("host") + "/api/skin/" + session.user.username;
+	let skin;
+	if (
+		session.user !== null &&
+		fs.existsSync("./files/skins/" + session.user.id.toString() + ".png")
+	) {
+		skin = fs.readFileSync("./files/skins/" + session.user.id.toString() + ".png");
+	} else {
+		skin = fs.readFileSync("./files/default.png");
+	}
+
+	const user: User = {
+		username: session.user.username,
+		uuid: session.user.uuid,
+		permissions: session.user.permissions,
+		roles: [session.user.role],
+		assets: {
+			SKIN: {
+				url: skinUrl,
+				digest: createHash("sha256").update(skin).digest("hex"),
+			},
+		},
+	};
+
+	db.user.update({
 		where: {
-			id: session.id,
+			id: session.user.id
 		},
 		data: {
-			serverId: requestData.serverId,
-		},
-	});
+			lastPlayed: new Date()
+		}
+	})
 
-	return new Response("OK", { status: 200 });
+	return json(user);
 }
