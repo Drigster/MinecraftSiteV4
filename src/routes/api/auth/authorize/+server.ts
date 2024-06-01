@@ -50,7 +50,7 @@ export async function POST({ request }) {
 			},
 			status: error.code,
 		});
-	} else if (!bcrypt.compareSync(requestData.password + user.uuid, user.password)) {
+	} else if (!bcrypt.compareSync(requestData.password + user.salt, user.password)) {
 		const error = {
 			error: "Пароль не верен!",
 			code: 403,
