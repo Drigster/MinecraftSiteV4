@@ -14,7 +14,6 @@ export async function POST({ request }) {
 	const requestData: Request = await request.json();
 	if (
 		requestData.username == undefined ||
-		requestData.uuid == undefined ||
 		requestData.accessToken == undefined ||
 		requestData.serverId == undefined
 	) {
@@ -37,8 +36,7 @@ export async function POST({ request }) {
 				username: {
 					equals: requestData.username,
 					mode: "insensitive",
-				},
-				uuid: requestData.uuid,
+				}
 			},
 			token: requestData.accessToken,
 		},
