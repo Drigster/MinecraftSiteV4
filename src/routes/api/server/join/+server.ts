@@ -69,7 +69,7 @@ export async function POST({ request }) {
 	) {
 		skin = fs.readFileSync("./files/skins/" + session.user.id.toString() + ".png");
 	} else {
-		skin = fs.readFileSync("./files/skins/default.png");
+		skin = fs.readFileSync("./files/default.png");
 	}
 
 	const user: User = {

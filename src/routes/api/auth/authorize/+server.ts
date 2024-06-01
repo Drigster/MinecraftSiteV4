@@ -69,7 +69,7 @@ export async function POST({ request }) {
 	if (user !== null && fs.existsSync("./files/skins/" + user.id.toString() + ".png")) {
 		skin = fs.readFileSync("./files/skins/" + user.id.toString() + ".png");
 	} else {
-		skin = fs.readFileSync("./files/skins/default.png");
+		skin = fs.readFileSync("./files/default.png");
 	}
 
 	const userObj: User = {
