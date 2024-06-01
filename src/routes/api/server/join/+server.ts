@@ -1,7 +1,4 @@
 import db from "$lib/db.js";
-import { json } from "@sveltejs/kit";
-import { createHash } from "crypto";
-import fs from "fs";
 
 interface Request {
 	username: string;
