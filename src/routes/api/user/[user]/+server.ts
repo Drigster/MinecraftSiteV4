@@ -2,6 +2,7 @@ import db from "$lib/db.js";
 import { json } from "@sveltejs/kit";
 import fs from "fs";
 import { createHash } from "crypto";
+import { ORIGIN } from "$env/static/private";
 
 export async function GET({ params, request }) {
 	params.user = params.user.replace(".png", "");
@@ -35,7 +36,7 @@ export async function GET({ params, request }) {
 		});
 	}
 
-	const skinUrl = "https://" + request.headers.get("host") + "/api/skin/" + user.username;
+	const skinUrl = ORIGIN + "/api/skin/" + user.username;
 	let skin;
 	if (fs.existsSync("./files/skins/" + user.id.toString() + ".png")) {
 		skin = fs.readFileSync("./files/skins/" + user.id.toString() + ".png");

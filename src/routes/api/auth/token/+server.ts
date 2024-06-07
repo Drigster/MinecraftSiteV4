@@ -1,3 +1,4 @@
+import { ORIGIN } from "$env/static/private";
 import db from "$lib/db.js";
 import { json } from "@sveltejs/kit";
 import { createHash } from "crypto";
@@ -71,7 +72,7 @@ export async function POST({ request }) {
 		},
 	});
 
-	const skinUrl = "https://" + request.headers.get("host") + "/api/skin/" + session.user.username;
+	const skinUrl = ORIGIN + "/api/skin/" + session.user.username;
 	let skin;
 	if (
 		session.user !== null &&
