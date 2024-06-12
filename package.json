@@ -12,7 +12,7 @@
 		"format": "npx prettier --write . && npx eslint . --fix",
 		"db": "mongod --config ./mongodb.conf",
 		"deploy": "npm run build && npx pm2 start ./build/index.js --name minecraftsitev4",
-		"update": "git pull && npm run deploy"
+		"update": "git pull && npm run build && npx pm2 restart minecraftsitev4 --update-env"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.3.0",
