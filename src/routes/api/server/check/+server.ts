@@ -78,7 +78,7 @@ export async function POST({ request }) {
 		},
 	};
 
-	db.user.update({
+	await db.user.update({
 		where: {
 			id: session.user.id
 		},
