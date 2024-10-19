@@ -36,11 +36,16 @@ export const actions = {
 			.where("id", "=", locals.user!.id)
 			.executeTakeFirstOrThrow();
 
-		sendVerificationEmail(user);
-
-		return setMessage(
-			form,
-			"Сообщение с подтверждением было отправлено повторно",
-		);
+		if (await sendVerificationEmail(user)) {
+			return setMessage(
+				form,
+				"Сообщение с подтверждением было отправлено повторно",
+			);
+		} else {
+			return setMessage(
+				form,
+				"Ошибка при отправке сообщения попробуйте позже",
+			);
+		}
 	},
 };

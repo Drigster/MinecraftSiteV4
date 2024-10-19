@@ -165,12 +165,17 @@ export const actions = {
 			.where("id", "=", locals.user!.id)
 			.executeTakeFirstOrThrow();
 
-		sendChangeEmailEmail(user);
-
-		return message(
-			form,
-			"На почту было отправлено сообщение с изменением почты!",
-		);
+		if (await sendChangeEmailEmail(user)) {
+			return message(
+				form,
+				"На почту было отправлено сообщение с изменением почты!",
+			);
+		} else {
+			return message(
+				form,
+				"Ошибка при отправке сообщения попробуйте позже",
+			);
+		}
 	},
 	changePassword: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(passwordChangeSchema));
@@ -185,12 +190,17 @@ export const actions = {
 			.where("id", "=", locals.user!.id)
 			.executeTakeFirstOrThrow();
 
-		sendChangePasswordEmail(user);
-
-		return message(
-			form,
-			"На почту было отправлено сообщение с изменением пароля!",
-		);
+		if (await sendChangePasswordEmail(user)) {
+			return message(
+				form,
+				"На почту было отправлено сообщение с изменением пароля!",
+			);
+		} else {
+			return message(
+				form,
+				"Ошибка при отправке сообщения попробуйте позже",
+			);
+		}
 	},
 	verifyEmail: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(emailVerifySchema));
@@ -205,11 +215,16 @@ export const actions = {
 			.where("id", "=", locals.user!.id)
 			.executeTakeFirstOrThrow();
 
-		sendVerificationEmail(user);
-
-		return message(
-			form,
-			"На почту было отправлено сообщение с подтверждением почты!",
-		);
+		if (await sendVerificationEmail(user)) {
+			return message(
+				form,
+				"На почту было отправлено сообщение с подтверждением почты!",
+			);
+		} else {
+			return message(
+				form,
+				"Ошибка при отправке сообщения попробуйте позже",
+			);
+		}
 	},
 };

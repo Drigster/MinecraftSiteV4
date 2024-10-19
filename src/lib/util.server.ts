@@ -221,13 +221,17 @@ export async function sendVerificationEmail(user: Selectable<User>) {
 		},
 	});
 
-	console.log(JSON.stringify(info));
-
 	if (dev) {
 		console.log(
 			"DEBUG",
 			"Preview URL: " + nodemailer.getTestMessageUrl(info),
 		);
+	}
+
+	if (info.accepted.length > 0) {
+		return true;
+	} else {
+		return false;
 	}
 }
 
@@ -254,13 +258,17 @@ export async function sendChangePasswordEmail(user: Selectable<User>) {
 		},
 	});
 
-	console.log(JSON.stringify(info));
-
 	if (dev) {
 		console.log(
 			"DEBUG",
 			"Preview URL: " + nodemailer.getTestMessageUrl(info),
 		);
+	}
+
+	if (info.accepted.length > 0) {
+		return true;
+	} else {
+		return false;
 	}
 }
 
@@ -287,13 +295,17 @@ export async function sendChangeEmailEmail(user: Selectable<User>) {
 		},
 	});
 
-	console.log(JSON.stringify(info));
-
 	if (dev) {
 		console.log(
 			"DEBUG",
 			"Preview URL: " + nodemailer.getTestMessageUrl(info),
 		);
+	}
+
+	if (info.accepted.length > 0) {
+		return true;
+	} else {
+		return false;
 	}
 }
 

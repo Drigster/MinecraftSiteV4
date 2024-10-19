@@ -36,11 +36,17 @@ export const actions = {
 			.executeTakeFirst();
 
 		if (user != null) {
-			await sendChangePasswordEmail(user);
-			return setMessage(
-				form,
-				"На почту было отпралено сообщение со сменой пароля!",
-			);
+			if (await sendChangePasswordEmail(user)) {
+				return setMessage(
+					form,
+					"На почту было отправлено сообщение с изменением пароля!",
+				);
+			} else {
+				return setMessage(
+					form,
+					"Ошибка при отправке сообщения попробуйте позже",
+				);
+			}
 		} else {
 			return setMessage(form, "Пользователь не найден!");
 		}
