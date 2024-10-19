@@ -6,6 +6,10 @@
 	const { form } = superForm(data.form);
 </script>
 
+<svelte:head>
+	<title>Админка | Foxy.town</title>
+</svelte:head>
+
 <div class="grid items-center">
 	<form method="post">
 		<label for="username">Username</label>

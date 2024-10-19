@@ -7,6 +7,11 @@
 	export let data: PageData;
 </script>
 
+<svelte:head>
+	<title>{$page.error?.message || $page.status || "Ошибка"} | Foxy.town</title
+	>
+</svelte:head>
+
 <Navbar user={data.user} />
 <main class="content-grid flex-grow">
 	<div class="center authForm contentBlock full-top min-w-96">

@@ -8,6 +8,10 @@
 	const { form, enhance, errors, message, delayed } = superForm(data.form);
 </script>
 
+<svelte:head>
+	<title>Изменение пароля | Foxy.town</title>
+</svelte:head>
+
 <div class="center authForm contentBlock full-top min-w-96">
 	<h2
 		class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"

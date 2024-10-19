@@ -8,6 +8,10 @@
 	const { enhance, message, delayed } = superForm(data.form);
 </script>
 
+<svelte:head>
+	<title>Подтверждение регистрации | Foxy.town</title>
+</svelte:head>
+
 <div class="center authForm contentBlock full-top max-w-xl">
 	<h2
 		class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"

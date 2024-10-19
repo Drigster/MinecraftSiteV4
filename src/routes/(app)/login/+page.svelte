@@ -8,6 +8,10 @@
 	const { form, enhance, errors, delayed } = superForm(data.form);
 </script>
 
+<svelte:head>
+	<title>Вход | Foxy.town</title>
+</svelte:head>
+
 <div class="center authForm contentBlock full-top min-w-96">
 	{#if data.user?.username != undefined}
 		<h2

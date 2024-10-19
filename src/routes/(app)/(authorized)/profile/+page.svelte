@@ -94,6 +94,10 @@
 	const capeChangefile = fileProxy(capeChangeForm, "cape");
 </script>
 
+<svelte:head>
+	<title>Профиль | Foxy.town</title>
+</svelte:head>
+
 <div class="profile">
 	<div class="flex gap-4">
 		<div class="contentBlock p-4 overflow-hidden w-1/4 flex flex-col">

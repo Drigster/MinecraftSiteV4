@@ -46,6 +46,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{days}:{hours}:{minutes}:{seconds} | Foxy.town</title>
+</svelte:head>
+
 <div class="timer">
 	<span class="countdown font-mono text-7xl">
 		<span id="days" style="--value:1;">{days}</span>:
