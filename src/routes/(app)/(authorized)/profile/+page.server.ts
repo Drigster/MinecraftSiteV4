@@ -4,14 +4,12 @@ import fs from "fs";
 import {
 	deleteCape,
 	deleteSkin,
-	getUser,
 	saveSkin,
 	sendChangeEmailEmail,
 	sendChangePasswordEmail,
 	sendVerificationEmail,
 } from "$lib/util.server.js";
-import { redirect } from "@sveltejs/kit";
-import db from "$lib/db";
+import { db } from "$lib/db";
 import {
 	capeRemoveSchema,
 	capeSchema,
@@ -23,8 +21,10 @@ import {
 	skinSchema,
 	usernameChangeSchema,
 } from "./schemas";
+import { lucia } from "$lib/server/auth";
+import { redirect } from "@sveltejs/kit";
 
-export const load = async ({ parent }) => {
+export const load = async ({ locals }) => {
 	const skinChangeForm = await superValidate(zod(skinSchema));
 	const capeChangeForm = await superValidate(zod(capeSchema));
 	const sessionRemoveForm = await superValidate(zod(sessionRemoveSchema));
@@ -35,8 +35,17 @@ export const load = async ({ parent }) => {
 	const passwordChangeForm = await superValidate(zod(passwordChangeSchema));
 	const emailVerifyForm = await superValidate(zod(emailVerifySchema));
 
-	const user = (await parent()).user;
-	const currentSession = (await parent()).currentSession;
+	const user = await db
+		.selectFrom("User")
+		.selectAll()
+		.where("id", "=", locals.user!.id)
+		.executeTakeFirstOrThrow();
+
+	const sessions = await db
+		.selectFrom("Session")
+		.selectAll()
+		.where("user_id", "=", locals.user!.id)
+		.execute();
 
 	return {
 		skinChangeForm,
@@ -49,162 +58,158 @@ export const load = async ({ parent }) => {
 		passwordChangeForm,
 		emailVerifyForm,
 		user,
-		currentSession,
+		sessions,
+		currentSession: locals.session!,
 	};
 };
 
 export const actions = {
-	changeSkin: async ({ request, cookies }) => {
-		const user = await getUser(cookies.get("sessionToken"));
-		if (user == null) {
-			return redirect(303, `/logout?redirectTo=/login`);
-		}
-
+	changeSkin: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(skinSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
-		await saveSkin(form.data.skin, user.id);
+		await saveSkin(form.data.skin, locals.user!.id);
 
 		return message(form, "Скин был изменён!");
 	},
-	changeCape: async ({ request, cookies }) => {
-		const user = await getUser(cookies.get("sessionToken"));
-		if (user == null) {
-			return redirect(303, `/logout?redirectTo=/login`);
-		}
-
+	changeCape: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(capeSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
+		if (!fs.existsSync("./files/capes/")) {
+			fs.mkdirSync("./files/capes/", { recursive: true });
+		}
 		fs.writeFileSync(
-			"./files/capes/" + user.id + ".png",
+			"./files/capes/" + locals.user!.id + ".png",
 			Buffer.from(await form.data.cape.arrayBuffer()),
 		);
 
 		return message(form, "Плащ был изменён!");
 	},
-	removeSession: async ({ request }) => {
+	removeSession: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(sessionRemoveSchema));
 
-		const token = form.data.token;
-		if (token != null) {
-			await db.session.delete({
-				where: {
-					token: token,
-				},
-			});
+		if (form.data.sessionId != null) {
+			await lucia.invalidateSession(form.data.sessionId);
+			if (form.data.sessionId == locals.session?.id) {
+				return redirect(302, "/login");
+			}
 		}
 
 		return message(form, "Сессия была удалена!");
 	},
-	deleteSkin: async ({ request, cookies }) => {
-		const user = await getUser(cookies.get("sessionToken"));
-		if (user == null) {
-			return redirect(303, `/logout?redirectTo=/login`);
-		}
-
+	deleteSkin: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(skinRemoveSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
-		deleteSkin(user.id);
+		deleteSkin(locals.user!.id);
 
 		return message(form, "Скин был удалён!");
 	},
-	deleteCape: async ({ request, cookies }) => {
-		const user = await getUser(cookies.get("sessionToken"));
-		if (user == null) {
-			return redirect(303, `/logout?redirectTo=/login`);
-		}
-
+	deleteCape: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(capeRemoveSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
-		deleteCape(user.id);
+		deleteCape(locals.user!.id);
 
 		return message(form, "Плащ был удалён!");
 	},
-	changeUsername: async ({ request, cookies }) => {
-		const user = await getUser(cookies.get("sessionToken"));
-		if (user == null) {
-			return redirect(303, `/logout?redirectTo=/login`);
-		}
-
+	changeUsername: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(usernameChangeSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
-		await db.user.update({
-			where: {
-				id: user.id,
-			},
-			data: {
+		await db
+			.updateTable("User")
+			.where("id", "=", locals.user!.id)
+			.set({
 				username: form.data.username,
-			},
-		});
+			})
+			.execute();
+
+		// .user.update({
+		// 	where: {
+		// 		id: user.id,
+		// 	},
+		// 	data: {
+		// 		username: form.data.username,
+		// 	},
+		// });
 
 		return message(form, "Никнейм был изменён!");
 	},
-	changeEmail: async ({ request, cookies }) => {
-		const user = await getUser(cookies.get("sessionToken"));
-		if (user == null) {
-			return redirect(303, `/logout?redirectTo=/login`);
-		}
-
+	changeEmail: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(emailChangeSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
+		const user = await db
+			.selectFrom("User")
+			.selectAll()
+			.where("id", "=", locals.user!.id)
+			.executeTakeFirstOrThrow();
+
 		sendChangeEmailEmail(user);
 
-		return message(form, "На почту было отправлено сообщение с изменением почты!");
+		return message(
+			form,
+			"На почту было отправлено сообщение с изменением почты!",
+		);
 	},
-	changePassword: async ({ request, cookies }) => {
-		const user = await getUser(cookies.get("sessionToken"));
-		if (user == null) {
-			return redirect(303, `/logout?redirectTo=/login`);
-		}
-
+	changePassword: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(passwordChangeSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
+		const user = await db
+			.selectFrom("User")
+			.selectAll()
+			.where("id", "=", locals.user!.id)
+			.executeTakeFirstOrThrow();
+
 		sendChangePasswordEmail(user);
 
-		return message(form, "На почту было отправлено сообщение с изменением пароля!");
+		return message(
+			form,
+			"На почту было отправлено сообщение с изменением пароля!",
+		);
 	},
-	verifyEmail: async ({ request, cookies }) => {
-		console.log(123);
-		const user = await getUser(cookies.get("sessionToken"));
-		if (user == null) {
-			return redirect(303, `/logout?redirectTo=/login`);
-		}
-
+	verifyEmail: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(emailVerifySchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
+		const user = await db
+			.selectFrom("User")
+			.selectAll()
+			.where("id", "=", locals.user!.id)
+			.executeTakeFirstOrThrow();
+
 		sendVerificationEmail(user);
 
-		return message(form, "На почту было отправлено сообщение с подтверждением почты!");
+		return message(
+			form,
+			"На почту было отправлено сообщение с подтверждением почты!",
+		);
 	},
 };

@@ -1,12 +1,12 @@
-interface UserSession {
+export type LauncherUserSession = {
 	id: number | string;
 	accessToken: string;
 	refreshToken: string;
 	expire: number;
-	user: User;
-}
+	user: LauncherUser;
+};
 
-interface User {
+export type LauncherUser = {
 	username: string;
 	uuid: string;
 	permissions: string[];
@@ -24,4 +24,4 @@ interface User {
 			digest: string;
 		};
 	};
-}
+};

@@ -1,21 +1,24 @@
-<script>
+<script lang="ts">
 	import { goto } from "$app/navigation";
-	import { redirect } from "@sveltejs/kit";
 	import { DateTime } from "luxon";
-	import { Interval } from "luxon";
 	import { onMount } from "svelte";
 
-	let days;
-	let hours;
-	let minutes;
-	let seconds;
+	let days: number;
+	let hours: number;
+	let minutes: number;
+	let seconds: number;
 
 	let target = DateTime.now()
 		.setLocale("ru")
 		.setZone("Europe/Tallinn")
 		.set({ year: 2024, month: 6, day: 1, hour: 12, minute: 0, second: 0 });
 
-	let interval = target.diff(DateTime.now(), ["days", "hours", "minutes", "seconds"]).toObject();
+	let interval = target.diff(DateTime.now(), [
+		"days",
+		"hours",
+		"minutes",
+		"seconds",
+	]);
 
 	days = Math.floor(interval.days);
 	hours = Math.floor(interval.hours);
@@ -23,10 +26,13 @@
 	seconds = Math.floor(interval.seconds);
 
 	onMount(() => {
-		var x = setInterval(function () {
-			let interval = target
-				.diff(DateTime.now(), ["days", "hours", "minutes", "seconds"])
-				.toObject();
+		setInterval(function () {
+			let interval = target.diff(DateTime.now(), [
+				"days",
+				"hours",
+				"minutes",
+				"seconds",
+			]);
 
 			days = Math.floor(interval.days);
 			hours = Math.floor(interval.hours);

@@ -9,24 +9,35 @@
 </script>
 
 <div class="center authForm contentBlock full-top min-w-96">
-	<h2 class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold">
+	<h2
+		class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
+	>
 		Восстановление пароля
 	</h2>
 
 	{#if $message}
 		<div class="text-center">
 			<p class="mb-8">{$message}</p>
-			<a href="/"><button class="!p-2 !text-base">Вернутся на главную</button></a>
+			<a href="/"
+				><button class="!p-2 !text-base">Вернутся на главную</button></a
+			>
 		</div>
 	{:else}
-		<form method="POST" use:enhance>
+		<form method="post" use:enhance>
 			<div>
 				<div class="inputBox">
-					<input type="text" name="login" bind:value={$form.login} required />
+					<input
+						type="text"
+						name="login"
+						bind:value={$form.login}
+						required
+					/>
 					<label for="login">Логин</label>
 				</div>
 				{#if $errors.login}
-					<span class="errorMessage">{$errors.login} {$errors.login}</span>
+					<span class="errorMessage"
+						>{$errors.login} {$errors.login}</span
+					>
 				{/if}
 			</div>
 

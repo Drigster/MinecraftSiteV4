@@ -9,12 +9,21 @@
 </script>
 
 <div class="center authForm contentBlock full-top min-w-96">
-	<h2 class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold">Регистрация</h2>
+	<h2
+		class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
+	>
+		Регистрация
+	</h2>
 
-	<form method="POST" use:enhance>
+	<form method="post" use:enhance>
 		<div>
 			<div class="inputBox">
-				<input type="text" name="username" bind:value={$form.username} required />
+				<input
+					type="text"
+					name="username"
+					bind:value={$form.username}
+					required
+				/>
 				<label for="username">Никнейм</label>
 			</div>
 			{#if $errors.username}
@@ -24,7 +33,12 @@
 
 		<div>
 			<div class="inputBox">
-				<input type="email" name="email" bind:value={$form.email} required />
+				<input
+					type="email"
+					name="email"
+					bind:value={$form.email}
+					required
+				/>
 				<label for="email">Почта</label>
 			</div>
 			{#if $errors.email}
@@ -34,15 +48,27 @@
 
 		<div>
 			<div class="inputBox">
-				<input type="password" name="password" bind:value={$form.password} required />
+				<input
+					type="password"
+					name="password"
+					bind:value={$form.password}
+					required
+				/>
 				<label for="password">Пароль</label>
 			</div>
 			<div class="inputBox pt-2">
-				<input type="password" name="password2" bind:value={$form.password2} required />
+				<input
+					type="password"
+					name="password2"
+					bind:value={$form.password2}
+					required
+				/>
 				<label for="password2">Повторить пароль</label>
 			</div>
 			{#if $errors.password || $errors.password2}
-				<span class="errorMessage">{$errors.password}{$errors.password2}</span>
+				<span class="errorMessage"
+					>{$errors.password}{$errors.password2}</span
+				>
 			{/if}
 		</div>
 

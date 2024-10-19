@@ -19,7 +19,10 @@ export const skinSchema = z.object({
 export const capeSchema = z.object({
 	cape: z
 		.instanceof(File, { message: "Please upload a file." })
-		.refine((f) => f.type == "image/png", "Файл должен быть в PNG формате."),
+		.refine(
+			(f) => f.type == "image/png",
+			"Файл должен быть в PNG формате.",
+		),
 });
 
 export const skinRemoveSchema = z.object({
@@ -31,7 +34,7 @@ export const capeRemoveSchema = z.object({
 });
 
 export const sessionRemoveSchema = z.object({
-	token: z.string(),
+	sessionId: z.string(),
 });
 
 export const usernameChangeSchema = z.object({

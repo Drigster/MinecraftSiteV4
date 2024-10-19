@@ -7,7 +7,7 @@
 </script>
 
 <div class="grid items-center">
-	<form method="POST">
+	<form method="post">
 		<label for="username">Username</label>
 		<input type="text" name="username" bind:value={$form.username} />
 

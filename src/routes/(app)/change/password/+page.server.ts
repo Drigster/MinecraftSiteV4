@@ -2,8 +2,9 @@ import { setMessage, superValidate } from "sveltekit-superforms";
 import { fail } from "@sveltejs/kit";
 import { zod } from "sveltekit-superforms/adapters";
 import { z } from "zod";
-import db from "$lib/db.js";
+
 import { sendChangePasswordEmail } from "$lib/util.server.js";
+import { db } from "$lib/db";
 
 const schema = z.object({
 	login: z.string().min(1, "Логин не может быть пустым"),
@@ -23,28 +24,23 @@ export const actions = {
 			return fail(400, { form });
 		}
 
-		const user = await db.user.findFirst({
-			where: {
-				OR: [
-					{
-						username: {
-							equals: form.data.login,
-							mode: "insensitive",
-						},
-					},
-					{
-						email: {
-							equals: form.data.login,
-							mode: "insensitive",
-						},
-					},
-				],
-			},
-		});
+		const user = await db
+			.selectFrom("User")
+			.selectAll()
+			.where((eb) =>
+				eb.or([
+					eb("username", "=", form.data.login),
+					eb("email", "=", form.data.login),
+				]),
+			)
+			.executeTakeFirst();
 
 		if (user != null) {
 			await sendChangePasswordEmail(user);
-			return setMessage(form, "На почту было отпралено сообщение со сменой пароля!");
+			return setMessage(
+				form,
+				"На почту было отпралено сообщение со сменой пароля!",
+			);
 		} else {
 			return setMessage(form, "Пользователь не найден!");
 		}

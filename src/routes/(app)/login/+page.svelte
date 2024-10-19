@@ -5,24 +5,35 @@
 
 	export let data: PageData;
 
-	const { form, enhance, errors, message, delayed } = superForm(data.form);
+	const { form, enhance, errors, delayed } = superForm(data.form);
 </script>
 
 <div class="center authForm contentBlock full-top min-w-96">
 	{#if data.user?.username != undefined}
-		<h2 class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold">
+		<h2
+			class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
+		>
 			Вы уже залогинены
 		</h2>
 		<div class="flex justify-between px-4">
 			<a href="/profile">В профиль</a> <a href="/logout">Выйти</a>
 		</div>
 	{:else}
-		<h2 class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold">Вход</h2>
+		<h2
+			class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
+		>
+			Вход
+		</h2>
 
-		<form method="POST" use:enhance>
+		<form method="post" use:enhance>
 			<div>
 				<div class="inputBox">
-					<input type="text" name="login" bind:value={$form.login} required />
+					<input
+						type="text"
+						name="login"
+						bind:value={$form.login}
+						required
+					/>
 					<label for="login">Логин</label>
 				</div>
 				{#if $errors.login}
@@ -32,7 +43,12 @@
 
 			<div>
 				<div class="inputBox">
-					<input type="password" name="password" bind:value={$form.password} required />
+					<input
+						type="password"
+						name="password"
+						bind:value={$form.password}
+						required
+					/>
 					<label for="password">Пароль</label>
 				</div>
 				{#if $errors.password}
@@ -41,8 +57,9 @@
 			</div>
 
 			<div class="flex justify-between">
-				<a href="/recovery">Забыл пароль</a><a class="text-accent" href="/register"
-					>Регистрация</a
+				<a href="/recovery">Забыл пароль</a><a
+					class="text-accent"
+					href="/register">Регистрация</a
 				>
 			</div>
 

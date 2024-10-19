@@ -1,11 +1,10 @@
-import { ORIGIN } from "$env/static/private";
-import db from "$lib/db.js";
-import { generateToken } from "$lib/util.server";
+import { db } from "$lib/db";
+import {
+	createLauncherUserSession,
+	createLuciaSession,
+} from "$lib/util.server.js";
 import { json } from "@sveltejs/kit";
 import bcrypt from "bcrypt";
-import { createHash } from "crypto";
-import fs from "fs";
-import { DateTime, Interval } from "luxon";
 
 interface Request {
 	login: string;
@@ -29,16 +28,13 @@ export async function POST({ request }) {
 		});
 	}
 
-	const user = await db.user.findFirst({
-		where: {
-			username: {
-				equals: requestData.login,
-				mode: "insensitive",
-			},
-		},
-	});
+	const user = await db
+		.selectFrom("User")
+		.selectAll()
+		.where("username", "=", requestData.login)
+		.executeTakeFirst();
 
-	if (user == null) {
+	if (user == undefined) {
 		const error = {
 			error: "Пользователь не найден!",
 			code: 404,
@@ -50,7 +46,9 @@ export async function POST({ request }) {
 			},
 			status: error.code,
 		});
-	} else if (!bcrypt.compareSync(requestData.password + user.salt, user.password)) {
+	} else if (
+		!bcrypt.compareSync(requestData.password + user.salt, user.password)
+	) {
 		const error = {
 			error: "Пароль не верен!",
 			code: 403,
@@ -64,56 +62,12 @@ export async function POST({ request }) {
 		});
 	}
 
-	const skinUrl = ORIGIN + "/api/skin/" + user.username;
-	let skin;
-	if (user !== null && fs.existsSync("./files/skins/" + user.id.toString() + ".png")) {
-		skin = fs.readFileSync("./files/skins/" + user.id.toString() + ".png");
-	} else {
-		skin = fs.readFileSync("./files/default.png");
-	}
+	const session = await createLuciaSession(
+		request.headers.get("X-Real-IP"),
+		user.id,
+		request.headers.get("User-Agent")!,
+		"LAUNCHER",
+	);
 
-	const userObj: User = {
-		username: user.username,
-		uuid: user.uuid,
-		permissions: user.permissions,
-		roles: [user.role],
-		assets: {
-			SKIN: {
-				url: skinUrl,
-				digest: createHash("sha256").update(skin).digest("hex"),
-			},
-		},
-	};
-
-	await db.session.deleteMany({
-		where: {
-			userId: user.id,
-			expiresAt: {
-				lte: new Date(),
-			},
-		},
-	});
-
-	const session = await db.session.create({
-		data: {
-			token: generateToken(),
-			refreshToken: generateToken(),
-			expiresAt: DateTime.now().plus({ week: 1 }).toJSDate(),
-			userId: user.id,
-			name: "Launcher",
-			ip: "–",
-		},
-	});
-
-	const userSession: UserSession = {
-		id: session.id,
-		accessToken: session.token,
-		refreshToken: session.refreshToken,
-		expire: Math.floor(
-			Interval.fromDateTimes(DateTime.now(), session.expiresAt).length("seconds"),
-		),
-		user: userObj,
-	};
-
-	return json(userSession);
+	return json(createLauncherUserSession(session, user));
 }

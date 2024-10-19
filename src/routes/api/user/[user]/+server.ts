@@ -1,26 +1,18 @@
-import db from "$lib/db.js";
+import { db } from "$lib/db";
 import { json } from "@sveltejs/kit";
-import fs from "fs";
-import { createHash } from "crypto";
-import { ORIGIN } from "$env/static/private";
+import { createLauncherUser } from "$lib/util.server.js";
 
-export async function GET({ params, request }) {
-	params.user = params.user.replace(".png", "");
-	const user = await db.user.findFirst({
-		where: {
-			OR: [
-				{
-					username: {
-						equals: params.user,
-						mode: "insensitive",
-					},
-				},
-				{
-					uuid: params.user,
-				},
-			],
-		},
-	});
+export async function GET({ params }) {
+	const user = await db
+		.selectFrom("User")
+		.selectAll()
+		.where((eb) =>
+			eb.or([
+				eb("username", "=", params.user),
+				eb("uuid", "=", params.user),
+			]),
+		)
+		.executeTakeFirst();
 
 	if (user == null) {
 		const error = {
@@ -36,26 +28,5 @@ export async function GET({ params, request }) {
 		});
 	}
 
-	const skinUrl = ORIGIN + "/api/skin/" + user.username;
-	let skin;
-	if (fs.existsSync("./files/skins/" + user.id.toString() + ".png")) {
-		skin = fs.readFileSync("./files/skins/" + user.id.toString() + ".png");
-	} else {
-		skin = fs.readFileSync("./files/default.png");
-	}
-
-	const userObj: User = {
-		username: user.username,
-		uuid: user.uuid,
-		permissions: user.permissions,
-		roles: [user.role],
-		assets: {
-			SKIN: {
-				url: skinUrl,
-				digest: createHash("sha256").update(skin).digest("hex"),
-			},
-		},
-	};
-
-	return json(userObj);
+	return json(createLauncherUser(user));
 }

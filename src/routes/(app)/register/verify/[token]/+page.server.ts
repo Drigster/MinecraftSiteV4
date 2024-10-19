@@ -1,16 +1,15 @@
 import { JWT_SECRET } from "$env/static/private";
-import db from "$lib/db";
+import { db } from "$lib/db";
 import jwt from "jsonwebtoken";
 
 export const load = async ({ params }) => {
-	let token;
 	try {
-		token = jwt.verify(params.token, JWT_SECRET) as jwt.JwtPayload;
-		const user = await db.user.findUnique({
-			where: {
-				email: token.email,
-			},
-		});
+		const token = jwt.verify(params.token, JWT_SECRET) as jwt.JwtPayload;
+		const user = await db
+			.selectFrom("User")
+			.select(["id", "verified"])
+			.where("email", "=", token.email)
+			.executeTakeFirst();
 
 		if (user == null) {
 			return { message: "Пользователь не найден!" };
@@ -20,17 +19,16 @@ export const load = async ({ params }) => {
 			return { message: "Почта уже подтверждена!" };
 		}
 
-		await db.user.update({
-			where: {
-				id: user.id,
-			},
-			data: {
+		await db
+			.updateTable("User")
+			.where("id", "=", user.id)
+			.set({
 				verified: true,
-			},
-		});
+			})
+			.execute();
 
 		return { message: "Почта успешно подтверждена!" };
-	} catch (error) {
+	} catch {
 		return { message: "Время запроса истекло!" };
 	}
 };

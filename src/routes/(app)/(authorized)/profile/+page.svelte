@@ -2,8 +2,7 @@
 	import { DateTime } from "luxon";
 	import { fileProxy, superForm } from "sveltekit-superforms";
 	import Skinview3d from "svelte-skinview3d";
-	import { Icon } from "@steeze-ui/svelte-icon";
-	import { Trash, XMark, Check } from "@steeze-ui/heroicons";
+	import { Trash, XMark, Check } from "@o7/icon/heroicons";
 	import spiner from "$lib/assets/spiner.svg";
 
 	export let data;
@@ -17,19 +16,15 @@
 		resetForm: true,
 	});
 
-	const { enhance: skinRemoveEnhance, delayed: skinRemoveDelayed } = superForm(
-		data.skinRemoveForm,
-		{
+	const { enhance: skinRemoveEnhance, delayed: skinRemoveDelayed } =
+		superForm(data.skinRemoveForm, {
 			resetForm: true,
-		},
-	);
+		});
 
-	const { enhance: capeRemoveEnhance, delayed: capeRemoveDelayed } = superForm(
-		data.capeRemoveForm,
-		{
+	const { enhance: capeRemoveEnhance, delayed: capeRemoveDelayed } =
+		superForm(data.capeRemoveForm, {
 			resetForm: true,
-		},
-	);
+		});
 
 	const {
 		enhance: emailChangeEnhance,
@@ -107,7 +102,8 @@
 					<div class="w-full aspect-square">
 						<img
 							class="h-full w-auto m-auto"
-							src="/api/skin/body/{data.user.username}?{Date.now()}"
+							src="/api/skin/body/{data.user
+								.username}?{Date.now()}"
 							alt=""
 							width="128"
 							height="256"
@@ -119,17 +115,22 @@
 					width={w}
 					height={w}
 					skinUrl="/api/skin/{data.user.username}?{Date.now()}"
+					capeUrl="/api/cape/{data.user.username}?{Date.now()}"
 				/>
 			</div>
 			{#if skinEditing}
 				<form
 					class="inline-change-form skin-buttons mb-1"
 					action="?/changeSkin"
-					method="POST"
+					method="post"
 					enctype="multipart/form-data"
 					use:skinChangeEnhance
 				>
-					<button type="submit" disabled style="display: none" aria-hidden="true"
+					<button
+						type="submit"
+						disabled
+						style="display: none"
+						aria-hidden="true"
 					></button>
 					<input
 						class="w-full button"
@@ -140,7 +141,11 @@
 					/>
 					<div>
 						{#if $skinChangeDelayed}
-							<button class="change-icon-button" type="submit" disabled>
+							<button
+								class="change-icon-button"
+								type="submit"
+								disabled
+							>
 								<img
 									class="h-full w-full"
 									width="20"
@@ -151,7 +156,7 @@
 							</button>
 						{:else}
 							<button class="change-icon-button" type="submit">
-								<Icon class="h-full w-full" size="20" src={Check} theme="solid" />
+								<Check class="h-full w-full" size="20" />
 							</button>
 						{/if}
 						<button
@@ -160,12 +165,8 @@
 							on:click={() => {
 								skinEditing = false;
 							}}
-							><Icon
-								class="h-full w-full"
-								size="20"
-								src={XMark}
-								theme="solid"
-							/></button
+						>
+							<XMark class="h-full w-full" size="20" /></button
 						>
 					</div>
 				</form>
@@ -177,7 +178,11 @@
 							skinEditing = true;
 						}}>Изменить скин</button
 					>
-					<form method="POST" action="?/deleteSkin" use:skinRemoveEnhance>
+					<form
+						method="post"
+						action="?/deleteSkin"
+						use:skinRemoveEnhance
+					>
 						<input type="hidden" name="skinRemove" value="remove" />
 						<button class="button aspect-square h-full">
 							{#if $skinRemoveDelayed}
@@ -189,7 +194,7 @@
 									alt="Spiner icon"
 								/>
 							{:else}
-								<Icon class="h-full w-full" size="20" src={Trash} theme="solid" />
+								<Trash class="m-auto" size="20" />
 							{/if}
 						</button>
 					</form>
@@ -205,11 +210,15 @@
 				<form
 					class="inline-change-form skin-buttons mb-1"
 					action="?/changeCape"
-					method="POST"
+					method="post"
 					enctype="multipart/form-data"
 					use:capeChangeEnhance
 				>
-					<button type="submit" disabled style="display: none" aria-hidden="true"
+					<button
+						type="submit"
+						disabled
+						style="display: none"
+						aria-hidden="true"
 					></button>
 					<input
 						class="w-full button"
@@ -220,7 +229,11 @@
 					/>
 					<div>
 						{#if $capeChangeDelayed}
-							<button class="change-icon-button" type="submit" disabled>
+							<button
+								class="change-icon-button"
+								type="submit"
+								disabled
+							>
 								<img
 									class="h-full w-full"
 									width="20"
@@ -231,7 +244,7 @@
 							</button>
 						{:else}
 							<button class="change-icon-button" type="submit">
-								<Icon class="h-full w-full" size="20" src={Check} theme="solid" />
+								<Check class="h-full w-full" size="20" />
 							</button>
 						{/if}
 						<button
@@ -240,13 +253,9 @@
 							on:click={() => {
 								capeEditing = false;
 							}}
-							><Icon
-								class="h-full w-full"
-								size="20"
-								src={XMark}
-								theme="solid"
-							/></button
 						>
+							<XMark class="h-full w-full" size="20" />
+						</button>
 					</div>
 				</form>
 			{:else}
@@ -257,7 +266,11 @@
 							capeEditing = true;
 						}}>Изменить плащ</button
 					>
-					<form method="POST" action="?/deleteCape" use:capeRemoveEnhance>
+					<form
+						method="post"
+						action="?/deleteCape"
+						use:capeRemoveEnhance
+					>
 						<input type="hidden" name="capeRemove" value="remove" />
 						<button class="button aspect-square h-full">
 							{#if $capeRemoveDelayed}
@@ -269,7 +282,7 @@
 									alt="Spiner icon"
 								/>
 							{:else}
-								<Icon class="h-full w-full" size="20" src={Trash} theme="solid" />
+								<Trash class="m-auto" size="20" />
 							{/if}
 						</button>
 					</form>
@@ -290,14 +303,26 @@
 						<form
 							class="inline-change-form"
 							action="?/changeUsername"
-							method="POST"
+							method="post"
 							use:usernameChangeEnhance
 						>
-							<button type="submit" disabled style="display: none" aria-hidden="true"
+							<button
+								type="submit"
+								disabled
+								style="display: none"
+								aria-hidden="true"
 							></button>
-							<input type="text" name="username" value={data.user.username} />
+							<input
+								type="text"
+								name="username"
+								value={data.user.username}
+							/>
 							{#if $usernameChangeDelayed}
-								<button class="change-icon-button" type="submit" disabled>
+								<button
+									class="change-icon-button"
+									type="submit"
+									disabled
+								>
 									<img
 										class="h-full w-full"
 										width="20"
@@ -307,13 +332,11 @@
 									/>
 								</button>
 							{:else}
-								<button class="change-icon-button" type="submit">
-									<Icon
-										class="h-full w-full"
-										size="20"
-										src={Check}
-										theme="solid"
-									/>
+								<button
+									class="change-icon-button"
+									type="submit"
+								>
+									<Check class="h-full w-full" size="20" />
 								</button>
 							{/if}
 							<button
@@ -322,13 +345,9 @@
 								on:click={() => {
 									usernameEditing = false;
 								}}
-								><Icon
-									class="h-full w-full"
-									size="20"
-									src={XMark}
-									theme="solid"
-								/></button
 							>
+								<XMark class="h-full w-full" size="20" />
+							</button>
 						</form>
 					{:else}
 						<span>
@@ -358,8 +377,16 @@
 					<span>
 						{data.user.email}
 					</span>
-					<form method="POST" action="?/changeEmail" use:emailChangeEnhance>
-						<input type="hidden" name="changeEmail" value="changeEmail" />
+					<form
+						method="post"
+						action="?/changeEmail"
+						use:emailChangeEnhance
+					>
+						<input
+							type="hidden"
+							name="changeEmail"
+							value="changeEmail"
+						/>
 						<button class="change-button">
 							{#if $emailChangeDelayed}
 								<span class="relative">
@@ -379,7 +406,9 @@
 					</form>
 				</span>
 				{#if $emailChangeErrors.changeEmail}
-					<span class="errorMessage">{$emailChangeErrors.changeEmail}</span>
+					<span class="errorMessage"
+						>{$emailChangeErrors.changeEmail}</span
+					>
 				{/if}
 				{#if $emailChangeMessage}
 					<span class="notifyMessage">{$emailChangeMessage}</span>
@@ -389,8 +418,16 @@
 				<span>Пароль</span>
 				<span class="flex gap-1 relative">
 					<span> ●●●●●●●● </span>
-					<form method="POST" action="?/changePassword" use:passwordChangeEnhance>
-						<input type="hidden" name="changePassword" value="changePassword" />
+					<form
+						method="post"
+						action="?/changePassword"
+						use:passwordChangeEnhance
+					>
+						<input
+							type="hidden"
+							name="changePassword"
+							value="changePassword"
+						/>
 						<button class="change-button">
 							{#if $passwordChangeDelayed}
 								<span class="relative">
@@ -410,7 +447,9 @@
 					</form>
 				</span>
 				{#if $passwordChangeErrors.changePassword}
-					<span class="errorMessage">{$passwordChangeErrors.changePassword}</span>
+					<span class="errorMessage"
+						>{$passwordChangeErrors.changePassword}</span
+					>
 				{/if}
 				{#if $passwordChangeMessage}
 					<span class="notifyMessage">{$passwordChangeMessage}</span>
@@ -423,8 +462,16 @@
 						<span class="text-[#26c90a]"> Верифицирован </span>
 					{:else}
 						<span class="text-[#e5e106]"> Не верифицирован </span>
-						<form method="POST" action="?/verifyEmail" use:emailVerifyEnhance>
-							<input type="hidden" name="verifyEmail" value="verifyEmail" />
+						<form
+							method="post"
+							action="?/verifyEmail"
+							use:emailVerifyEnhance
+						>
+							<input
+								type="hidden"
+								name="verifyEmail"
+								value="verifyEmail"
+							/>
 							<button class="change-button">
 								{#if $emailVerifyDelayed}
 									<span class="relative">
@@ -445,7 +492,9 @@
 					{/if}
 				</span>
 				{#if $emailVerifyErrors.verifyEmail}
-					<span class="errorMessage">{$emailVerifyErrors.verifyEmail}</span>
+					<span class="errorMessage"
+						>{$emailVerifyErrors.verifyEmail}</span
+					>
 				{/if}
 				{#if $emailVerifyMessage}
 					<span class="notifyMessage">{$emailVerifyMessage}</span>
@@ -454,7 +503,7 @@
 			<div>
 				<span>Дата регистрации</span>
 				<span
-					>{DateTime.fromJSDate(data.user.regDate)
+					>{DateTime.fromSQL(data.user.regDate)
 						.setLocale("ru")
 						.toLocaleString({})}</span
 				>
@@ -463,9 +512,11 @@
 				<span>Последняя активность</span>
 				<span>
 					{#if data.user.lastPlayed}
-						{DateTime.fromJSDate(data.user.lastPlayed).setLocale("ru").toLocaleString()}
+						{DateTime.fromSQL(data.user.lastPlayed)
+							.setLocale("ru")
+							.toLocaleString()}
 					{:else}
-						Отсуцтвует
+						Отсутствует
 					{/if}
 				</span>
 			</div>
@@ -478,30 +529,34 @@
 				Сессии автоматически удаляются после месяца неактивности.
 			</h2>
 		</div>
-		<form method="POST" use:sessionRemoveEnhance>
+		<form method="post" use:sessionRemoveEnhance>
 			<ul class="sessionList">
-				{#each data.user.sessions as session, i}
-					<li class={data.currentSession == session.token ? "" : ""}>
-						<span>{session.name}</span>
-						<span class="text-center">{session.ip}</span>
+				{#each data.sessions as session}
+					<li>
+						<span>{session.type}</span>
+						<span class="text-center">{session.device}</span>
+						<span class="text-center">{session.location}</span>
 						<span>
-							{#if data.currentSession == session.token}
+							{#if data.currentSession?.id == session.id}
 								<span class="text-accent"> Текущая </span>
 							{:else}
-								{DateTime.fromJSDate(session.lastLogin)
+								{DateTime.fromSQL(session.last_login)
 									.setLocale("ru")
 									.toRelativeCalendar()}
 							{/if}</span
 						>
-						{#if $sessionRemoveDelayed && $sessionRemoveFormId == session.token}
-							<button class="button"><img src={spiner} alt="Spiner icon" /></button>
+						{#if $sessionRemoveDelayed && $sessionRemoveFormId == session.id}
+							<button class="button"
+								><img src={spiner} alt="Spiner icon" /></button
+							>
 						{:else}
 							<button
 								class="ml-auto"
 								formaction="?/removeSession"
-								name="token"
-								value={session.token}
-								on:click={() => ($sessionRemoveFormId = session.token)}
+								name="sessionId"
+								value={session.id}
+								on:click={() =>
+									($sessionRemoveFormId = session.id)}
 							>
 								Удалить
 							</button>
@@ -520,7 +575,7 @@
 
 	.sessionList {
 		display: grid;
-		grid-template-columns: repeat(3, max-content) 1fr;
+		grid-template-columns: repeat(4, max-content) 1fr;
 		max-height: 40svh;
 		max-height: 40vh;
 		overflow: auto;
@@ -528,7 +583,7 @@
 	}
 
 	.sessionList li {
-		grid-column: span 4;
+		grid-column: span 5;
 		display: grid;
 		grid-template-columns: subgrid;
 		gap: 2rem;

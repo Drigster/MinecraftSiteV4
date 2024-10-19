@@ -1,31 +1,30 @@
-import db from "$lib/db.js";
+import { db } from "$lib/db";
 import fs from "fs";
+import defaultBody from "$lib/assets/default_body.png?hex";
 
 export async function GET({ params }) {
 	params.user = params.user.replace(".png", "");
 
-	const user = await db.user.findFirst({
-		where: {
-			OR: [
-				{
-					username: {
-						equals: params.user,
-						mode: "insensitive",
-					},
-				},
-				{
-					uuid: params.user,
-				},
-			],
-		},
-	});
+	const user = await db
+		.selectFrom("User")
+		.select("id")
+		.where((eb) =>
+			eb.or([
+				eb("username", "=", params.user),
+				eb("uuid", "=", params.user),
+			]),
+		)
+		.executeTakeFirst();
 
 	let skin;
 
-	if (user !== null && fs.existsSync("./files/skins/" + user.id.toString() + "_body.png")) {
-		skin = fs.readFileSync("./files/skins/" + user.id.toString() + "_body.png");
+	if (
+		user !== undefined &&
+		fs.existsSync("./files/skins/" + user.id + "_body.png")
+	) {
+		skin = fs.readFileSync("./files/skins/" + user.id + "_body.png");
 	} else {
-		skin = fs.readFileSync("./files/default_body.png");
+		skin = Buffer.from(defaultBody, "hex");
 	}
 
 	return new Response(skin, {

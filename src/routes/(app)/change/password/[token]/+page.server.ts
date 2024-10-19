@@ -3,7 +3,7 @@ import { fail } from "@sveltejs/kit";
 import { zod } from "sveltekit-superforms/adapters";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import db from "$lib/db.js";
+import { db } from "$lib/db";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "$env/static/private";
 
@@ -18,16 +18,15 @@ export const load = async ({ params }) => {
 	let token;
 	try {
 		token = jwt.verify(params.token, JWT_SECRET) as jwt.JwtPayload;
-	} catch (error) {
+	} catch {
 		setMessage(form, "Время запроса истекло!");
 	}
 
 	if (token != undefined) {
-		const user = await db.user.findUnique({
-			where: {
-				email: token.email,
-			},
-		});
+		const user = await db
+			.selectFrom("User")
+			.where("email", "=", token.email)
+			.executeTakeFirst();
 
 		if (user == null) {
 			setMessage(form, "Пользователь не найден!");
@@ -50,18 +49,15 @@ export const actions = {
 			token = jwt.verify(params.token, JWT_SECRET, {
 				ignoreExpiration: true,
 			}) as jwt.JwtPayload;
-		} catch (error) {
+		} catch {
 			return setMessage(form, "Время запроса истекло!");
 		}
 
-		let user = await db.user.findFirst({
-			where: {
-				email: {
-					equals: token.email,
-					mode: "insensitive",
-				},
-			},
-		});
+		const user = await db
+			.selectFrom("User")
+			.select(["id", "uuid"])
+			.where("email", "=", token.email)
+			.executeTakeFirst();
 
 		if (user == null) {
 			return setMessage(form, "Token is invalid");
@@ -71,22 +67,20 @@ export const actions = {
 			return setError(form, "password", "Пароли не совпадают!");
 		}
 
-		user = await db.user.update({
-			where: {
-				id: user.id,
-			},
-			data: {
+		await db
+			.updateTable("User")
+			.where("id", "=", user.id)
+			.set({
 				salted: true,
 				salt: user.uuid.replaceAll("-", ""),
-				password: bcrypt.hashSync(form.data.password + user.uuid.replaceAll("-", ""), 12),
-			},
-		});
+				password: bcrypt.hashSync(
+					form.data.password + user.uuid.replaceAll("-", ""),
+					12,
+				),
+			})
+			.execute();
 
-		await db.session.deleteMany({
-			where: {
-				userId: user.id,
-			},
-		});
+		await db.deleteFrom("Session").where("user_id", "=", user.id).execute();
 
 		return setMessage(form, "Пароль успешно изменён!");
 	},

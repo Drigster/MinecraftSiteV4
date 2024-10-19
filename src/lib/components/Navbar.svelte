@@ -1,9 +1,10 @@
 <script lang="ts">
 	import logo from "$lib/assets/logo.svg";
+	import type { User } from "lucia/dist/core";
 
-	let h;
+	let h = $state(0);
 
-	export let data;
+	let { user }: { user: User | null } = $props();
 </script>
 
 <header class="fixed w-full">
@@ -18,22 +19,29 @@
 			<li class="nav-item rainbow">
 				<a class="nav-link" href="/download">Скачать лаунчер</a>
 			</li>
-			{#if data.user?.role == "ADMIN"}
-				<li class="nav-item"><a class="nav-link" href="/admin">Админка</a></li>
+			{#if user?.role == "ADMIN"}
+				<li class="nav-item">
+					<a class="nav-link" href="/admin">Админка</a>
+				</li>
 			{/if}
-			{#if data.user?.username != undefined}
-				<li class="nav-item ml-auto text-white !my-0 flex" bind:clientHeight={h}>
-					<span class="nav-link mt-5 mb-4 mr-8"><a href="/logout">Выйти</a></span>
+			{#if user?.username != undefined}
+				<li
+					class="nav-item ml-auto text-white !my-0 flex"
+					bind:clientHeight={h}
+				>
+					<span class="nav-link mt-5 mb-4 mr-8"
+						><a href="/logout">Выйти</a></span
+					>
 					<a class="flex" href="/profile">
 						<img
 							class="m-auto border-2 border-accent rounded-full"
-							src="/api/skin/head/{data.user.username}?{Date.now()}"
+							src="/api/skin/head/{user.username}?{Date.now()}"
 							height="32"
 							width="32"
 							alt="Player's skin head"
 						/>
 						<!-- height={h-16} width={h-16} -->
-						<span class="nav-link mt-5 mb-4">{data.user.username}</span>
+						<span class="nav-link mt-5 mb-4">{user.username}</span>
 					</a>
 				</li>
 			{:else}

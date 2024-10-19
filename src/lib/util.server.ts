@@ -1,27 +1,31 @@
-import db from "./db";
-import { DateTime } from "luxon";
-import crypto from "crypto";
 import fs from "fs";
 import sharp from "sharp";
-import jwt from "jsonwebtoken";
 import {
 	JWT_SECRET,
-	NODE_ENV,
 	ORIGIN,
 	SMTP_HOST,
 	SMTP_PASSWORD,
 	SMTP_PORT,
 	SMTP_USER,
-	SMTP_SECURE
 } from "$env/static/private";
 import logo from "$lib/assets/logo.svg";
-import type { User } from "@prisma/client";
-import nodemailer from "nodemailer";
-import type { SentMessageInfo } from "nodemailer/lib/smtp-transport";
+import nodemailer, { type Transporter } from "nodemailer";
+import type { DB, Session, User } from "./db/schema";
+import type { Selectable } from "kysely";
+import { dev } from "$app/environment";
+import type { LauncherUser, LauncherUserSession } from "./types.ts";
+import { DateTime, Interval } from "luxon";
+import { generateIdFromEntropySize } from "lucia";
+import { lucia } from "./server/auth";
+import DeviceDetector from "device-detector-js";
+import geoip from "geoip-lite";
+import jwt from "jsonwebtoken";
+import { createHash } from "crypto";
+import skinTemplate from "$lib/assets/template.png?hex";
 
-let transporter: nodemailer.Transporter<SentMessageInfo>;
+let transporter: Transporter;
 try {
-	if (NODE_ENV === "development") {
+	if (dev) {
 		const testAccount = await nodemailer.createTestAccount();
 		transporter = nodemailer.createTransport({
 			host: "smtp.ethereal.email",
@@ -35,48 +39,20 @@ try {
 	} else {
 		transporter = nodemailer.createTransport({
 			host: SMTP_HOST,
-			port: SMTP_PORT,
+			port: parseInt(SMTP_PORT),
 			secure: false,
 			auth: {
 				user: SMTP_USER,
 				pass: SMTP_PASSWORD,
 			},
 			tls: {
-				ciphers:'SSLv3'
-			}
+				ciphers: "SSLv3",
+			},
 		});
 	}
 	console.log("INFO", "Transport ready");
 } catch (error) {
 	console.log("ERROR", error);
-}
-
-export async function getUser(token: string | undefined) {
-	if (token != undefined) {
-		const session = await db.session.findUnique({
-			where: {
-				token,
-			},
-			include: {
-				user: {
-					include: {
-						sessions: true,
-						donations: true,
-					},
-				},
-			},
-		});
-
-		if (session != undefined && session.expiresAt >= DateTime.now().toJSDate()) {
-			return session.user;
-		}
-	}
-
-	return null;
-}
-
-export function generateToken(length = 32) {
-	return crypto.randomBytes(length).toString("hex");
 }
 
 export async function saveSkin(file: File, filename: string) {
@@ -96,7 +72,7 @@ export async function saveSkin(file: File, filename: string) {
 		})
 		.toFile("./files/skins/" + filename + "_head.png");
 
-	const body = await sharp("./files/template.png")
+	const body = await sharp(Buffer.from(skinTemplate, "hex"))
 		.resize(16, 32)
 		.composite([
 			{
@@ -222,19 +198,10 @@ function buildEmail(
 	return file;
 }
 
-export function verifyToken(token: string) {
-	try {
-		return jwt.verify(token, JWT_SECRET);
-	} catch {
-		return false;
-	}
-}
-
-export async function sendVerificationEmail(user: User) {
+export async function sendVerificationEmail(user: Selectable<User>) {
 	const token = jwt.sign({ email: user.email }, JWT_SECRET, {
 		expiresIn: "15m",
 	});
-
 	const url = ORIGIN + "/register/verify/" + token;
 
 	const info = await transporter.sendMail({
@@ -256,16 +223,18 @@ export async function sendVerificationEmail(user: User) {
 
 	console.log(JSON.stringify(info));
 
-	if (process.env.NODE_ENV === "development") {
-		console.log("DEBUG", "Preview URL: " + nodemailer.getTestMessageUrl(info));
+	if (dev) {
+		console.log(
+			"DEBUG",
+			"Preview URL: " + nodemailer.getTestMessageUrl(info),
+		);
 	}
 }
 
-export async function sendChangePasswordEmail(user: User) {
+export async function sendChangePasswordEmail(user: Selectable<User>) {
 	const token = jwt.sign({ email: user.email }, JWT_SECRET, {
 		expiresIn: "15m",
 	});
-
 	const url = ORIGIN + "/change/password/" + token;
 
 	const info = await transporter.sendMail({
@@ -287,16 +256,18 @@ export async function sendChangePasswordEmail(user: User) {
 
 	console.log(JSON.stringify(info));
 
-	if (process.env.NODE_ENV === "development") {
-		console.log("DEBUG", "Preview URL: " + nodemailer.getTestMessageUrl(info));
+	if (dev) {
+		console.log(
+			"DEBUG",
+			"Preview URL: " + nodemailer.getTestMessageUrl(info),
+		);
 	}
 }
 
-export async function sendChangeEmailEmail(user: User) {
+export async function sendChangeEmailEmail(user: Selectable<User>) {
 	const token = jwt.sign({ email: user.email }, JWT_SECRET, {
 		expiresIn: "15m",
 	});
-
 	const url = ORIGIN + "/change/email/" + token;
 
 	const info = await transporter.sendMail({
@@ -318,7 +289,91 @@ export async function sendChangeEmailEmail(user: User) {
 
 	console.log(JSON.stringify(info));
 
-	if (process.env.NODE_ENV === "development") {
-		console.log("DEBUG", "Preview URL: " + nodemailer.getTestMessageUrl(info));
+	if (dev) {
+		console.log(
+			"DEBUG",
+			"Preview URL: " + nodemailer.getTestMessageUrl(info),
+		);
 	}
+}
+
+export function createLauncherUser(user: Selectable<User>) {
+	const skinUrl = ORIGIN + "/api/skin/" + user.username;
+
+	let skin;
+	if (fs.existsSync("./files/skins/" + user.id.toString() + ".png")) {
+		skin = fs.readFileSync("./files/skins/" + user.id.toString() + ".png");
+	} else {
+		skin = fs.readFileSync("./files/default.png");
+	}
+
+	const userData: LauncherUser = {
+		username: user.username,
+		uuid: user.uuid,
+		// TODO: get from servers
+		permissions: ["*"],
+		roles: [user.role],
+		assets: {
+			SKIN: {
+				url: skinUrl,
+				digest: createHash("sha256").update(skin).digest("hex"),
+			},
+		},
+	};
+
+	return userData;
+}
+
+export function createLauncherUserSession(
+	session: {
+		id: Selectable<DB["Session"]>["id"];
+		token: Selectable<DB["Session"]>["token"];
+		refreshToken: Selectable<DB["Session"]>["refreshToken"];
+		expires_at?: Selectable<DB["Session"]>["expires_at"];
+		expiresAt?: Date;
+	},
+	user: Selectable<DB["User"]>,
+) {
+	const sessionData: LauncherUserSession = {
+		id: session.id,
+		accessToken: session.token,
+		refreshToken: session.refreshToken,
+		expire: Math.floor(
+			Interval.fromDateTimes(
+				DateTime.now(),
+				session.expires_at
+					? DateTime.fromSQL(session.expires_at)
+					: DateTime.fromJSDate(session.expiresAt!),
+			).length("seconds"),
+		),
+		user: createLauncherUser(user),
+	};
+
+	return sessionData;
+}
+
+export async function createLuciaSession(
+	ip: string | null,
+	userId: Selectable<User>["id"],
+	userAgent: string,
+	type: Selectable<Session>["type"],
+) {
+	let location = "Unknown";
+	if (ip != null) {
+		const geo = geoip.lookup(ip);
+		if (geo != null) {
+			location = `${geo?.country}, ${geo?.region}, ${geo?.city}`;
+		}
+	}
+	const deviceDetector = new DeviceDetector();
+	const device = deviceDetector.parse(userAgent);
+	const session = await lucia.createSession(userId, {
+		token: generateIdFromEntropySize(32),
+		refreshToken: generateIdFromEntropySize(32),
+		device: `${device.os?.name} ${device.os?.version} - ${device.client?.name} ${device.client?.version}`,
+		location,
+		type: type,
+	});
+
+	return session;
 }

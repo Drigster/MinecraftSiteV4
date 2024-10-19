@@ -1,37 +1,55 @@
-// eslint.config.js
+import globals from "globals";
+import js from "@eslint/js";
+import prettier from "eslint-plugin-prettier/recommended";
+import svelte from "eslint-plugin-svelte";
+import ts from "typescript-eslint";
 
-import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
-
-export default tseslint.config(
+export default ts.config(
+	js.configs.recommended,
+	...ts.configs.recommended,
+	...svelte.configs["flat/recommended"],
+	...svelte.configs["flat/prettier"],
+	prettier,
 	{
-		ignores: [
-			".DS_Store",
-			"node_modules/",
-			"build/",
-			".svelte-kit",
-			"package/",
-			".env",
-			".env.*",
-			"!.env.example",
-			"pnpm-lock.yaml",
-			"package-lock.json",
-			"yarn.lock",
-		],
+		languageOptions: {
+			globals: {
+				...globals.browser,
+				...globals.es2017,
+			},
+		},
 	},
-	eslint.configs.recommended,
-	...tseslint.configs.recommended,
-	...tseslint.configs.stylistic,
+	{
+		files: ["**/*.cjs", "**/*.mjs"],
+		languageOptions: {
+			globals: {
+				...globals.node,
+			},
+		},
+	},
+	{
+		files: ["**/*.svelte"],
+		languageOptions: {
+			parserOptions: {
+				parser: ts.parser,
+			},
+		},
+	},
 	{
 		rules: {
-			"no-duplicate-imports": "warn",
-			"sort-imports": [
+			"@typescript-eslint/no-unused-vars": [
 				"warn",
 				{
-					ignoreDeclarationSort: true,
-					allowSeparatedGroups: true,
+					argsIgnorePattern: "^_",
+					caughtErrorsIgnorePattern: "^_",
+					varsIgnorePattern: "^_",
 				},
 			],
 		},
 	},
+	{
+		rules: {
+			"prettier/prettier": "warn",
+		},
+	},
+	{ ignores: ["**/.svelte-kit", "build/", "dist/"] },
 );

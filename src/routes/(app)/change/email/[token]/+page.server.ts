@@ -2,10 +2,10 @@ import { setError, setMessage, superValidate } from "sveltekit-superforms";
 import { fail } from "@sveltejs/kit";
 import { zod } from "sveltekit-superforms/adapters";
 import { z } from "zod";
-import db from "$lib/db.js";
+import { validate } from "deep-email-validator";
+import { db } from "$lib/db";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "$env/static/private";
-import { validate } from "deep-email-validator";
 
 const schema = z.object({
 	email: z.string().email(),
@@ -17,16 +17,15 @@ export const load = async ({ params }) => {
 	let token;
 	try {
 		token = jwt.verify(params.token, JWT_SECRET) as jwt.JwtPayload;
-	} catch (error) {
+	} catch {
 		setMessage(form, "Время запроса истекло!");
 	}
 
 	if (token != undefined) {
-		const user = await db.user.findUnique({
-			where: {
-				email: token.email,
-			},
-		});
+		const user = await db
+			.selectFrom("User")
+			.where("email", "=", token.email)
+			.executeTakeFirst();
 
 		if (user == null) {
 			setMessage(form, "Пользователь не найден!");
@@ -49,18 +48,15 @@ export const actions = {
 			token = jwt.verify(params.token, JWT_SECRET, {
 				ignoreExpiration: true,
 			}) as jwt.JwtPayload;
-		} catch (error) {
+		} catch {
 			return setMessage(form, "Время запроса истекло!");
 		}
 
-		let user = await db.user.findFirst({
-			where: {
-				email: {
-					equals: token.email,
-					mode: "insensitive",
-				},
-			},
-		});
+		const user = await db
+			.selectFrom("User")
+			.select("id")
+			.where("email", "=", token.email)
+			.executeTakeFirst();
 
 		if (user == null) {
 			return setMessage(form, "Token is invalid");
@@ -72,24 +68,31 @@ export const actions = {
 				case "regex":
 					return setError(form, "email", "Неверный формат почты!");
 				case "disposable":
-					return setError(form, "email", "Временные почты запрещены!");
+					return setError(
+						form,
+						"email",
+						"Временные почты запрещены!",
+					);
 				case "typo":
 				case "mx":
 				case "smtp":
-					return setError(form, "email", "Почта не существует или не действительна!");
+					return setError(
+						form,
+						"email",
+						"Почта не существует или не действительна!",
+					);
 				default:
 					break;
 			}
 		}
 
-		user = await db.user.update({
-			where: {
-				id: user.id,
-			},
-			data: {
+		await db
+			.updateTable("User")
+			.where("id", "=", user.id)
+			.set({
 				email: form.data.email,
-			},
-		});
+			})
+			.execute();
 
 		return setMessage(form, "Пароль успешно изменён!");
 	},

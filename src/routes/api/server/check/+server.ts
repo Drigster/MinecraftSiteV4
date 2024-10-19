@@ -1,8 +1,7 @@
-import db from "$lib/db.js";
-import fs from "fs";
 import { json } from "@sveltejs/kit";
-import { createHash } from "crypto";
-import { ORIGIN } from "$env/static/private";
+import { createLauncherUser } from "$lib/util.server.js";
+import { db } from "$lib/db/index.js";
+import { DateTime } from "luxon";
 
 interface Request {
 	username: string;
@@ -11,7 +10,10 @@ interface Request {
 
 export async function POST({ request }) {
 	const requestData: Request = await request.json();
-	if (requestData.username == undefined || requestData.serverId == undefined) {
+	if (
+		requestData.username == undefined ||
+		requestData.serverId == undefined
+	) {
 		const error = {
 			error: "Bad Request",
 			code: 400,
@@ -25,20 +27,11 @@ export async function POST({ request }) {
 		});
 	}
 
-	const session = await db.session.findFirst({
-		where: {
-			user: {
-				username: {
-					equals: requestData.username,
-					mode: "insensitive",
-				},
-			},
-			serverId: requestData.serverId,
-		},
-		include: {
-			user: true,
-		},
-	});
+	const session = await db
+		.selectFrom("Session")
+		.selectAll()
+		.where("serverId", "=", requestData.serverId)
+		.executeTakeFirst();
 
 	if (session == null) {
 		const error = {
@@ -54,38 +47,33 @@ export async function POST({ request }) {
 		});
 	}
 
-	const skinUrl = ORIGIN + "/api/skin/" + session.user.username;
-	let skin;
-	if (
-		session.user !== null &&
-		fs.existsSync("./files/skins/" + session.user.id.toString() + ".png")
-	) {
-		skin = fs.readFileSync("./files/skins/" + session.user.id.toString() + ".png");
-	} else {
-		skin = fs.readFileSync("./files/default.png");
+	const user = await db
+		.selectFrom("User")
+		.selectAll()
+		.where("id", "=", session.user_id)
+		.executeTakeFirstOrThrow();
+
+	if (user.username != requestData.username) {
+		const error = {
+			error: "Сервер и пользователь не совпадают!",
+			code: 403,
+		};
+
+		return new Response(JSON.stringify(error), {
+			headers: {
+				"Content-Type": "application/json",
+			},
+			status: error.code,
+		});
 	}
 
-	const user: User = {
-		username: session.user.username,
-		uuid: session.user.uuid,
-		permissions: session.user.permissions,
-		roles: [session.user.role],
-		assets: {
-			SKIN: {
-				url: skinUrl,
-				digest: createHash("sha256").update(skin).digest("hex"),
-			},
-		},
-	};
+	await db
+		.updateTable("User")
+		.where("id", "=", user.id)
+		.set({
+			lastPlayed: DateTime.now().toSQL(),
+		})
+		.execute();
 
-	await db.user.update({
-		where: {
-			id: session.user.id
-		},
-		data: {
-			lastPlayed: new Date()
-		}
-	})
-
-	return json(user);
+	return json(createLauncherUser(user));
 }

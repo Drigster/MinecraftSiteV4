@@ -9,12 +9,21 @@
 </script>
 
 <div class="center authForm contentBlock full-top min-w-96">
-	<h2 class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold">Смена почты</h2>
+	<h2
+		class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
+	>
+		Смена почты
+	</h2>
 
-	<form method="POST" use:enhance>
+	<form method="post" use:enhance>
 		<div>
 			<div class="inputBox">
-				<input type="email" name="email" bind:value={$form.email} required />
+				<input
+					type="email"
+					name="email"
+					bind:value={$form.email}
+					required
+				/>
 				<label for="email">Новая почта</label>
 			</div>
 			{#if $errors.email}

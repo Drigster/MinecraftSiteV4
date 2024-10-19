@@ -9,21 +9,25 @@
 </script>
 
 <div class="center authForm contentBlock full-top max-w-xl">
-	<h2 class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold">
+	<h2
+		class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
+	>
 		Аккаунт не поддтверждён
 	</h2>
 
 	<div class="text-center">
 		<p class="mb-8">
-			Для продолжения подтвердите регистрацию. Для продтверждения на почту было оправлено
-			сообщение.
+			Для продолжения подтвердите регистрацию. Для продтверждения на почту
+			было оправлено сообщение.
 		</p>
 		{#if $message}
 			<p class="mb-8">{$message}</p>
 		{/if}
 		<div class="flex flex-wrap justify-center gap-2">
-			<a href="/"><button class="!p-2 !text-base">Вернутся на главную</button></a>
-			<form class="inline-block" method="POST" use:enhance>
+			<a href="/"
+				><button class="!p-2 !text-base">Вернутся на главную</button></a
+			>
+			<form class="inline-block" method="post" use:enhance>
 				<input type="hidden" name="verify" value="verify" />
 				<button class="!p-2 !text-base">
 					{#if $delayed}

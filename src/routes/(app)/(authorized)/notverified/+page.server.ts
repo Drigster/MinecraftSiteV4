@@ -2,17 +2,15 @@ import { setMessage, superValidate } from "sveltekit-superforms";
 import { fail, redirect } from "@sveltejs/kit";
 import { zod } from "sveltekit-superforms/adapters";
 import { z } from "zod";
-import { getUser, sendVerificationEmail } from "$lib/util.server";
+import { sendVerificationEmail } from "$lib/util.server";
+import { db } from "$lib/db/index.js";
 
 const schema = z.object({
 	verify: z.string(),
 });
 
-export const load = async ({ cookies, url }) => {
-	const user = await getUser(cookies.get("sessionToken"));
-	if (user == null) {
-		redirect(303, "/");
-	} else if (user.verified) {
+export const load = async ({ url, locals }) => {
+	if (locals.user!.verified) {
 		const redirectTo = url.searchParams.get("redirectTo");
 		if (redirectTo != null) {
 			return redirect(303, redirectTo);
@@ -23,23 +21,26 @@ export const load = async ({ cookies, url }) => {
 
 	return { form };
 };
-3;
 
 export const actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, locals }) => {
 		const form = await superValidate(request, zod(schema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
-		const user = await getUser(cookies.get("sessionToken"));
-		if (user == null) {
-			redirect(303, "/");
-		}
+		const user = await db
+			.selectFrom("User")
+			.selectAll()
+			.where("id", "=", locals.user!.id)
+			.executeTakeFirstOrThrow();
 
 		sendVerificationEmail(user);
 
-		return setMessage(form, "Сообщение с подтверждением было отправлено повторно");
+		return setMessage(
+			form,
+			"Сообщение с подтверждением было отправлено повторно",
+		);
 	},
 };

@@ -1,4 +1,4 @@
-import db from "$lib/db.js";
+import { db } from "$lib/db";
 
 interface Request {
 	username: string;
@@ -27,20 +27,11 @@ export async function POST({ request }) {
 		});
 	}
 
-	const session = await db.session.findUnique({
-		where: {
-			user: {
-				username: {
-					equals: requestData.username,
-					mode: "insensitive",
-				}
-			},
-			token: requestData.accessToken,
-		},
-		include: {
-			user: true,
-		},
-	});
+	const session = await db
+		.selectFrom("Session")
+		.selectAll()
+		.where("token", "=", requestData.accessToken)
+		.executeTakeFirst();
 
 	if (session == null) {
 		const error = {
@@ -56,24 +47,23 @@ export async function POST({ request }) {
 		});
 	}
 
-	await db.session.update({
-		where: {
-			id: session.id,
-		},
-		data: {
-			serverId: requestData.serverId,
-		},
-	});
+	await db
+		.updateTable("Session")
+		.where("id", "=", session.id)
+		.set({
+			user_id: requestData.uuid,
+		})
+		.execute();
 
-	const error = {
+	const message = {
 		message: "OK",
 		code: 200,
 	};
 
-	return new Response(JSON.stringify(error), {
+	return new Response(JSON.stringify(message), {
 		headers: {
 			"Content-Type": "application/json",
 		},
-		status: error.code,
+		status: message.code,
 	});
 }

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Footer from "$lib/Footer.svelte";
-	import Navbar from "$lib/Navbar.svelte";
+	import Footer from "$lib/components/Footer.svelte";
+	import Navbar from "$lib/components/Navbar.svelte";
 	import type { PageData } from "./$types";
 
 	export let data: PageData;
 </script>
 
-<Navbar {data} />
+<Navbar user={data.user} />
 <main class="content-grid flex-grow">
 	<slot />
 </main>

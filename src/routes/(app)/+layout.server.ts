@@ -1,8 +1,7 @@
-import { getUser } from "$lib/util.server.js";
 import { redirect } from "@sveltejs/kit";
 import { DateTime } from "luxon";
 
-export const load = async ({ cookies }) => {
+export const load = async ({ cookies, locals }) => {
 	const target = DateTime.now()
 		.setLocale("ru")
 		.setZone("Europe/Tallinn")
@@ -11,12 +10,5 @@ export const load = async ({ cookies }) => {
 		return redirect(307, "/timer");
 	}
 
-	const user = await getUser(cookies.get("sessionToken"));
-	if (user !== null) {
-		return {
-			user: {
-				username: user.username,
-			},
-		};
-	}
+	return { user: locals.user };
 };

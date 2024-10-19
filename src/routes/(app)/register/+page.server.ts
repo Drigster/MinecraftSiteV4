@@ -3,10 +3,13 @@ import { fail, redirect } from "@sveltejs/kit";
 import { zod } from "sveltekit-superforms/adapters";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import db from "$lib/db.js";
+
 import { v4 as uuidv4 } from "uuid";
 import { validate } from "deep-email-validator";
 import { sendVerificationEmail } from "$lib/util.server.js";
+import { db } from "$lib/db";
+import { dev } from "$app/environment";
+import { generateIdFromEntropySize } from "lucia";
 
 const schema = z.object({
 	username: z
@@ -33,40 +36,52 @@ export const actions = {
 			return fail(400, { form });
 		}
 
-		let user = await db.user.findFirst({
-			where: {
-				OR: [
-					{
-						username: form.data.username,
-					},
-					{
-						email: form.data.email,
-					},
-				],
-			},
-		});
+		const existing_user = await db
+			.selectFrom("User")
+			.select(["email", "username"])
+			.where((eb) =>
+				eb.or([
+					eb("username", "=", form.data.username),
+					eb("email", "=", form.data.email),
+				]),
+			)
+			.executeTakeFirst();
 
-		if (user != null) {
-			if (user.username == form.data.username) {
+		if (existing_user != null) {
+			if (existing_user.username == form.data.username) {
 				return setError(form, "username", "Никнейм занят!");
-			} else if (user.email == form.data.email) {
+			} else if (existing_user.email == form.data.email) {
 				return setError(form, "email", "Почта занята!");
 			}
 		}
 
-		const res = await validate(form.data.email);
-		if (!res.valid) {
-			switch (res.reason) {
-				case "regex":
-					return setError(form, "email", "Неверный формат почты!");
-				case "disposable":
-					return setError(form, "email", "Временные почты запрещены!");
-				case "typo":
-				case "mx":
-				case "smtp":
-					return setError(form, "email", "Почта не существует или не действительна!");
-				default:
-					break;
+		if (!dev) {
+			const res = await validate(form.data.email);
+			if (!res.valid) {
+				switch (res.reason) {
+					case "regex":
+						return setError(
+							form,
+							"email",
+							"Неверный формат почты!",
+						);
+					case "disposable":
+						return setError(
+							form,
+							"email",
+							"Временные почты запрещены!",
+						);
+					case "typo":
+					case "mx":
+					case "smtp":
+						return setError(
+							form,
+							"email",
+							"Почта не существует или не действительна!",
+						);
+					default:
+						break;
+				}
 			}
 		}
 
@@ -76,16 +91,19 @@ export const actions = {
 
 		const uuid = uuidv4();
 		const salt = uuid.replaceAll("-", "");
-		user = await db.user.create({
-			data: {
+		const user = await db
+			.insertInto("User")
+			.values({
+				id: generateIdFromEntropySize(10),
 				uuid: uuid,
 				email: form.data.email,
 				username: form.data.username,
 				password: bcrypt.hashSync(form.data.password + salt, 12),
 				salt: salt,
 				salted: true,
-			},
-		});
+			})
+			.returningAll()
+			.executeTakeFirstOrThrow();
 
 		sendVerificationEmail(user);
 
