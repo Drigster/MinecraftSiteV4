@@ -4,6 +4,6 @@
 	>
 		<span>© {new Date().getFullYear()} Drigster</span>
 		<div></div>
-		<a href="https://github.com">Found a bug?</a>
+		<a href="https://github.com/Drigster/MinecraftSiteV4">Found a bug?</a>
 	</div>
 </footer>
