@@ -1,14 +1,15 @@
 <script lang="ts">
 	import Footer from "$lib/components/Footer.svelte";
 	import Navbar from "$lib/components/Navbar.svelte";
+	import type { Snippet } from "svelte";
 	import type { PageData } from "./$types";
 
-	export let data: PageData;
+	let { data, children }: { data: PageData; children: Snippet } = $props();
 </script>
 
 <Navbar user={data.user} />
 <main class="content-grid flex-grow">
-	<slot />
+	{@render children()}
 </main>
 <Footer />
 

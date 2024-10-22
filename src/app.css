@@ -157,6 +157,7 @@ body {
 	margin-block: 0.87rem;
 	color: var(--secondary);
 	transition: 0.5s;
+	pointer-events: none;
 }
 
 .inputBox input:valid ~ label,

@@ -19,7 +19,7 @@ export async function handle({ event, resolve }) {
 	}
 	if (sessionCookie) {
 		event.cookies.set(sessionCookie.name, sessionCookie.value, {
-			path: ".",
+			path: "/",
 			...sessionCookie.attributes,
 		});
 	}

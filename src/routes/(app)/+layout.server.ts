@@ -1,7 +1,9 @@
 import { redirect } from "@sveltejs/kit";
 import { DateTime } from "luxon";
 
-export const load = async ({ cookies, locals }) => {
+export const load = async ({ cookies, locals, depends }) => {
+	depends("locals:user");
+
 	const target = DateTime.now()
 		.setLocale("ru")
 		.setZone("Europe/Tallinn")

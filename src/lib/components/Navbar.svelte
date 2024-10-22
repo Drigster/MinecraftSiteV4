@@ -1,10 +1,19 @@
 <script lang="ts">
+	import { goto, invalidate } from "$app/navigation";
 	import logo from "$lib/assets/logo.svg";
 	import type { User } from "lucia/dist/core";
 
 	let h = $state(0);
 
 	let { user }: { user: User | null } = $props();
+
+	async function logout() {
+		await fetch("/logout", {
+			method: "POST",
+		});
+		await invalidate("locals:user");
+		goto("/");
+	}
 </script>
 
 <header class="fixed w-full">
@@ -30,7 +39,7 @@
 					bind:clientHeight={h}
 				>
 					<span class="nav-link mt-5 mb-4 mr-8"
-						><a href="/logout">Выйти</a></span
+						><button onclick={logout}>Выйти</button></span
 					>
 					<a class="flex" href="/profile">
 						<img

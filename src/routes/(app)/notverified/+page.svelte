@@ -20,13 +20,13 @@
 	</h2>
 
 	<div class="text-center">
-		<p class="mb-8">
-			Для продолжения подтвердите регистрацию. Для продтверждения на почту
-			было оправлено сообщение. (Сообщение с подтверждением может попадать
-			в спам).
+		<p class="mb-1">
+			При регистрации на вашу почту было выслано сообщение с
+			подтверждением регистрации
 		</p>
+		<p class="mb-8 text-secondary">Сообщение могло попасть в спам</p>
 		{#if $message}
-			<p class="mb-8">{$message}</p>
+			<p class="mb-8 text-accent">{$message}</p>
 		{/if}
 		<div class="flex flex-wrap justify-center gap-2">
 			<a href="/"

@@ -16,7 +16,7 @@
 	</h2>
 
 	<div class="text-center">
-		<p class="mb-8 notifyMessage">{data.message}</p>
+		<p class="mb-8">{data.message}</p>
 		<a href="/"
 			><button class="!p-2 !text-base">Вернутся на главную</button></a
 		>
