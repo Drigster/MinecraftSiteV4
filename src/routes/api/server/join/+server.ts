@@ -1,8 +1,8 @@
 import { db } from "$lib/db";
 
 interface Request {
-	username: string;
-	uuid: string;
+	username?: string;
+	uuid?: string;
 	accessToken: string;
 	serverId: string;
 }
@@ -10,7 +10,7 @@ interface Request {
 export async function POST({ request }) {
 	const requestData: Request = await request.json();
 	if (
-		requestData.username == undefined ||
+		requestData.username == undefined && requestData.uuid == undefined ||
 		requestData.accessToken == undefined ||
 		requestData.serverId == undefined
 	) {
