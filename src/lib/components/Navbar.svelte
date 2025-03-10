@@ -16,7 +16,7 @@
 	}
 </script>
 
-<header class="fixed w-full">
+<header class="fixed w-full z-50">
 	<nav class="navbar">
 		<a class="nav-logo" href="/">
 			<img class="h-8 w-8" src={logo} alt="" />

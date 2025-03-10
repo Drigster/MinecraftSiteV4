@@ -3,11 +3,40 @@
 @tailwind utilities;
 
 :root {
+	/* Shadcn */
+	--background: rgba(0, 0, 0, 0.6);
+	--foreground: purple;
+
+	--muted: rgb(255, 0, 43);
+	--muted-foreground: blue;
+
+	--popover: var(--background);
+	--popover-foreground: var(--primary);
+
+	--card: purple;
+	--card-foreground: purple;
+
+	--border: green;
+	--input: var(--primary);
+
 	--primary: rgb(221, 234, 253);
+	--primary-foreground: purple;
+
 	--secondary: rgb(163, 163, 163);
+	--secondary-foreground: purple;
+
 	--accent: rgb(252, 111, 83);
-	--background: rgb(0, 0, 0, 0.6);
-	--error: red;
+	--accent-foreground: purple;
+
+	--destructive: red;
+	--destructive-foreground: purple;
+
+	--ring: var(--accent);
+
+	--radius: 0.5rem;
+	/* Shadcn end */
+
+	--danger: purple;
 	--notify: yellow;
 }
 
@@ -26,7 +55,7 @@ body {
 }
 
 body {
-	background-image: url('/src/lib/assets/bg.jpg');
+	background-image: url("/src/lib/assets/bg.jpg");
 	background-position: top center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -53,10 +82,8 @@ body {
 
 	display: grid;
 	grid-template-columns:
-		[full-width-start] minmax(
-			var(--padding-inline),
-			1fr
-		) [breakout-start] minmax(0, var(--breakout-size))
+		[full-width-start] minmax(var(--padding-inline), 1fr)
+		[breakout-start] minmax(0, var(--breakout-size))
 		[content-start] min(
 			100% - (var(--padding-inline) * 2),
 			var(--content-max-width)
