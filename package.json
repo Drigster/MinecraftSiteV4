@@ -11,7 +11,6 @@
 	},
 	"dependencies": {
 		"@libsql/client": "^0.14.0",
-		"@libsql/kysely-libsql": "^0.4.1",
 		"@o7/icon": "^0.3.24",
 		"@prisma/client": "6.0.1",
 		"@tanstack/svelte-query": "^5.62.3",
@@ -21,6 +20,7 @@
 		"geoip-lite": "^1.4.10",
 		"highlight.js": "^11.11.1",
 		"kysely": "^0.27.5",
+		"kysely-libsql": "^0.6.0",
 		"layerchart": "^0.99.4",
 		"nodemailer": "^6.9.16",
 		"sharp": "^0.33.5",

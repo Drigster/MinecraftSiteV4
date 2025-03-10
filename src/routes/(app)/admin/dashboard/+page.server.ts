@@ -1,6 +1,6 @@
 import { db } from "$lib/db";
 
-export const load = async ({ locals }) => {
+export const load = async () => {
 	const users = await db
 		.selectFrom("User")
 		.select((eb) => eb.fn.countAll().as("num_rows"))

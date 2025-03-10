@@ -6,6 +6,7 @@ import { validate } from "deep-email-validator";
 import { db } from "$lib/db";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "$env/static/private";
+import { ToastLevel } from "$lib/components/toast";
 
 const schema = z.object({
 	email: z.string().email(),
@@ -18,7 +19,10 @@ export const load = async ({ params }) => {
 	try {
 		token = jwt.verify(params.token, JWT_SECRET) as jwt.JwtPayload;
 	} catch {
-		setMessage(form, "Время запроса истекло!");
+		setMessage(form, {
+			type: ToastLevel.Error,
+			text: "Время запроса истекло!",
+		});
 	}
 
 	if (token != undefined) {
@@ -28,7 +32,10 @@ export const load = async ({ params }) => {
 			.executeTakeFirst();
 
 		if (user == null) {
-			setMessage(form, "Пользователь не найден!");
+			setMessage(form, {
+				type: ToastLevel.Error,
+				text: "Пользователь не найден!",
+			});
 		}
 	}
 
@@ -49,7 +56,10 @@ export const actions = {
 				ignoreExpiration: true,
 			}) as jwt.JwtPayload;
 		} catch {
-			return setMessage(form, "Время запроса истекло!");
+			return setMessage(form, {
+				type: ToastLevel.Error,
+				text: "Время запроса истекло!",
+			});
 		}
 
 		const user = await db
@@ -59,7 +69,10 @@ export const actions = {
 			.executeTakeFirst();
 
 		if (user == null) {
-			return setMessage(form, "Token is invalid");
+			return setMessage(form, {
+				type: ToastLevel.Error,
+				text: "Token is invalid",
+			});
 		}
 
 		const res = await validate(form.data.email);
@@ -94,6 +107,9 @@ export const actions = {
 			})
 			.execute();
 
-		return setMessage(form, "Пароль успешно изменён!");
+		return setMessage(form, {
+			type: ToastLevel.Info,
+			text: "Пароль успешно изменён!",
+		});
 	},
 };

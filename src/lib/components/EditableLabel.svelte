@@ -24,6 +24,7 @@
 		hidden = false,
 		buttonText = "Изменить",
 	}: {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		formData: SuperValidated<Infer<any>>;
 		action: string;
 		title: string;
@@ -36,7 +37,7 @@
 	} = $props();
 	let isEditing = $state(false);
 
-	const { form, errors, enhance, delayed, message } = superForm(formData, {
+	const { enhance, delayed } = superForm(formData, {
 		resetForm: true,
 		onUpdated({ form }) {
 			isEditing = false;

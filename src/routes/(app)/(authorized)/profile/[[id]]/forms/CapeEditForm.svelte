@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SuperValidated, Infer, InferIn } from "sveltekit-superforms";
+	import type { SuperValidated, Infer } from "sveltekit-superforms";
 	import { fileProxy, superForm } from "sveltekit-superforms";
 	import type { CapeSchema } from "../schemas";
 	import { Check, XMark } from "@o7/icon/heroicons";
@@ -17,7 +17,7 @@
 		idEditing: boolean;
 	} = $props();
 
-	const { form, errors, enhance, delayed, message } = superForm(data, {
+	const { form, enhance, delayed } = superForm(data, {
 		resetForm: true,
 		onUpdated({ form }) {
 			idEditing = false;

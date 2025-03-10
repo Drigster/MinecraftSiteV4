@@ -3,7 +3,7 @@ import type { DB } from "./schema";
 import { dev } from "$app/environment";
 import { TURSO_TOKEN, TURSO_URL } from "$env/static/private";
 import { createClient } from "@libsql/client";
-import { LibsqlDialect } from "@libsql/kysely-libsql";
+import { LibsqlDialect } from "kysely-libsql";
 
 if (!TURSO_URL || !TURSO_TOKEN) {
 	if (dev) {

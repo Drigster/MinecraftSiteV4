@@ -1,6 +1,4 @@
 <script lang="ts">
-	import Counter from "$lib/components/Counter.svelte";
-	import { ChartBar, ServerStack, User } from "@o7/icon/heroicons";
 	import type { PageData } from "./$types";
 	import { DateTime } from "luxon";
 

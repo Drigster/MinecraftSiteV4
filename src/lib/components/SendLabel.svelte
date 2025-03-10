@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Check, XMark } from "@o7/icon/heroicons";
 	import spiner from "$lib/assets/spiner.svg";
 	import { superForm, type SuperValidated } from "sveltekit-superforms";
 	import TextLabel from "./TextLabel.svelte";
@@ -14,6 +13,7 @@
 		hidden = false,
 		buttonText = "Изменить",
 	}: {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		form: SuperValidated<any> | undefined;
 		action: string;
 		title: string;
@@ -23,13 +23,9 @@
 		hidden?: boolean;
 		buttonText?: string;
 	} = $props();
-	let isEditing = $state(false);
 
-	const { enhance, delayed, errors, message } = superForm(form, {
+	const { enhance, delayed } = superForm(form, {
 		resetForm: true,
-		onUpdated: () => {
-			isEditing = false;
-		},
 	});
 </script>
 

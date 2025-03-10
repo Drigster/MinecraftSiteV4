@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { DateTime } from "luxon";
-	import { fileProxy, superForm } from "sveltekit-superforms";
+	import { superForm } from "sveltekit-superforms";
 	import Skinview3d from "svelte-skinview3d";
-	import { Trash, XMark, Check } from "@o7/icon/heroicons";
+	import { Trash } from "@o7/icon/heroicons";
 	import spiner from "$lib/assets/spiner.svg";
 	import { type PageData } from "./$types";
 	import EditableLabel from "$lib/components/EditableLabel.svelte";

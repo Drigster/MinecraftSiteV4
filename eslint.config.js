@@ -51,5 +51,5 @@ export default ts.config(
 			"prettier/prettier": "warn",
 		},
 	},
-	{ ignores: ["**/.svelte-kit", "build/", "dist/"] },
+	{ ignores: ["**/.svelte-kit", "build/", "dist/", "src/lib/components/ui"] },
 );

@@ -74,15 +74,3 @@
 		>
 	</Tabs.Root>
 </div>
-
-<style>
-	.profileInfo {
-		display: grid;
-		grid-template-columns: 1fr max-content;
-	}
-
-	.skin-buttons {
-		display: grid;
-		grid-template-columns: 1fr max-content;
-	}
-</style>

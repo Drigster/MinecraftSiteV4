@@ -28,9 +28,7 @@
 
 	const {
 		form: serverCreateForm,
-		formId: serverCreateFormId,
 		enhance: serverCreateEnhance,
-		delayed: serverCreateDelayed,
 		errors: serverCreateErrors,
 	} = superForm(data.serverCreateForm, {
 		resetForm: true,
@@ -63,6 +61,7 @@
 			id: "id",
 			accessor: ({ id }) => id,
 			cell: (cell) => {
+				console.log(cell.row);
 				return createRender(Actions, {
 					id: cell.id,
 					server_uuid: cell.row.original.uuid,
@@ -80,7 +79,7 @@
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
 		table.createViewModel(columns);
 
-	const { pageIndex, pageCount, pageSize } = pluginStates.page;
+	const { pageIndex, pageSize } = pluginStates.page;
 	let pageNumber = $state(1);
 	$effect(() => {
 		$pageIndex = pageNumber - 1;
@@ -235,7 +234,6 @@
 									attrs={cell.attrs()}
 									let:attrs
 									props={cell.props()}
-									let:props
 								>
 									<Table.Cell {...attrs}>
 										{#if cell.id === "id"}
