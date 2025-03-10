@@ -13,15 +13,28 @@ if (!TURSO_URL || !TURSO_TOKEN) {
 	}
 }
 
-export const dbClient = createClient({
-	url: TURSO_URL,
-	authToken: TURSO_TOKEN,
-});
+let _dbClient;
+let _db;
 
-export const db = new Kysely<DB>({
-	dialect: new LibsqlDialect({ client: dbClient }),
-});
+try {
+	_dbClient = createClient({
+		url: TURSO_URL,
+		authToken: TURSO_TOKEN,
+	});
 
+	_db = new Kysely<DB>({
+		dialect: new LibsqlDialect({ client: _dbClient }),
+	});
+} catch (e) {
+	console.error("DB ERROR: " + e);
+}
+
+if (_dbClient === undefined || _db === undefined) {
+	throw new Error("DB ERROR: Failed to initialize database");
+}
+
+export const dbClient = _dbClient;
+export const db = _db;
 export function json<T>(obj: T): RawBuilder<T> {
 	return sql`${JSON.stringify(obj)}`;
 }
