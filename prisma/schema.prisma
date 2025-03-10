@@ -1,6 +1,6 @@
 datasource db {
   provider = "sqlite"
-  url      = ""
+  url      = "file:./database.db"
 }
 
 generator kysely {
@@ -64,12 +64,12 @@ model Server {
   uuid          String    @unique
   name          String
   description   String
-  icon          String
+  configHash    String
   ip            String
   port          Int
   mods          ModFile[]
-  owner         User      @relation("ServerOwner", fields: [ownerId], references: [id])
-  ownerId       String
+  owner         User?     @relation("ServerOwner", fields: [ownerId], references: [id])
+  ownerId       String?
   createdAt     DateTime  @default(now()) //  @default(dbgenerated("(strftime('%FT%R:%fZ'))"))
   users         User[]    @relation("ServerUser")
   /// @kyselyType('ACTIVE' | 'HIDDEN' | 'ARCHIVED')
@@ -82,6 +82,7 @@ model Mod {
   id      String    @id
   name    String
   link    String
+  /// @kyselyType('GLOBAL' | 'DEFAULT' | 'LIBRARY' | 'ADDON' | 'CLIENT')
   type    String
   ModFile ModFile[]
 }
@@ -97,6 +98,8 @@ model ModFile {
   dependencies ModFile[] @relation("ModDependency")
   conflicts    ModFile[] @relation("ModConflict")
   Server       Server?   @relation(fields: [serverId], references: [id])
+  /// @kyselyType('SERVER' | 'CLIENT' | 'BOTH')
+  type         String
   serverId     String?
   dependants   ModFile[] @relation("ModDependency")
   conflicters  ModFile[] @relation("ModConflict")

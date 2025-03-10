@@ -8,7 +8,10 @@ export type Mod = {
     id: string;
     name: string;
     link: string;
-    type: string;
+    /**
+     * @kyselyType('GLOBAL' | 'DEFAULT' | 'LIBRARY' | 'ADDON' | 'CLIENT')
+     */
+    type: 'GLOBAL' | 'DEFAULT' | 'LIBRARY' | 'ADDON' | 'CLIENT';
 };
 export type ModConflict = {
     A: string;
@@ -27,6 +30,10 @@ export type ModFile = {
      * @kyselyType(boolean)
      */
     isOptional: Generated<boolean>;
+    /**
+     * @kyselyType('SERVER' | 'CLIENT' | 'BOTH')
+     */
+    type: 'SERVER' | 'CLIENT' | 'BOTH';
     serverId: string | null;
 };
 export type SecurityAction = {
@@ -48,10 +55,10 @@ export type Server = {
     uuid: string;
     name: string;
     description: string;
-    icon: string;
+    configHash: string;
     ip: string;
     port: number;
-    ownerId: string;
+    ownerId: string | null;
     createdAt: Generated<string>;
     /**
      * @kyselyType('ACTIVE' | 'HIDDEN' | 'ARCHIVED')
