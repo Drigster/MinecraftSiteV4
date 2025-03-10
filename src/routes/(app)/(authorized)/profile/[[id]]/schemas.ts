@@ -16,6 +16,8 @@ export const skinSchema = z.object({
 		}, "Файл должен быть в размере 64x64 px."),
 });
 
+export type SkinSchema = typeof skinSchema;
+
 export const capeSchema = z.object({
 	cape: z
 		.instanceof(File, { message: "Please upload a file." })
@@ -25,30 +27,34 @@ export const capeSchema = z.object({
 		),
 });
 
-export const skinRemoveSchema = z.object({
-	skinRemove: z.string(),
-});
-
-export const capeRemoveSchema = z.object({
-	capeRemove: z.string(),
-});
+export type CapeSchema = typeof capeSchema;
 
 export const sessionRemoveSchema = z.object({
 	sessionId: z.string(),
 });
 
 export const usernameChangeSchema = z.object({
-	username: z.string().min(1, "Никнейм не может быть пустым"),
+	username: z
+		.string()
+		.regex(/^[a-zA-Z0-9_]+$/, "Никнейм имеет недопустимые символы")
+		.min(1, "Никнейм не может быть пустым")
+		.max(16, "Никнейм не может быть длинее 16 символов"),
 });
 
-export const emailChangeSchema = z.object({
-	changeEmail: z.string(),
+export const adminEmailChangeSchema = z.object({
+	email: z.string().email(),
 });
 
-export const passwordChangeSchema = z.object({
-	changePassword: z.string(),
+export const uuidChangeSchema = z.object({
+	uuid: z
+		.string()
+		.length(36, "Длина UUID должна быть 36 символов")
+		.regex(
+			/^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/,
+			"UUID имеет недопустимые символы",
+		),
 });
 
-export const emailVerifySchema = z.object({
-	verifyEmail: z.string(),
+export const adminPasswordChangeSchema = z.object({
+	password: z.string().min(1, "Пароль не может быть пустым"),
 });
