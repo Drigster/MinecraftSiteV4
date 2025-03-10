@@ -13,7 +13,7 @@ import nodemailer, { type Transporter } from "nodemailer";
 import type { DB, Session, User } from "./db/schema";
 import type { Selectable } from "kysely";
 import { dev } from "$app/environment";
-import type { LauncherUser, LauncherUserSession } from "./types.ts";
+import type { LauncherUser, LauncherUserSession } from "./types";
 import { DateTime, Interval } from "luxon";
 import { generateIdFromEntropySize } from "lucia";
 import { lucia } from "./server/auth";
@@ -22,6 +22,8 @@ import geoip from "geoip-lite";
 import jwt from "jsonwebtoken";
 import { createHash } from "crypto";
 import skinTemplate from "$lib/assets/template.png?hex";
+import { db } from "./db";
+import type { ApiError, ProfileData, ProfileType } from "./apiTypes";
 
 let transporter: Transporter;
 try {
@@ -309,7 +311,7 @@ export async function sendChangeEmailEmail(user: Selectable<User>) {
 	}
 }
 
-export function createLauncherUser(user: Selectable<User>) {
+export async function createLauncherUser(user: Selectable<User>) {
 	const skinUrl = ORIGIN + "/api/skin/" + user.username;
 
 	let skin;
@@ -319,11 +321,27 @@ export function createLauncherUser(user: Selectable<User>) {
 		skin = fs.readFileSync("./files/default.png");
 	}
 
+	const servers = await db
+		.selectFrom(["Server", "_ServerUser"])
+		.select("Server.uuid")
+		.whereRef("_ServerUser.A", "=", "Server.id")
+		.where("_ServerUser.B", "=", user.id)
+		.execute();
+
+	const permissions: string[] = [];
+
+	if (user.role == "ADMIN") {
+		permissions.push("*");
+	}
+
+	for (const server of servers) {
+		permissions.push(`launchserver.profile.${server.uuid}.*`);
+	}
+
 	const userData: LauncherUser = {
 		username: user.username,
 		uuid: user.uuid,
-		// TODO: get from servers
-		permissions: ["*"],
+		permissions: permissions,
 		roles: [user.role],
 		assets: {
 			SKIN: {
@@ -388,4 +406,113 @@ export async function createLuciaSession(
 	});
 
 	return session;
+}
+
+export async function getServers() {
+	let servers = await db.selectFrom("Server").selectAll().execute();
+
+	try {
+		const serversFromApi: ProfileType[] | ApiError = await fetch(
+			"http://localhost:3000/api/profile/list",
+		).then((res) => res.json());
+
+		if ("code" in serversFromApi) {
+			console.log("ERROR", serversFromApi);
+			return servers;
+		}
+
+		let dataChanged = false;
+
+		for (const serverFromApi of serversFromApi) {
+			const serverFromDb = servers.find(
+				(serverFromDb) => serverFromDb.uuid === serverFromApi.uuid,
+			);
+
+			if (serverFromDb != undefined) {
+				if (serverFromDb.configHash !== serverFromApi.hash) {
+					const serverDataFromApi: ProfileData = await fetch(
+						`http://localhost:3000/api/profile/${serverFromApi.uuid}/get/`,
+					).then((res) => res.json());
+
+					if ("code" in serverDataFromApi) {
+						console.log("ERROR", serversFromApi);
+						return servers;
+					}
+
+					if (
+						(serverFromDb.status == "HIDDEN" &&
+							!serverDataFromApi.limited) ||
+						(serverFromDb.status == "ACTIVE" &&
+							serverDataFromApi.limited)
+					) {
+						console.log("NOT_IMPLEMENTED", "Change limited");
+					}
+					await db
+						.updateTable("Server")
+						.set({
+							name: serverDataFromApi.title,
+							description: serverDataFromApi.info,
+							ip:
+								serverDataFromApi.servers[0]?.serverAddress ||
+								"",
+							port:
+								serverDataFromApi.servers[0]?.serverPort ||
+								25565,
+							configHash: serverFromApi.hash,
+						})
+						.where("uuid", "=", serverFromApi.uuid)
+						.execute();
+					dataChanged = true;
+				}
+			} else {
+				const serverDataFromApi: ProfileData = await fetch(
+					`http://localhost:3000/api/profile/${serverFromApi.uuid}/get/`,
+				).then((res) => res.json());
+
+				if ("code" in serverDataFromApi) {
+					console.log("ERROR", serversFromApi);
+					return servers;
+				}
+
+				await db
+					.insertInto("Server")
+					.values({
+						id: generateIdFromEntropySize(10),
+						uuid: serverDataFromApi.uuid,
+						name: serverDataFromApi.title,
+						description: serverDataFromApi.info,
+						ip: serverDataFromApi.servers[0]?.serverAddress || "",
+						port: serverDataFromApi.servers[0]?.serverPort || 25565,
+						configHash: serverFromApi.hash,
+						status: "HIDDEN",
+					})
+					.execute();
+				dataChanged = true;
+			}
+		}
+
+		if (
+			dataChanged ||
+			serversFromApi.length !=
+				servers.filter((obj) => obj.status != "ARCHIVED").length
+		) {
+			const uuidSet = new Set(serversFromApi.map((s) => s.uuid));
+			const difference = servers
+				.map((obj) => obj.uuid)
+				.filter((uuid) => !uuidSet.has(uuid));
+
+			await db
+				.updateTable("Server")
+				.set({ status: "ARCHIVED" })
+				.where("uuid", "in", difference)
+				.execute();
+
+			servers = await db.selectFrom("Server").selectAll().execute();
+		}
+	} catch (error) {
+		console.log("ERROR", error);
+		return servers;
+	}
+
+	return servers;
 }
