@@ -354,7 +354,7 @@ export async function createLauncherUser(user: Selectable<User>) {
 	return userData;
 }
 
-export function createLauncherUserSession(
+export async function createLauncherUserSession(
 	session: {
 		id: Selectable<DB["Session"]>["id"];
 		token: Selectable<DB["Session"]>["token"];
@@ -376,7 +376,7 @@ export function createLauncherUserSession(
 					: DateTime.fromJSDate(session.expiresAt!),
 			).length("seconds"),
 		),
-		user: createLauncherUser(user),
+		user: await createLauncherUser(user),
 	};
 
 	return sessionData;
