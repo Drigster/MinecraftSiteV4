@@ -6,7 +6,6 @@ import bcrypt from "bcrypt";
 import { db } from "$lib/db";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "$env/static/private";
-import { ToastLevel } from "$lib/components/toast";
 
 const schema = z.object({
 	password: z.string().min(1, "Пароль не может быть пустым"),
@@ -21,7 +20,7 @@ export const load = async ({ params }) => {
 		token = jwt.verify(params.token, JWT_SECRET) as jwt.JwtPayload;
 	} catch {
 		setMessage(form, {
-			type: ToastLevel.Error,
+			type: "error",
 			text: "Время запроса истекло!",
 		});
 	}
@@ -34,7 +33,7 @@ export const load = async ({ params }) => {
 
 		if (user == null) {
 			setMessage(form, {
-				type: ToastLevel.Error,
+				type: "error",
 				text: "Пользователь не найден!",
 			});
 		}
@@ -58,7 +57,7 @@ export const actions = {
 			}) as jwt.JwtPayload;
 		} catch {
 			return setMessage(form, {
-				type: ToastLevel.Error,
+				type: "error",
 				text: "Время запроса истекло!",
 			});
 		}
@@ -71,7 +70,7 @@ export const actions = {
 
 		if (user == null) {
 			return setMessage(form, {
-				type: ToastLevel.Error,
+				type: "error",
 				text: "Token is invalid",
 			});
 		}
@@ -96,7 +95,7 @@ export const actions = {
 		await db.deleteFrom("Session").where("user_id", "=", user.id).execute();
 
 		return setMessage(form, {
-			type: ToastLevel.Info,
+			type: "info",
 			text: "Пароль успешно изменён!",
 		});
 	},

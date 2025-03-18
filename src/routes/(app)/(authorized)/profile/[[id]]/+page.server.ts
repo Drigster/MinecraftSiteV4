@@ -25,7 +25,6 @@ import type { Selectable } from "kysely";
 import type { DB } from "$lib/db/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import { ToastLevel } from "$lib/components/toast";
 
 export const load = async ({ locals, params }) => {
 	const skinChangeForm = await superValidate(zod(skinSchema), {
@@ -133,7 +132,7 @@ export const actions = {
 		await saveSkin(form.data.skin, locals.user!.id);
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			text: "Скин был изменён!",
 		});
 	},
@@ -153,7 +152,7 @@ export const actions = {
 		);
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			text: "Плащ был изменён!",
 		});
 	},
@@ -167,7 +166,7 @@ export const actions = {
 		deleteSkin(locals.user!.id);
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			text: "Скин был удалён!",
 		});
 	},
@@ -181,7 +180,7 @@ export const actions = {
 		deleteCape(locals.user!.id);
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			text: "Плащ был удалён!",
 		});
 	},
@@ -201,7 +200,7 @@ export const actions = {
 			.execute();
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			text: "Никнейм был изменён!",
 		});
 	},
@@ -220,12 +219,12 @@ export const actions = {
 
 		if (await sendChangeEmailEmail(user)) {
 			return message(form, {
-				type: ToastLevel.Info,
+				type: "info",
 				text: "На почту было отправлено сообщение с изменением почты!",
 			});
 		} else {
 			return message(form, {
-				type: ToastLevel.Error,
+				type: "error",
 				text: "Ошибка при отправке сообщения, попробуйте позже.",
 			});
 		}
@@ -245,12 +244,12 @@ export const actions = {
 
 		if (await sendChangePasswordEmail(user)) {
 			return message(form, {
-				type: ToastLevel.Info,
+				type: "info",
 				text: "На почту было отправлено сообщение с изменением пароля!",
 			});
 		} else {
 			return message(form, {
-				type: ToastLevel.Error,
+				type: "error",
 				text: "Ошибка при отправке сообщения, попробуйте позже.",
 			});
 		}
@@ -270,12 +269,12 @@ export const actions = {
 
 		if (await sendVerificationEmail(user)) {
 			return message(form, {
-				type: ToastLevel.Info,
+				type: "info",
 				text: "На почту было отправлено сообщение с подтверждением почты!",
 			});
 		} else {
 			return message(form, {
-				type: ToastLevel.Error,
+				type: "error",
 				text: "Ошибка при отправке сообщения, попробуйте позже",
 			});
 		}
@@ -299,7 +298,7 @@ export const actions = {
 		}
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			text: "Сессия была удалена!",
 		});
 	},
@@ -318,7 +317,7 @@ export const actions = {
 				.executeTakeFirst()
 		) {
 			return message(form, {
-				type: ToastLevel.Error,
+				type: "error",
 				text: "Пользователь с таким именем уже существует!",
 			});
 		}
@@ -332,7 +331,7 @@ export const actions = {
 			.execute();
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			title: "Администратор",
 			text: "Никнейм был изменён!",
 		});
@@ -352,7 +351,7 @@ export const actions = {
 				.executeTakeFirst()
 		) {
 			return message(form, {
-				type: ToastLevel.Error,
+				type: "error",
 				text: "Пользователь с таким UUID уже существует!",
 			});
 		}
@@ -366,7 +365,7 @@ export const actions = {
 			.execute();
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			title: "Администратор",
 			text: "UUID был изменён!",
 		});
@@ -387,7 +386,7 @@ export const actions = {
 			.execute();
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			title: "Администратор",
 			text: "Почта была изменена!",
 		});
@@ -417,7 +416,7 @@ export const actions = {
 			.execute();
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			title: "Администратор",
 			text: "Пароль был изменён!",
 		});
@@ -438,7 +437,7 @@ export const actions = {
 			.execute();
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			title: "Администратор",
 			text: "Почта была верифицирована!",
 		});
@@ -459,7 +458,7 @@ export const actions = {
 			.execute();
 
 		return message(form, {
-			type: ToastLevel.Success,
+			type: "success",
 			title: "Администратор",
 			text: "Почта была деверифицирована!",
 		});

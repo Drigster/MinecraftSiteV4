@@ -1,5 +1,3 @@
-import type { ToastLevel } from "$lib/components/toast";
-
 declare global {
 	namespace App {
 		// interface Platform {}
@@ -16,7 +14,7 @@ declare global {
 		}
 		namespace Superforms {
 			type Message = {
-				type: ToastLevel;
+				type: "info" | "success" | "error";
 				title?: string;
 				text: string;
 			};

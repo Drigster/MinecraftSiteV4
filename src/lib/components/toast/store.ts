@@ -4,7 +4,7 @@ interface ToastModel {
 	id: string;
 	title?: string;
 	message: string;
-	type: ToastLevel;
+	type: "info" | "success" | "error";
 	duration: number;
 	dismissible: boolean;
 }
@@ -12,22 +12,20 @@ interface ToastModel {
 export interface Toast {
 	message: string;
 	title?: string;
-	type?: ToastLevel;
+	type?: "info" | "success" | "error";
 	duration?: number;
 	dismissible?: boolean;
-}
-
-export enum ToastLevel {
-	Info = "blue",
-	Success = "green",
-	Error = "red",
 }
 
 export const toasts = writable<ToastModel[]>([]);
 
 // Setup some sensible defaults for a toast.
-const defaults = {
-	type: ToastLevel.Info,
+const defaults: {
+	type: ToastModel["type"];
+	dismissible: ToastModel["dismissible"];
+	duration: ToastModel["duration"];
+} = {
+	type: "info",
 	dismissible: true,
 	duration: 9000,
 };

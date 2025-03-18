@@ -4,7 +4,6 @@ import { zod } from "sveltekit-superforms/adapters";
 import { z } from "zod";
 import { sendVerificationEmail } from "$lib/util.server";
 import { db } from "$lib/db/index.js";
-import { ToastLevel } from "$lib/components/toast";
 
 const schema = z.object({
 	verify: z.string(),
@@ -39,12 +38,12 @@ export const actions = {
 
 		if (await sendVerificationEmail(user)) {
 			return setMessage(form, {
-				type: ToastLevel.Info,
+				type: "info",
 				text: "Сообщение с подтверждением было отправлено повторно",
 			});
 		} else {
 			return setMessage(form, {
-				type: ToastLevel.Error,
+				type: "error",
 				text: "Ошибка при отправке сообщения попробуйте позже",
 			});
 		}

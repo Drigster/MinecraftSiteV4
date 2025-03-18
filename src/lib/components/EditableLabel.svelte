@@ -9,7 +9,6 @@
 	import TextLabel from "./TextLabel.svelte";
 	import { page } from "$app/stores";
 	import { getFlash } from "sveltekit-flash-message";
-	import { ToastLevel } from "./toast";
 
 	const flash = getFlash(page);
 
@@ -50,13 +49,13 @@
 			}
 			if (form.errors[input]) {
 				$flash = {
-					type: ToastLevel.Error,
+					type: "error",
 					message: form.errors[input],
 				};
 			}
 		},
 		onError({ result }) {
-			$flash = { type: ToastLevel.Error, message: result.error.message };
+			$flash = { type: "error", message: result.error.message };
 		},
 	});
 

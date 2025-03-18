@@ -5,7 +5,6 @@ import { z } from "zod";
 
 import { sendChangePasswordEmail } from "$lib/util.server.js";
 import { db } from "$lib/db";
-import { ToastLevel } from "$lib/components/toast/store.js";
 
 const schema = z.object({
 	login: z.string().min(1, "Логин не может быть пустым"),
@@ -39,18 +38,18 @@ export const actions = {
 		if (user != null) {
 			if (await sendChangePasswordEmail(user)) {
 				return setMessage(form, {
-					type: ToastLevel.Info,
+					type: "info",
 					text: "На почту было отправлено сообщение с изменением пароля!",
 				});
 			} else {
 				return setMessage(form, {
-					type: ToastLevel.Error,
+					type: "error",
 					text: "Ошибка при отправке сообщения попробуйте позже",
 				});
 			}
 		} else {
 			return setMessage(form, {
-				type: ToastLevel.Error,
+				type: "error",
 				text: "Пользователь не найден!",
 			});
 		}

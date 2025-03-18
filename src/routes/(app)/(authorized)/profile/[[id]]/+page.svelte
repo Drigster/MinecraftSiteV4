@@ -14,7 +14,6 @@
 	import { page } from "$app/stores";
 	import SkinEditForm from "./forms/SkinEditForm.svelte";
 	import CapeEditForm from "./forms/CapeEditForm.svelte";
-	import { ToastLevel } from "$lib/components/toast";
 
 	const flash = getFlash(page);
 
@@ -37,7 +36,7 @@
 			}
 		},
 		onError({ result }) {
-			$flash = { type: ToastLevel.Error, message: result.error.message };
+			$flash = { type: "error", message: result.error.message };
 		},
 	});
 
@@ -55,7 +54,7 @@
 			},
 			onError({ result }) {
 				$flash = {
-					type: ToastLevel.Error,
+					type: "error",
 					message: result.error.message,
 				};
 			},
@@ -75,7 +74,7 @@
 			},
 			onError({ result }) {
 				$flash = {
-					type: ToastLevel.Error,
+					type: "error",
 					message: result.error.message,
 				};
 			},

@@ -5,7 +5,6 @@ import { zod } from "sveltekit-superforms/adapters";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { getServers } from "$lib/util.server";
-import { ToastLevel } from "$lib/components/toast";
 
 const serverCreateSchema = z.object({
 	serverName: z.string().min(1, "Название не может быть пустым"),
@@ -63,7 +62,7 @@ export const actions = {
 			.executeTakeFirstOrThrow();
 
 		return message(form, {
-			type: ToastLevel.Info,
+			type: "info",
 			text: "Сервер создан!",
 		});
 	},

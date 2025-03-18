@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { twMerge } from "tailwind-merge";
-	import { ToastLevel, dismissToast, toasts } from "./store";
+	import { dismissToast, toasts } from "./store";
 	import {
 		CheckCircle,
 		ExclamationCircle,
@@ -36,14 +36,12 @@
 	<section class={toastsClass}>
 		{#each $toasts as toast (toast.id)}
 			<Alert.Root
-				variant={toast.type == ToastLevel.Error
-					? "destructive"
-					: "default"}
+				variant={toast.type == "error" ? "destructive" : "default"}
 				on:close={() => dismissToast(toast.id)}
 			>
-				{#if toast.type == ToastLevel.Error}
+				{#if toast.type == "error"}
 					<XCircle size="24" />
-				{:else if toast.type == ToastLevel.Success}
+				{:else if toast.type == "success"}
 					<CheckCircle size="24" />
 				{:else}
 					<ExclamationCircle size="24" />
