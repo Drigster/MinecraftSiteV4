@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Ellipsis from "@o7/icon/lucide";
+	import { Ellipsis } from "@o7/icon/lucide";
 	import type { HTMLAttributes } from "svelte/elements";
 	import { cn } from "$lib/utils.js";
 

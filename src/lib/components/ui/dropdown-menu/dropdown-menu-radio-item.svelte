@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
-	import Circle from "@o7/icon/lucide";
+	import { Circle } from "@o7/icon/lucide";
 	import { cn } from "$lib/utils.js";
 
 	type $$Props = DropdownMenuPrimitive.RadioItemProps;
