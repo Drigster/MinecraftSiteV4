@@ -63,7 +63,6 @@
 			cell: (cell) => {
 				console.log(cell.row);
 				return createRender(Actions, {
-					id: cell.id,
 					server_uuid: cell.row.original.uuid,
 					owner_uuid: cell.row.original.owner?.uuid,
 				});

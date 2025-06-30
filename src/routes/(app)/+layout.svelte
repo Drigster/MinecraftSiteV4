@@ -8,7 +8,7 @@
 </script>
 
 <Navbar user={data.user} />
-<main class="content-grid flex-grow">
+<main class="content-grid flex-grow pb-4">
 	{@render children()}
 </main>
 <Footer />

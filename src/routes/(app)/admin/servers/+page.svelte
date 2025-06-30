@@ -7,5 +7,19 @@
 
 <div class="contentBlock p-4">
 	<h2 class="text-2xl">Сервера</h2>
-	<DataTable {data} />
+	<table>
+		<thead> </thead>
+		<tbody>
+			{#each data.servers as server}
+				<tr>
+					<td
+						><a href="/admin/server/{server.uuid}">{server.name}</a
+						></td
+					>
+					<td>{server.owner}</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+	<!-- <DataTable {data} /> -->
 </div>

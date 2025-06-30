@@ -14,20 +14,15 @@
 		FileCog,
 		House,
 	} from "@o7/icon/lucide";
-	import * as Dialog from "$lib/components/ui/dialog/index.js";
-	import { Input } from "$lib/components/ui/input/index.js";
-	import { Label } from "$lib/components/ui/label/index.js";
-	import { Button } from "$lib/components/ui/button/index.js";
+	import UploadFileModal from "./UploadFileModal.svelte";
 
-	let {
-		files,
-	}: {
-		files: FileType[];
-	} = $props();
+	let { data } = $props();
 	let path = $derived("/" + $page.params.path || "/");
 	let viewType = $state<"dir" | "file">("dir");
 
-	let currentPathFiles = $derived(files.filter((file) => file.path == path));
+	let currentPathFiles = $derived(
+		data.files.filter((file) => file.path == path),
+	);
 </script>
 
 <div>
@@ -62,32 +57,7 @@
 					{/if}
 				{/each}
 			</div>
-			<Dialog.Root>
-				<Dialog.Trigger class="p-1 border-2 border-gray-500 rounded-md"
-					>Загрузить файл</Dialog.Trigger
-				>
-				<Dialog.Content class="sm:max-w-[425px]">
-					<Dialog.Header>
-						<Dialog.Title>Загрузить файл</Dialog.Title>
-					</Dialog.Header>
-					<form class="flex flex-col" action="">
-						<div class="grid gap-4 py-4">
-							<div class="grid grid-cols-4 items-center gap-4">
-								<Label for="file" class="text-right">Файл</Label
-								>
-								<Input
-									id="file"
-									type="file"
-									class="col-span-3"
-								/>
-							</div>
-						</div>
-						<Button class="ml-auto" type="submit"
-							>Save changes</Button
-						>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
+			<UploadFileModal data={data.uploadFileForm} />
 		</div>
 		<div class="flex flex-col gap-1">
 			{#if path != "/"}

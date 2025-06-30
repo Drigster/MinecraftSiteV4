@@ -1,5 +1,5 @@
 <script lang="ts">
-	import FileBrowser from "$lib/components/FileBrowser.svelte";
+	import FileBrowser from "$lib/components/FileBrowser/FileBrowser.svelte";
 	import type { PageData } from "./$types";
 
 	let { data }: { data: PageData } = $props();
@@ -11,5 +11,5 @@
 
 <div>
 	<a href="/admin/servers"><button>Назад</button></a>
-	<FileBrowser files={data.files} />
+	<FileBrowser {data} />
 </div>
