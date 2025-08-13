@@ -19,11 +19,11 @@ const config = {
 		extend: {
 			colors: {
 				"background-dark": "var(--background-dark)",
-				"background": "var(--background)",
+				"background": "rgba(0, 0, 0, 0.6)",
 				"background-light": "var(--background-light)",
-				"accent": "var(--accent)",
-				"text": "var(--text)",
-				"text-muted": "var(--text-muted)",
+				"accent": "rgb(252, 111, 83)",
+				"text": "rgb(221, 234, 253)",
+				"text-muted": "rgb(163, 163, 163)",
 				"border": "var(--border)"
 			}
 		},

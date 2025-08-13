@@ -1,7 +1,7 @@
 import { setMessage, superValidate } from "sveltekit-superforms";
 import { fail } from "@sveltejs/kit";
 import { zod } from "sveltekit-superforms/adapters";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { sendChangePasswordEmail } from "$lib/util.server.js";
 import { db } from "$lib/db";

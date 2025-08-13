@@ -15,22 +15,11 @@
 	} from "@o7/icon/lucide";
 	import UploadFileModal from "./UploadFileModal.svelte";
 	import type { FileType } from "$lib/apiTypes";
-	import type { SuperValidated } from "sveltekit-superforms";
 
 	let {
 		files,
-		uploadFileForm,
 	}: {
 		files: FileType[];
-		uploadFileForm: SuperValidated<
-			{
-				file: File;
-			},
-			App.Superforms.Message,
-			{
-				file: File;
-			}
-		>;
 	} = $props();
 	let path = $derived("/" + page.params.path || "/");
 	let viewType = $state<"dir" | "file">("dir");

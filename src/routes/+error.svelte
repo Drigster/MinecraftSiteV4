@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from "$app/stores";
+	import { page } from "$app/state";
 	import Footer from "$lib/components/Footer.svelte";
 	import Navbar from "$lib/components/Navbar.svelte";
 	import { type PageData } from "./(app)/$types";
@@ -8,8 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>{$page.error?.message || $page.status || "Ошибка"} | Foxy.town</title
-	>
+	<title>{page.error?.message || page.status || "Ошибка"} | Foxy.town</title>
 </svelte:head>
 
 <Navbar user={data.user} />
@@ -18,11 +17,11 @@
 		<h2
 			class="text-center mx-auto uppercase text-3xl mb-4 text-accent font-bold"
 		>
-			{$page.status}
+			{page.status}
 		</h2>
 		<div class="text-center">
 			<p class="mb-8">
-				{$page.error?.message}
+				{page.error?.message}
 			</p>
 		</div>
 		<div class="flex justify-center px-4">

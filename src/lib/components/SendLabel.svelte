@@ -1,11 +1,13 @@
 <script lang="ts">
-	import spiner from "$lib/assets/spiner.svg";
-	import { superForm, type SuperValidated } from "sveltekit-superforms";
+	import { getFlash } from "sveltekit-flash-message";
 	import TextLabel from "./TextLabel.svelte";
+	import type { RemoteForm } from "@sveltejs/kit";
+	import { page } from "$app/state";
+
+	const flash = getFlash(page);
 
 	let {
-		form,
-		action,
+		change,
 		title,
 		value,
 		titleClass = "",
@@ -14,8 +16,7 @@
 		buttonText = "Изменить",
 	}: {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		form: SuperValidated<any> | undefined;
-		action: string;
+		change: RemoteForm<void>;
 		title: string;
 		value: string;
 		titleClass?: string;
@@ -23,31 +24,30 @@
 		hidden?: boolean;
 		buttonText?: string;
 	} = $props();
-
-	const { enhance, delayed } = superForm(form, {
-		resetForm: true,
-	});
 </script>
 
 <TextLabel {title} {titleClass} {valueClass}>
 	<span>{value}</span>
 	{#if !hidden}
-		<form method="post" {action} use:enhance>
-			<button class="text-xs text-secondary m-1 hover:text-white">
-				{#if $delayed}
-					<span class="relative">
-						{buttonText}
-						<img
-							class="h-full mx-1 absolute left-full top-0"
-							width="20"
-							height="20"
-							src={spiner}
-							alt="Spiner icon"
-						/>
-					</span>
-				{:else}
-					{buttonText}
-				{/if}
+		<form
+			{...change.enhance(async ({ form, submit }) => {
+				try {
+					await submit();
+					form.reset();
+				} catch (error) {
+					$flash = {
+						type: "success",
+						message: "Ошибка, попробуйте позже",
+					};
+					console.log(error);
+				}
+			})}
+		>
+			<button
+				class="text-xs text-text-muted m-1 hover:text-opacity-50 disabled:line-through disabled:cursor-wait disabled:text-opacity-50"
+				disabled={change.pending > 0}
+			>
+				{buttonText}
 			</button>
 		</form>
 	{/if}

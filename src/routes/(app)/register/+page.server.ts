@@ -1,7 +1,7 @@
 import { setError, superValidate } from "sveltekit-superforms";
 import { fail, redirect } from "@sveltejs/kit";
 import { zod } from "sveltekit-superforms/adapters";
-import { z } from "zod";
+import { z } from "zod/v4";
 import bcrypt from "bcrypt";
 
 import { v4 as uuidv4 } from "uuid";
@@ -17,7 +17,7 @@ const schema = z.object({
 		.min(1, "Никнейм не может быть пустым")
 		.max(16, "Никнейм не может быть длинее 16 символов")
 		.regex(/[a-zA-Z0-9_]+/, "Никнейм имеет недопустимые символы"),
-	email: z.string().email(),
+	email: z.email(),
 	password: z.string().min(1, "Пароль не может быть пустым"),
 	password2: z.string().min(1, "Пароль не может быть пустым"),
 });

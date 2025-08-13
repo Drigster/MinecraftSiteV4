@@ -1,7 +1,7 @@
 import { setError, setMessage, superValidate } from "sveltekit-superforms";
 import { fail } from "@sveltejs/kit";
 import { zod } from "sveltekit-superforms/adapters";
-import { z } from "zod";
+import { z } from "zod/v4";
 import bcrypt from "bcrypt";
 import { db } from "$lib/db";
 import jwt from "jsonwebtoken";

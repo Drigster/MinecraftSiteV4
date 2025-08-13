@@ -1,5 +1,5 @@
 import { query } from '$app/server';
-import z from 'zod';
+import z from 'zod/v4';
 
 export const getDir = query(z.string() ,async (path) => {
 	let response: Response;

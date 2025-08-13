@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { DateTime } from "luxon";
-	import { superForm } from "sveltekit-superforms";
 	import Skinview3d from "svelte-skinview3d";
 	import { Trash } from "@o7/icon/heroicons";
-	import spiner from "$lib/assets/spiner.svg";
 	import { type PageData } from "./$types";
 	import EditableLabel from "$lib/components/EditableLabel.svelte";
 	import SendLabel from "$lib/components/SendLabel.svelte";
@@ -11,74 +9,23 @@
 	import { ExclamationCircle } from "@o7/icon/heroicons";
 	import * as Table from "$lib/components/ui/table";
 	import { getFlash } from "sveltekit-flash-message";
-	import { page } from "$app/stores";
+	import { page } from "$app/state";
+	import {
+		changeEmail,
+		changePassword,
+		changeUsername,
+		changeUUID,
+		removeCape,
+		removeSkin,
+		verifyEmail,
+	} from "./functions.remote";
 	import SkinEditForm from "./forms/SkinEditForm.svelte";
-	import CapeEditForm from "./forms/CapeEditForm.svelte";
 
 	const flash = getFlash(page);
 
 	let { data }: { data: PageData } = $props();
+
 	let w = $state(0);
-
-	const {
-		formId: sessionRemoveFormId,
-		enhance: sessionRemoveEnhance,
-		delayed: sessionRemoveDelayed,
-	} = superForm(data.sessionRemoveForm, {
-		resetForm: true,
-		onUpdated({ form }) {
-			if (form.message) {
-				$flash = {
-					type: form.message.type,
-					message: form.message.text,
-					title: form.message.title,
-				};
-			}
-		},
-		onError({ result }) {
-			$flash = { type: "error", message: result.error.message };
-		},
-	});
-
-	const { enhance: skinRemoveEnhance, delayed: skinRemoveDelayed } =
-		superForm(data.skinRemoveForm, {
-			resetForm: true,
-			onUpdated({ form }) {
-				if (form.message) {
-					$flash = {
-						type: form.message.type,
-						message: form.message.text,
-						title: form.message.title,
-					};
-				}
-			},
-			onError({ result }) {
-				$flash = {
-					type: "error",
-					message: result.error.message,
-				};
-			},
-		});
-
-	const { enhance: capeRemoveEnhance, delayed: capeRemoveDelayed } =
-		superForm(data.capeRemoveForm, {
-			resetForm: true,
-			onUpdated({ form }) {
-				if (form.message) {
-					$flash = {
-						type: form.message.type,
-						message: form.message.text,
-						title: form.message.title,
-					};
-				}
-			},
-			onError({ result }) {
-				$flash = {
-					type: "error",
-					message: result.error.message,
-				};
-			},
-		});
 
 	let skinEditing = $state(false);
 	let capeEditing = $state(false);
@@ -123,10 +70,7 @@
 				/>
 			</div>
 			{#if skinEditing}
-				<SkinEditForm
-					data={data.skinChangeForm}
-					bind:idEditing={skinEditing}
-				/>
+				<SkinEditForm bind:idEditing={skinEditing} />
 			{:else}
 				<div class="skin-buttons mb-1 gap-1">
 					<button
@@ -136,32 +80,30 @@
 						}}>Изменить скин</button
 					>
 					<form
-						method="post"
-						action="?/deleteSkin"
-						use:skinRemoveEnhance
+						{...removeSkin.enhance(async ({ form, submit }) => {
+							try {
+								await submit();
+								form.reset();
+							} catch (error) {
+								$flash = {
+									type: "success",
+									message: "Ошибка, попробуйте позже",
+								};
+								console.log(error);
+							}
+						})}
 					>
-						<input type="hidden" name="skinRemove" value="remove" />
 						<button class="button aspect-square h-full">
-							{#if $skinRemoveDelayed}
-								<img
-									class="h-full w-full"
-									width="20"
-									height="20"
-									src={spiner}
-									alt="Spiner icon"
-								/>
-							{:else}
-								<Trash class="m-auto" size="20" />
-							{/if}
+							<Trash class="m-auto" size="20" />
 						</button>
 					</form>
 				</div>
 			{/if}
 			{#if capeEditing}
-				<CapeEditForm
+				<!-- <CapeEditForm
 					data={data.capeChangeForm}
 					bind:idEditing={capeEditing}
-				/>
+				/> -->
 			{:else}
 				<div class="skin-buttons mb-1 gap-1">
 					<button
@@ -171,23 +113,21 @@
 						}}>Изменить плащ</button
 					>
 					<form
-						method="post"
-						action="?/deleteCape"
-						use:capeRemoveEnhance
+						{...removeCape.enhance(async ({ form, submit }) => {
+							try {
+								await submit();
+								form.reset();
+							} catch (error) {
+								$flash = {
+									type: "success",
+									message: "Ошибка, попробуйте позже",
+								};
+								console.log(error);
+							}
+						})}
 					>
-						<input type="hidden" name="capeRemove" value="remove" />
 						<button class="button aspect-square h-full">
-							{#if $capeRemoveDelayed}
-								<img
-									class="h-full w-full"
-									width="20"
-									height="20"
-									src={spiner}
-									alt="Spiner icon"
-								/>
-							{:else}
-								<Trash class="m-auto" size="20" />
-							{/if}
+							<Trash class="m-auto" size="20" />
 						</button>
 					</form>
 				</div>
@@ -196,41 +136,32 @@
 		<div class="contentBlock p-4 profileInfo grow">
 			<EditableLabel
 				title="Никнейм"
-				formData={data.usernameChangeForm}
-				action={data.isSelf
-					? "?/changeUsername"
-					: "?/adminChangeUsername"}
+				change={changeUsername}
 				value={data.user!.username}
 				input="username"
 			/>
 			{#if !data.isSelf}
 				<EditableLabel
 					title="UUID"
-					formData={data.uuidChangeForm}
-					action="?/adminChangeUUID"
+					change={changeUUID}
 					value={data.user!.uuid}
 					input="uuid"
 				/>
 			{/if}
-			<EditableLabel
+			<SendLabel
 				title="Почта"
-				formData={data.emailChangeForm}
-				action="?/adminChangeEmail"
+				change={changeEmail}
 				value={data.user!.email}
-				input="email"
 			/>
-			<EditableLabel
+			<SendLabel
 				title="Пароль"
-				formData={data.passwordChangeForm}
-				action="?/adminChangePassword"
+				change={changePassword}
 				value="●●●●●●●●"
-				input="password"
 			/>
 			{#if data.isSelf}
 				<SendLabel
 					title="Статус аккаунта"
-					form={data.emailVerifyForm}
-					action="?/verifyEmail"
+					change={verifyEmail}
 					value={data.user!.verified
 						? "Верифицирован"
 						: "Не верифицирован"}
@@ -243,10 +174,7 @@
 			{:else}
 				<SendLabel
 					title="Статус аккаунта"
-					form={data.emailVerifyForm}
-					action={data.user!.verified
-						? "?/adminUnVerifyEmail"
-						: "?/adminVerifyEmail"}
+					change={verifyEmail}
 					value={data.user!.verified
 						? "Верифицирован"
 						: "Не верифицирован"}
@@ -281,7 +209,7 @@
 				Сессии автоматически удаляются после месяца неактивности.
 			</h2>
 		</div>
-		<form method="post" use:sessionRemoveEnhance>
+		<form method="post">
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
@@ -318,7 +246,7 @@
 								{/if}
 							</Table.Cell>
 							<Table.Cell class="text-right">
-								{#if $sessionRemoveDelayed && $sessionRemoveFormId == session.id}
+								<!-- {#if $sessionRemoveDelayed && $sessionRemoveFormId == session.id}
 									<button
 										class="ml-auto"
 										formaction="?/removeSession"
@@ -346,7 +274,7 @@
 									>
 										Удалить
 									</button>
-								{/if}
+								{/if} -->
 							</Table.Cell>
 						</Table.Row>
 					{/each}
@@ -359,7 +287,7 @@
 <style>
 	.profileInfo {
 		display: grid;
-		grid-template-columns: 1fr max-content;
+		grid-template-columns: 1fr minmax(30%, max-content);
 	}
 
 	.skin-buttons {

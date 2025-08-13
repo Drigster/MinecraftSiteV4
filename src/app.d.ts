@@ -5,6 +5,12 @@ declare global {
 			user: import("lucia").User | null;
 			session: import("lucia").Session | null;
 		}
+		interface PageData {
+			flash?: { 
+				type: "success" | "error",
+				message: string
+			}
+		}
 		// interface Error {}
 		// interface Session {}
 		// interface Stuff {}

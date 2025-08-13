@@ -53,6 +53,7 @@
 		"zod": "^4.0.17"
 	},
 	"devDependencies": {
+		"@types/bcrypt": "^6.0.0",
 		"@types/geoip-lite": "^1.4.4",
 		"@types/jsonwebtoken": "^9.0.10",
 		"@types/luxon": "^3.7.1",

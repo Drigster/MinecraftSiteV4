@@ -5,7 +5,7 @@
 	import { Label } from "../ui/label";
 	import { Input } from "../ui/input";
 	import { Button } from "../ui/button";
-	import { page } from "$app/stores";
+	import { page } from "$app/state";
 	import { getFlash } from "sveltekit-flash-message";
 	import * as Dialog from "$lib/components/ui/dialog/index.js";
 

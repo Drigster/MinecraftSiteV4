@@ -3,41 +3,43 @@
 @tailwind utilities;
 
 :root {
-	/* Shadcn */
 	--background: rgba(0, 0, 0, 0.6);
+	--primary: rgb(221, 234, 253);
+	--secondary: rgb(163, 163, 163);
+	--accent: rgb(252, 111, 83);
+
+
+	/* Shadcn */
 	--foreground: purple;
 
-	--muted: rgb(255, 0, 43);
-	--muted-foreground: blue;
+	--muted: purple;
+	--muted-foreground: purple;
 
-	--popover: var(--background);
-	--popover-foreground: var(--primary);
+	--popover: purple;
+	--popover-foreground: purple;
 
 	--card: purple;
 	--card-foreground: purple;
 
-	--border: green;
-	--input: var(--primary);
+	--border: purple;
+	--input: purple;
 
-	--primary: rgb(221, 234, 253);
 	--primary-foreground: purple;
 
-	--secondary: rgb(163, 163, 163);
 	--secondary-foreground: purple;
 
-	--accent: rgb(252, 111, 83);
 	--accent-foreground: purple;
 
-	--destructive: red;
+	--destructive: purple;
 	--destructive-foreground: purple;
 
-	--ring: var(--accent);
+	--ring: purple;
 
-	--radius: 0.5rem;
+	--radius: 0.123rem;
 	/* Shadcn end */
 
 	--danger: purple;
-	--notify: yellow;
+	--notify: purple;
 }
 
 html {
@@ -69,6 +71,11 @@ body {
 	margin-inline: auto;
 	border: solid 2px var(--primary);
 	border-radius: 0.75rem;
+}
+
+.button:hover {
+	color: hsl(216 89% 93% / 0.6);
+	border: solid 2px hsl(216 89% 93% / 0.6);
 }
 
 .content-grid {

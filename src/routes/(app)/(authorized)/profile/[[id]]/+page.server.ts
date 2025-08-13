@@ -1,62 +1,9 @@
-import { fail, message, superValidate } from "sveltekit-superforms";
-import { zod } from "sveltekit-superforms/adapters";
-import fs from "fs";
-import {
-	deleteCape,
-	deleteSkin,
-	saveSkin,
-	sendChangeEmailEmail,
-	sendChangePasswordEmail,
-	sendVerificationEmail,
-} from "$lib/util.server.js";
 import { db } from "$lib/db";
-import {
-	adminEmailChangeSchema,
-	adminPasswordChangeSchema,
-	capeSchema,
-	sessionRemoveSchema,
-	skinSchema,
-	usernameChangeSchema,
-	uuidChangeSchema,
-} from "./schemas";
-import { lucia } from "$lib/server/auth";
-import { error, redirect } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 import type { Selectable } from "kysely";
 import type { DB } from "$lib/db/schema";
-import { z } from "zod";
-import bcrypt from "bcrypt";
 
 export const load = async ({ locals, params }) => {
-	const skinChangeForm = await superValidate(zod(skinSchema), {
-		id: "skinChangeForm",
-	});
-	const capeChangeForm = await superValidate(zod(capeSchema), {
-		id: "capeChangeForm",
-	});
-	const sessionRemoveForm = await superValidate(zod(sessionRemoveSchema), {
-		id: "sessionRemoveForm",
-	});
-	const usernameChangeForm = await superValidate(zod(usernameChangeSchema), {
-		id: "usernameChangeForm",
-	});
-	const uuidChangeForm = await superValidate(zod(uuidChangeSchema), {
-		id: "usernameChangeForm",
-	});
-	const skinRemoveForm = await superValidate(zod(z.object({})), {
-		id: "skinRemoveForm",
-	});
-	const capeRemoveForm = await superValidate(zod(z.object({})), {
-		id: "capeRemoveForm",
-	});
-	const emailChangeForm = await superValidate(zod(z.object({})), {
-		id: "emailChangeForm",
-	});
-	const passwordChangeForm = await superValidate(zod(z.object({})), {
-		id: "passwordChangeForm",
-	});
-	const emailVerifyForm = await superValidate(zod(z.object({})), {
-		id: "emailVerifyForm",
-	});
 	let user: Selectable<DB["User"]>;
 	let sessions: Selectable<DB["Session"]>[];
 
@@ -103,16 +50,6 @@ export const load = async ({ locals, params }) => {
 	}
 
 	return {
-		skinChangeForm,
-		capeChangeForm,
-		sessionRemoveForm,
-		usernameChangeForm,
-		uuidChangeForm,
-		skinRemoveForm,
-		capeRemoveForm,
-		emailChangeForm,
-		passwordChangeForm,
-		emailVerifyForm,
 		user,
 		sessions,
 		currentSession: locals.session!,
@@ -121,346 +58,346 @@ export const load = async ({ locals, params }) => {
 	};
 };
 
-export const actions = {
-	changeSkin: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(skinSchema));
+// export const actions = {
+// 	changeSkin: async ({ request, locals }) => {
+// 		const form = await superValidate(request, zod(skinSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		await saveSkin(form.data.skin, locals.user!.id);
+// 		await saveSkin(form.data.skin, locals.user!.id);
 
-		return message(form, {
-			type: "success",
-			text: "Скин был изменён!",
-		});
-	},
-	changeCape: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(capeSchema));
+// 		return message(form, {
+// 			type: "success",
+// 			text: "Скин был изменён!",
+// 		});
+// 	},
+// 	changeCape: async ({ request, locals }) => {
+// 		const form = await superValidate(request, zod(capeSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		if (!fs.existsSync("./files/capes/")) {
-			fs.mkdirSync("./files/capes/", { recursive: true });
-		}
-		fs.writeFileSync(
-			"./files/capes/" + locals.user!.id + ".png",
-			Buffer.from(await form.data.cape.arrayBuffer()),
-		);
+// 		if (!fs.existsSync("./files/capes/")) {
+// 			fs.mkdirSync("./files/capes/", { recursive: true });
+// 		}
+// 		fs.writeFileSync(
+// 			"./files/capes/" + locals.user!.id + ".png",
+// 			Buffer.from(await form.data.cape.arrayBuffer()),
+// 		);
 
-		return message(form, {
-			type: "success",
-			text: "Плащ был изменён!",
-		});
-	},
-	deleteSkin: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(z.object({})));
+// 		return message(form, {
+// 			type: "success",
+// 			text: "Плащ был изменён!",
+// 		});
+// 	},
+// 	deleteSkin: async ({ request, locals }) => {
+// 		const form = await superValidate(request, zod(z.object({})));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		deleteSkin(locals.user!.id);
+// 		deleteSkin(locals.user!.id);
 
-		return message(form, {
-			type: "success",
-			text: "Скин был удалён!",
-		});
-	},
-	deleteCape: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(z.object({})));
+// 		return message(form, {
+// 			type: "success",
+// 			text: "Скин был удалён!",
+// 		});
+// 	},
+// 	deleteCape: async ({ request, locals }) => {
+// 		const form = await superValidate(request, zod(z.object({})));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		deleteCape(locals.user!.id);
+// 		deleteCape(locals.user!.id);
 
-		return message(form, {
-			type: "success",
-			text: "Плащ был удалён!",
-		});
-	},
-	changeUsername: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(usernameChangeSchema));
+// 		return message(form, {
+// 			type: "success",
+// 			text: "Плащ был удалён!",
+// 		});
+// 	},
+// 	changeUsername: async ({ request, locals }) => {
+// 		const form = await superValidate(request, zod(usernameChangeSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		await db
-			.updateTable("User")
-			.where("id", "=", locals.user!.id)
-			.set({
-				username: form.data.username,
-			})
-			.execute();
+// 		await db
+// 			.updateTable("User")
+// 			.where("id", "=", locals.user!.id)
+// 			.set({
+// 				username: form.data.username,
+// 			})
+// 			.execute();
 
-		return message(form, {
-			type: "success",
-			text: "Никнейм был изменён!",
-		});
-	},
-	changeEmail: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(z.object({})));
+// 		return message(form, {
+// 			type: "success",
+// 			text: "Никнейм был изменён!",
+// 		});
+// 	},
+// 	changeEmail: async ({ request, locals }) => {
+// 		const form = await superValidate(request, zod(z.object({})));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		const user = await db
-			.selectFrom("User")
-			.selectAll()
-			.where("id", "=", locals.user!.id)
-			.executeTakeFirstOrThrow();
+// 		const user = await db
+// 			.selectFrom("User")
+// 			.selectAll()
+// 			.where("id", "=", locals.user!.id)
+// 			.executeTakeFirstOrThrow();
 
-		if (await sendChangeEmailEmail(user)) {
-			return message(form, {
-				type: "info",
-				text: "На почту было отправлено сообщение с изменением почты!",
-			});
-		} else {
-			return message(form, {
-				type: "error",
-				text: "Ошибка при отправке сообщения, попробуйте позже.",
-			});
-		}
-	},
-	changePassword: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(z.object({})));
+// 		if (await sendChangeEmailEmail(user)) {
+// 			return message(form, {
+// 				type: "info",
+// 				text: "На почту было отправлено сообщение с изменением почты!",
+// 			});
+// 		} else {
+// 			return message(form, {
+// 				type: "error",
+// 				text: "Ошибка при отправке сообщения, попробуйте позже.",
+// 			});
+// 		}
+// 	},
+// 	changePassword: async ({ request, locals }) => {
+// 		const form = await superValidate(request, zod(z.object({})));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		const user = await db
-			.selectFrom("User")
-			.selectAll()
-			.where("id", "=", locals.user!.id)
-			.executeTakeFirstOrThrow();
+// 		const user = await db
+// 			.selectFrom("User")
+// 			.selectAll()
+// 			.where("id", "=", locals.user!.id)
+// 			.executeTakeFirstOrThrow();
 
-		if (await sendChangePasswordEmail(user)) {
-			return message(form, {
-				type: "info",
-				text: "На почту было отправлено сообщение с изменением пароля!",
-			});
-		} else {
-			return message(form, {
-				type: "error",
-				text: "Ошибка при отправке сообщения, попробуйте позже.",
-			});
-		}
-	},
-	verifyEmail: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(z.object({})));
+// 		if (await sendChangePasswordEmail(user)) {
+// 			return message(form, {
+// 				type: "info",
+// 				text: "На почту было отправлено сообщение с изменением пароля!",
+// 			});
+// 		} else {
+// 			return message(form, {
+// 				type: "error",
+// 				text: "Ошибка при отправке сообщения, попробуйте позже.",
+// 			});
+// 		}
+// 	},
+// 	verifyEmail: async ({ request, locals }) => {
+// 		const form = await superValidate(request, zod(z.object({})));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		const user = await db
-			.selectFrom("User")
-			.selectAll()
-			.where("id", "=", locals.user!.id)
-			.executeTakeFirstOrThrow();
+// 		const user = await db
+// 			.selectFrom("User")
+// 			.selectAll()
+// 			.where("id", "=", locals.user!.id)
+// 			.executeTakeFirstOrThrow();
 
-		if (await sendVerificationEmail(user)) {
-			return message(form, {
-				type: "info",
-				text: "На почту было отправлено сообщение с подтверждением почты!",
-			});
-		} else {
-			return message(form, {
-				type: "error",
-				text: "Ошибка при отправке сообщения, попробуйте позже",
-			});
-		}
-	},
-	removeSession: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(sessionRemoveSchema));
+// 		if (await sendVerificationEmail(user)) {
+// 			return message(form, {
+// 				type: "info",
+// 				text: "На почту было отправлено сообщение с подтверждением почты!",
+// 			});
+// 		} else {
+// 			return message(form, {
+// 				type: "error",
+// 				text: "Ошибка при отправке сообщения, попробуйте позже",
+// 			});
+// 		}
+// 	},
+// 	removeSession: async ({ request, locals }) => {
+// 		const form = await superValidate(request, zod(sessionRemoveSchema));
 
-		if (form.data.sessionId != null) {
-			const sessions = await lucia.getUserSessions(locals.user!.id);
-			const session = sessions.find(
-				(session) => session.id == form.data.sessionId,
-			);
-			if (session != null) {
-				if (session.userId == locals.user!.id) {
-					await lucia.invalidateSession(form.data.sessionId);
-					if (form.data.sessionId == locals.session?.id) {
-						return redirect(302, "/login");
-					}
-				}
-			}
-		}
+// 		if (form.data.sessionId != null) {
+// 			const sessions = await lucia.getUserSessions(locals.user!.id);
+// 			const session = sessions.find(
+// 				(session) => session.id == form.data.sessionId,
+// 			);
+// 			if (session != null) {
+// 				if (session.userId == locals.user!.id) {
+// 					await lucia.invalidateSession(form.data.sessionId);
+// 					if (form.data.sessionId == locals.session?.id) {
+// 						return redirect(302, "/login");
+// 					}
+// 				}
+// 			}
+// 		}
 
-		return message(form, {
-			type: "success",
-			text: "Сессия была удалена!",
-		});
-	},
-	adminChangeUsername: async ({ request, params }) => {
-		const form = await superValidate(request, zod(usernameChangeSchema));
+// 		return message(form, {
+// 			type: "success",
+// 			text: "Сессия была удалена!",
+// 		});
+// 	},
+// 	adminChangeUsername: async ({ request, params }) => {
+// 		const form = await superValidate(request, zod(usernameChangeSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		if (
-			await db
-				.selectFrom("User")
-				.select("User.id")
-				.where("username", "=", form.data.username)
-				.executeTakeFirst()
-		) {
-			return message(form, {
-				type: "error",
-				text: "Пользователь с таким именем уже существует!",
-			});
-		}
+// 		if (
+// 			await db
+// 				.selectFrom("User")
+// 				.select("User.id")
+// 				.where("username", "=", form.data.username)
+// 				.executeTakeFirst()
+// 		) {
+// 			return message(form, {
+// 				type: "error",
+// 				text: "Пользователь с таким именем уже существует!",
+// 			});
+// 		}
 
-		await db
-			.updateTable("User")
-			.set({
-				username: form.data.username,
-			})
-			.where("id", "=", params.id!)
-			.execute();
+// 		await db
+// 			.updateTable("User")
+// 			.set({
+// 				username: form.data.username,
+// 			})
+// 			.where("id", "=", params.id!)
+// 			.execute();
 
-		return message(form, {
-			type: "success",
-			title: "Администратор",
-			text: "Никнейм был изменён!",
-		});
-	},
-	adminChangeUUID: async ({ request, params }) => {
-		const form = await superValidate(request, zod(uuidChangeSchema));
+// 		return message(form, {
+// 			type: "success",
+// 			title: "Администратор",
+// 			text: "Никнейм был изменён!",
+// 		});
+// 	},
+// 	adminChangeUUID: async ({ request, params }) => {
+// 		const form = await superValidate(request, zod(uuidChangeSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		if (
-			await db
-				.selectFrom("User")
-				.select("User.id")
-				.where("uuid", "=", form.data.uuid)
-				.executeTakeFirst()
-		) {
-			return message(form, {
-				type: "error",
-				text: "Пользователь с таким UUID уже существует!",
-			});
-		}
+// 		if (
+// 			await db
+// 				.selectFrom("User")
+// 				.select("User.id")
+// 				.where("uuid", "=", form.data.uuid)
+// 				.executeTakeFirst()
+// 		) {
+// 			return message(form, {
+// 				type: "error",
+// 				text: "Пользователь с таким UUID уже существует!",
+// 			});
+// 		}
 
-		await db
-			.updateTable("User")
-			.set({
-				uuid: form.data.uuid,
-			})
-			.where("id", "=", params.id!)
-			.execute();
+// 		await db
+// 			.updateTable("User")
+// 			.set({
+// 				uuid: form.data.uuid,
+// 			})
+// 			.where("id", "=", params.id!)
+// 			.execute();
 
-		return message(form, {
-			type: "success",
-			title: "Администратор",
-			text: "UUID был изменён!",
-		});
-	},
-	adminChangeEmail: async ({ request, params }) => {
-		const form = await superValidate(request, zod(adminEmailChangeSchema));
+// 		return message(form, {
+// 			type: "success",
+// 			title: "Администратор",
+// 			text: "UUID был изменён!",
+// 		});
+// 	},
+// 	adminChangeEmail: async ({ request, params }) => {
+// 		const form = await superValidate(request, zod(adminEmailChangeSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		await db
-			.updateTable("User")
-			.set({
-				email: form.data.email,
-			})
-			.where("id", "=", params.id!)
-			.execute();
+// 		await db
+// 			.updateTable("User")
+// 			.set({
+// 				email: form.data.email,
+// 			})
+// 			.where("id", "=", params.id!)
+// 			.execute();
 
-		return message(form, {
-			type: "success",
-			title: "Администратор",
-			text: "Почта была изменена!",
-		});
-	},
-	adminChangePassword: async ({ request, params }) => {
-		const form = await superValidate(
-			request,
-			zod(adminPasswordChangeSchema),
-		);
+// 		return message(form, {
+// 			type: "success",
+// 			title: "Администратор",
+// 			text: "Почта была изменена!",
+// 		});
+// 	},
+// 	adminChangePassword: async ({ request, params }) => {
+// 		const form = await superValidate(
+// 			request,
+// 			zod(adminPasswordChangeSchema),
+// 		);
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		const user = await db
-			.selectFrom("User")
-			.select("salt")
-			.where("id", "=", params.id!)
-			.executeTakeFirstOrThrow();
+// 		const user = await db
+// 			.selectFrom("User")
+// 			.select("salt")
+// 			.where("id", "=", params.id!)
+// 			.executeTakeFirstOrThrow();
 
-		await db
-			.updateTable("User")
-			.set({
-				password: bcrypt.hashSync(form.data.password + user.salt, 12),
-			})
-			.where("id", "=", params.id!)
-			.execute();
+// 		await db
+// 			.updateTable("User")
+// 			.set({
+// 				password: bcrypt.hashSync(form.data.password + user.salt, 12),
+// 			})
+// 			.where("id", "=", params.id!)
+// 			.execute();
 
-		return message(form, {
-			type: "success",
-			title: "Администратор",
-			text: "Пароль был изменён!",
-		});
-	},
-	adminVerifyEmail: async ({ request, params }) => {
-		const form = await superValidate(request, zod(z.object({})));
+// 		return message(form, {
+// 			type: "success",
+// 			title: "Администратор",
+// 			text: "Пароль был изменён!",
+// 		});
+// 	},
+// 	adminVerifyEmail: async ({ request, params }) => {
+// 		const form = await superValidate(request, zod(z.object({})));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		await db
-			.updateTable("User")
-			.set({
-				verified: true,
-			})
-			.where("id", "=", params.id!)
-			.execute();
+// 		await db
+// 			.updateTable("User")
+// 			.set({
+// 				verified: true,
+// 			})
+// 			.where("id", "=", params.id!)
+// 			.execute();
 
-		return message(form, {
-			type: "success",
-			title: "Администратор",
-			text: "Почта была верифицирована!",
-		});
-	},
-	adminUnVerifyEmail: async ({ request, params }) => {
-		const form = await superValidate(request, zod(z.object({})));
+// 		return message(form, {
+// 			type: "success",
+// 			title: "Администратор",
+// 			text: "Почта была верифицирована!",
+// 		});
+// 	},
+// 	adminUnVerifyEmail: async ({ request, params }) => {
+// 		const form = await superValidate(request, zod(z.object({})));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+// 		if (!form.valid) {
+// 			return fail(400, { form });
+// 		}
 
-		await db
-			.updateTable("User")
-			.set({
-				verified: false,
-			})
-			.where("id", "=", params.id!)
-			.execute();
+// 		await db
+// 			.updateTable("User")
+// 			.set({
+// 				verified: false,
+// 			})
+// 			.where("id", "=", params.id!)
+// 			.execute();
 
-		return message(form, {
-			type: "success",
-			title: "Администратор",
-			text: "Почта была деверифицирована!",
-		});
-	},
-};
+// 		return message(form, {
+// 			type: "success",
+// 			title: "Администратор",
+// 			text: "Почта была деверифицирована!",
+// 		});
+// 	},
+// };

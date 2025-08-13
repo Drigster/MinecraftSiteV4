@@ -1,14 +1,14 @@
 import { setError, setMessage, superValidate } from "sveltekit-superforms";
 import { fail } from "@sveltejs/kit";
 import { zod } from "sveltekit-superforms/adapters";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { validate } from "deep-email-validator";
 import { db } from "$lib/db";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "$env/static/private";
 
 const schema = z.object({
-	email: z.string().email(),
+	email: z.email(),
 });
 
 export const load = async ({ params }) => {

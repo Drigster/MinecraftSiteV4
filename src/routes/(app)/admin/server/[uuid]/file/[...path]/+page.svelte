@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from "$app/stores";
+	import { page } from "$app/state";
 	import type { PageData } from "./$types";
 	import { onMount } from "svelte";
 	import hljs from "highlight.js";
