@@ -4,19 +4,33 @@
 	import "highlight.js/styles/tokyo-night-dark.css";
 	import log4j from "./log4j";
 	import { ArrowRight, Loader } from "@o7/icon/lucide";
+	import { fa, tr } from "zod/v4/locales";
 
-	type WebSocketMessage = {
-		type: "ack" | "error" | "update" | "full";
-		message: string;
-	};
+	type WebSocketMessage =
+		| {
+				type: "error" | "update" | "full";
+				message: string;
+		  }
+		| {
+				type: "ack";
+		  };
 
-	type Status = "disconnected" | "connected" | "awaitingResponce";
+	type Status =
+		| "Loading"
+		| "Connecting"
+		| "Connected"
+		| "Disconnected"
+		| "Error"
+		| "Reconnecting";
 
 	hljs.registerLanguage("log4j", log4j);
 
 	let data = $state("");
-	let status: Status = $state("disconnected");
+	let status: Status = $state("Loading");
+	let awaitingResponce = $state(false);
 	let pastCommands: string[] = $state([]);
+	let wsTimeout = $state(0);
+	let wsMaxTimeout = 60;
 
 	let codeElement = $state<HTMLElement>();
 	let formElement = $state<HTMLFormElement>();
@@ -24,70 +38,8 @@
 	let socket: WebSocket;
 
 	onMount(async () => {
-		socket = new WebSocket("ws://localhost:8080");
-
-		socket.onopen = () => {
-			status = "connected";
-			socket.send(JSON.stringify({ type: "full" }));
-		};
-
-		socket.onmessage = async (event: MessageEvent) => {
-			try {
-				const response: WebSocketMessage = JSON.parse(event.data);
-
-				switch (response.type) {
-					case "ack":
-						formElement?.reset();
-						status = "connected";
-						break;
-
-					case "error":
-						console.error("❌ Error:", response.message);
-						break;
-
-					case "update":
-						data +=
-							"\n" +
-							hljs.highlight(response.message, {
-								language: "log4j",
-							}).value;
-						await tick(); // Wait for the DOM to update
-						codeElement?.scrollTo({
-							top: codeElement.scrollHeight,
-							behavior: "smooth",
-						});
-						status = "connected";
-						break;
-
-					case "full":
-						data = hljs.highlight(response.message, {
-							language: "log4j",
-						}).value;
-						await tick(); // Wait for the DOM to update
-						codeElement?.scrollTo({
-							top: codeElement.scrollHeight,
-							behavior: "instant",
-						});
-						status = "connected";
-						break;
-
-					default:
-						console.warn("⚠️ Unknown message type:", response);
-				}
-			} catch (error) {
-				console.error("Failed to parse WebSocket message:", error);
-				console.log("Raw message:", event.data);
-			}
-		};
-
-		socket.onclose = () => {
-			status = "disconnected";
-			console.log("WebSocket disconnected");
-		};
-
-		socket.onerror = (error: Event) => {
-			console.error("WebSocket error:", error);
-		};
+		status = "Connecting";
+		openSocket();
 
 		let store = localStorage.getItem("pastCommands");
 
@@ -110,6 +62,99 @@
 		localStorage.setItem("pastCommands", JSON.stringify(pastCommands));
 	});
 
+	$effect(() => {
+		if (status == "Disconnected") {
+			console.log("Reconnect effect");
+			reconnectSocket();
+		}
+	});
+
+	function reconnectSocket() {
+		console.log("Status: " + status);
+		status = "Reconnecting";
+		console.log("Reconnecting");
+		if (wsTimeout == 0) {
+			console.log("Reconnecting instant");
+			openSocket();
+			wsTimeout = 5;
+			return;
+		}
+		setTimeout(() => {
+			console.log("Reconnecting " + wsTimeout);
+			openSocket();
+			console.log("wsTimeout = " + Math.min(wsTimeout * 2, wsMaxTimeout));
+			wsTimeout = Math.min(wsTimeout * 2, wsMaxTimeout);
+		}, wsTimeout);
+	}
+
+	function openSocket() {
+		socket = new WebSocket("ws://localhost:3000/ws");
+		console.log("Connecting to WebSocket...");
+
+		socket.onopen = () => {
+			wsTimeout = 0;
+			status = "Connected";
+			console.log("Connected");
+		};
+
+		socket.onmessage = async (event: MessageEvent) => {
+			try {
+				const response: WebSocketMessage = JSON.parse(event.data);
+
+				switch (response.type) {
+					case "ack":
+						formElement?.reset();
+						awaitingResponce = false;
+						break;
+
+					case "error":
+						console.error("❌ Error:", response.message);
+						break;
+
+					case "update":
+						data +=
+							"\n" +
+							hljs.highlight(response.message, {
+								language: "log4j",
+							}).value;
+						await tick(); // Wait for the DOM to update
+						codeElement?.scrollTo({
+							top: codeElement.scrollHeight,
+							behavior: "smooth",
+						});
+						break;
+
+					case "full":
+						data = hljs.highlight(response.message, {
+							language: "log4j",
+						}).value;
+						await tick(); // Wait for the DOM to update
+						codeElement?.scrollTo({
+							top: codeElement.scrollHeight,
+							behavior: "instant",
+						});
+						break;
+
+					default:
+						console.warn("⚠️ Unknown message type:", response);
+				}
+			} catch (error) {
+				console.error("Failed to parse WebSocket message:", error);
+				console.log("Raw message:", event.data);
+			}
+		};
+
+		socket.onclose = () => {
+			status = "Disconnected";
+			console.log("Disconnected");
+		};
+
+		socket.onerror = (error: Event) => {
+			status = "Error";
+			console.log("Error:", error);
+		};
+	}
+
 	function handleSublit(
 		e: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement },
 	) {
@@ -126,19 +171,20 @@
 
 	function sendCommand(command: string) {
 		socket.send(JSON.stringify({ type: "command", message: command }));
-		status = "awaitingResponce";
+		awaitingResponce = true;
 	}
 </script>
 
 <div class="flex flex-col">
 	<div class="bg-slate-700 rounded-t-lg grid relative">
-		{#if status == "disconnected"}
+		{#if status != "Connected"}
 			<div
 				class="grid place-content-center absolute inset-0 z-50 bg-black bg-opacity-75 text-xl"
 			>
-				Loading...
+				{status}...
 			</div>
 		{/if}
+		{status}
 		<pre class="overflow-auto m-0 text-xs"><code
 				class="log4j grid-area-1-1 h-[65vh] block overflow-x-auto p-2"
 				bind:this={codeElement}>{@html data}</code
@@ -153,14 +199,14 @@
 		<span class="absolute left-0 top-0 p-2">$</span>
 		<input
 			name="command"
-			disabled={status == "awaitingResponce"}
+			disabled={awaitingResponce}
 			class="p-2 w-full bg-transparent pl-6 rounded-bl-lg"
 		/>
 		<button
 			type="submit"
 			class="aspect-square bg-slate-950 flex justify-center items-center rounded-br-lg border"
 		>
-			{#if status == "awaitingResponce"}
+			{#if awaitingResponce}
 				<Loader class="animate-spin" />
 			{:else}
 				<ArrowRight />

@@ -5,7 +5,8 @@
 	"type": "module",
 	"pnpm": {
 		"onlyBuiltDependencies": [
-			"esbuild"
+			"esbuild",
+			"sharp"
 		]
 	},
 	"scripts": {
@@ -16,15 +17,15 @@
 		"db:push": "node ./prisma/push.mjs"
 	},
 	"dependencies": {
-		"@libsql/client": "^0.15.9",
+		"@libsql/client": "^0.15.10",
 		"@lucia-auth/adapter-sqlite": "^3.0.2",
 		"@o7/icon": "latest",
-		"@sveltejs/adapter-node": "^5.2.12",
-		"@sveltejs/kit": "^2.22.2",
-		"@sveltejs/vite-plugin-svelte": "^5.1.0",
+		"@sveltejs/adapter-node": "^5.2.14",
+		"@sveltejs/kit": "^2.28.0",
+		"@sveltejs/vite-plugin-svelte": "^6.1.1",
 		"autoprefixer": "^10.4.21",
 		"bcrypt": "^6.0.0",
-		"bits-ui": "^2.8.10",
+		"bits-ui": "^2.9.2",
 		"clsx": "^2.1.1",
 		"d3-scale": "^4.0.2",
 		"device-detector-js": "^3.0.3",
@@ -32,29 +33,29 @@
 		"highlight.js": "^11.11.1",
 		"image-size": "^2.0.2",
 		"jsonwebtoken": "^9.0.2",
-		"kysely": "^0.28.2",
+		"kysely": "^0.28.5",
 		"kysely-libsql": "^0.7.1",
 		"layerchart": "^1.0.11",
 		"lucia": "^3.2.2",
-		"luxon": "^3.6.1",
-		"nodemailer": "^7.0.4",
-		"sharp": "^0.34.2",
-		"svelte": "^5.34.9",
+		"luxon": "^3.7.1",
+		"nodemailer": "^7.0.5",
+		"sharp": "^0.34.3",
+		"svelte": "^5.38.1",
 		"svelte-headless-table": "^0.18.3",
 		"svelte-skinview3d": "^1.0.0",
 		"sveltekit-flash-message": "^2.4.6",
 		"sveltekit-superforms": "^2.27.1",
 		"tailwind-merge": "^3.3.1",
-		"tailwind-variants": "^1.0.0",
+		"tailwind-variants": "^2.1.0",
 		"tailwindcss": "^3.4.17",
 		"uuid": "^11.1.0",
-		"vite": "^7.0.0",
-		"zod": "^3.25.67"
+		"vite": "^7.1.2",
+		"zod": "^4.0.17"
 	},
 	"devDependencies": {
 		"@types/geoip-lite": "^1.4.4",
 		"@types/jsonwebtoken": "^9.0.10",
-		"@types/luxon": "^3.6.2",
+		"@types/luxon": "^3.7.1",
 		"@types/nodemailer": "^6.4.17"
 	}
 }

@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { page } from "$app/stores";
-	import type { FileType } from "$lib/apiTypes";
+	import { page } from "$app/state";
 	import { formatBytes } from "$lib/utils";
 	import {
-		File,
+		File as FileIcon,
 		FileArchive,
 		FileImage,
 		FileWarning,
@@ -15,14 +14,26 @@
 		House,
 	} from "@o7/icon/lucide";
 	import UploadFileModal from "./UploadFileModal.svelte";
+	import type { FileType } from "$lib/apiTypes";
+	import type { SuperValidated } from "sveltekit-superforms";
 
-	let { data } = $props();
-	let path = $derived("/" + $page.params.path || "/");
+	let {
+		files,
+		uploadFileForm,
+	}: {
+		files: FileType[];
+		uploadFileForm: SuperValidated<
+			{
+				file: File;
+			},
+			App.Superforms.Message,
+			{
+				file: File;
+			}
+		>;
+	} = $props();
+	let path = $derived("/" + page.params.path || "/");
 	let viewType = $state<"dir" | "file">("dir");
-
-	let currentPathFiles = $derived(
-		data.files.filter((file) => file.path == path),
-	);
 </script>
 
 <div>
@@ -30,7 +41,7 @@
 		<div class="flex justify-between pb-1">
 			<div class="p-2 flex">
 				<a
-					href={"/server/" + $page.params.uuid + "/files/"}
+					href={"/admin/server/" + page.params.uuid + "/files/"}
 					class=" text-blue-400"
 				>
 					<House />
@@ -39,7 +50,7 @@
 					{#if i != path.split("/").length - 1}
 						<a
 							href={"/server/" +
-								$page.params.uuid +
+								page.params.uuid +
 								"/files" +
 								path.substring(
 									0,
@@ -57,14 +68,14 @@
 					{/if}
 				{/each}
 			</div>
-			<UploadFileModal data={data.uploadFileForm} />
+			<!-- <UploadFileModal /> -->
 		</div>
 		<div class="flex flex-col gap-1">
 			{#if path != "/"}
 				<div class="p-2 border-2 border-gray-500 rounded-md">
 					<a
-						href={"/server/" +
-							$page.params.uuid +
+						href={"/admin/server/" +
+							page.params.uuid +
 							"/files" +
 							path.substring(0, path.lastIndexOf("/"))}
 						class=" text-blue-400 text-xl"
@@ -73,14 +84,14 @@
 					</a>
 				</div>
 			{/if}
-			{#each currentPathFiles as file}
+			{#each files as file}
 				<div class="border-2 border-gray-500 rounded-md flex">
 					{#if file.type == "file"}
 						<a
 							data-sveltekit-preload-data="tap"
 							class="flex p-2 gap-1"
-							href="/server/{$page.params
-								.uuid}/file{path}/{file.name}?from={$page.url
+							href="/admin/server/{page.params
+								.uuid}/file{path}{file.name}?from={page.url
 								.pathname}"
 						>
 							{#if file.name.endsWith(".txt")}
@@ -96,13 +107,13 @@
 							{:else if file.name.endsWith(".jar")}
 								<FileCog />
 							{:else}
-								<File />
+								<FileIcon />
 							{/if}
 							<div>{file.name}</div>
 						</a>
 					{:else if file.type == "directory"}
 						<a
-							href={$page.url.pathname + "/" + file.name}
+							href={page.url.pathname + "/" + file.name}
 							class="p-2 text-blue-400 flex gap-1"
 						>
 							<FolderOpen />

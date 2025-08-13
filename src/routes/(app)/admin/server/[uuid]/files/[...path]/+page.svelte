@@ -11,5 +11,5 @@
 
 <div>
 	<a href="/admin/servers"><button>Назад</button></a>
-	<FileBrowser {data} />
+	<FileBrowser files={data.files} />
 </div>

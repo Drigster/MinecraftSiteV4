@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
 
-export const GET = async ({ params, locals }) => {
+export const load = async ({ params, locals }) => {
 	if (locals.user?.role != "ADMIN") {
 		return error(404, "Not found");
 	}
@@ -10,7 +10,7 @@ export const GET = async ({ params, locals }) => {
 	let response: Response;
 	try {
 		response = await fetch(
-			`http://localhost:3000/api/updates/${params.uuid}/file/?file=${params.path}`,
+			`http://localhost:3000/file/${params.path}`,
 		);
 	} catch (err) {
 		console.log(err);
@@ -23,7 +23,7 @@ export const GET = async ({ params, locals }) => {
 	if (response.status == 404) {
 		return error(404, "File not found");
 	}
-
+	
 	const contentDisposition = response.headers.get("Content-Disposition");
 	let filename = "unknown";
 
@@ -34,15 +34,7 @@ export const GET = async ({ params, locals }) => {
 		}
 	}
 
-	const buffer = await response.arrayBuffer();
+	const buffer = response.arrayBuffer();
 
-	return new Response(buffer, {
-		status: 200,
-		headers: {
-			"Content-Type":
-				response.headers.get("Content-Type") ||
-				"application/octet-stream",
-			"Content-Disposition": `attachment; filename="${filename}"`,
-		},
-	});
+	return { buffer: buffer, filename: filename };
 };

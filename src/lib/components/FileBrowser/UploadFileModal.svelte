@@ -9,7 +9,6 @@
 	import { getFlash } from "sveltekit-flash-message";
 	import * as Dialog from "$lib/components/ui/dialog/index.js";
 
-	let { data }: { data: SuperValidated<Infer<UploadFileSchema>> } = $props();
 	const flash = getFlash(page);
 
 	const { form, errors, enhance, reset } = superForm(data, {

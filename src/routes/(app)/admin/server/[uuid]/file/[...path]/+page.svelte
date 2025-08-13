@@ -50,9 +50,14 @@
 		{#await data.buffer}
 			<p class="p-2 text-xl text-center">Loading...</p>
 		{:then raw}
-			<pre class="h-full"><code class="h-full" bind:this={codeBlock}
-					>{new TextDecoder().decode(raw)}</code
+			<pre class="overflow-auto max-h-full m-0 text-xs"><code
+					class="log4j grid-area-1-1 max-w-full block overflow-x-auto p-2"
+					bind:this={codeBlock}>{new TextDecoder().decode(raw)}</code
 				></pre>
+			<!-- <pre class="overflow-auto h-full"><code
+					class="overflow-x-auto h-full"
+					bind:this={codeBlock}>{new TextDecoder().decode(raw)}</code
+				></pre> -->
 		{:catch error}
 			<p style="color: red">{error.message}</p>
 		{/await}
