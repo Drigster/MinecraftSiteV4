@@ -26,7 +26,7 @@
 <div class="py-2 flex flex-col gap-1">
 	<div class="flex gap-1 justify-between">
 		<a
-			href={`${$page.url.searchParams.get("from") || "/server/" + $page.params.uuid + "/files/"}`}
+			href={`${page.url.searchParams.get("from") || "/server/" + page.params.uuid + "/files/"}`}
 			><button>Назад</button></a
 		>
 	</div>
@@ -37,8 +37,8 @@
 			<div class="flex gap-1 justify-between">
 				{data.filename}
 				<a
-					href="/server/{$page.params
-						.uuid}/download/?filePath={$page.url.searchParams.get(
+					href="/server/{page.params
+						.uuid}/download/?filePath={page.url.searchParams.get(
 						'filePath',
 					)}"
 					><button class="flex items-center"

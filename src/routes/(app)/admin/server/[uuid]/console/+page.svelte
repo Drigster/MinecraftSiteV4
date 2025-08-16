@@ -4,7 +4,6 @@
 	import "highlight.js/styles/tokyo-night-dark.css";
 	import log4j from "./log4j";
 	import { ArrowRight, Loader } from "@o7/icon/lucide";
-	import { fa, tr } from "zod/v4/locales";
 
 	type WebSocketMessage =
 		| {

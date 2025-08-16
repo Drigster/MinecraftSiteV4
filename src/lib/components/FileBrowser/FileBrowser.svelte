@@ -80,7 +80,9 @@
 							data-sveltekit-preload-data="tap"
 							class="flex p-2 gap-1"
 							href="/admin/server/{page.params
-								.uuid}/file{path}{file.name}?from={page.url
+								.uuid}/file{path.endsWith('/')
+								? path
+								: path + '/'}{file.name}?from={page.url
 								.pathname}"
 						>
 							{#if file.name.endsWith(".txt")}
