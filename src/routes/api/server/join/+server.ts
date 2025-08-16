@@ -1,8 +1,8 @@
 import { db } from "$lib/db";
 
 interface Request {
-	username: string;
-	uuid: string;
+	username?: string;
+	uuid?: string;
 	accessToken: string;
 	serverId: string;
 }
@@ -10,7 +10,7 @@ interface Request {
 export async function POST({ request }) {
 	const requestData: Request = await request.json();
 	if (
-		requestData.username == undefined ||
+		(requestData.uuid == undefined && requestData.username == undefined) ||
 		requestData.accessToken == undefined ||
 		requestData.serverId == undefined
 	) {
@@ -18,6 +18,21 @@ export async function POST({ request }) {
 			error: "Bad Request",
 			code: 400,
 		};
+		if (requestData.uuid == undefined && requestData.username != undefined) {
+			error.error = "Bad Request, uuid not found!"
+		}
+		else if (requestData.username == undefined && requestData.uuid != undefined) {
+			error.error = "Bad Request, username not found!"
+		}
+		else if (requestData.username == undefined && requestData.uuid == undefined) {
+			error.error = "Bad Request, username and uuid not found"
+		}
+		else if (requestData.accessToken == undefined) {
+			error.error = "Bad Request, accessToken not found!"
+		}
+		else if (requestData.serverId == undefined) {
+			error.error = "Bad Request, serverId not found!"
+		}
 
 		return new Response(JSON.stringify(error), {
 			headers: {
@@ -51,7 +66,7 @@ export async function POST({ request }) {
 		.updateTable("Session")
 		.where("id", "=", session.id)
 		.set({
-			user_id: requestData.uuid,
+			serverId: requestData.serverId
 		})
 		.execute();
 
