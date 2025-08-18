@@ -54,10 +54,13 @@ export type Server = {
     id: string;
     uuid: string;
     name: string;
+    codename: string;
     description: string;
     configHash: string;
     ip: string;
     port: number;
+    localIp: string;
+    localPort: number;
     ownerId: string | null;
     createdAt: Generated<string>;
     /**

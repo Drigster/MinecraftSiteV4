@@ -30,7 +30,7 @@
 		<div class="flex justify-between pb-1">
 			<div class="p-2 flex">
 				<a
-					href={"/admin/server/" + page.params.uuid + "/files/"}
+					href={"/admin/servers/" + page.params.uuid + "/files/"}
 					class=" text-blue-400"
 				>
 					<House />
@@ -63,7 +63,7 @@
 			{#if path != "/"}
 				<div class="p-2 border-2 border-gray-500 rounded-md">
 					<a
-						href={"/admin/server/" +
+						href={"/admin/servers/" +
 							page.params.uuid +
 							"/files" +
 							path.substring(0, path.lastIndexOf("/"))}
@@ -79,7 +79,7 @@
 						<a
 							data-sveltekit-preload-data="tap"
 							class="flex p-2 gap-1"
-							href="/admin/server/{page.params
+							href="/admin/servers/{page.params
 								.uuid}/file{path.endsWith('/')
 								? path
 								: path + '/'}{file.name}?from={page.url

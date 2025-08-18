@@ -8,16 +8,16 @@
 	<div class="contentBlock p-4">
 		<ul class="flex gap-2 flex-col">
 			<li class="border-2 rounded-lg px-2 border-primary">
-				<a href="/admin/server/{page.params.uuid}/">Overview</a>
+				<a href="/admin/servers/{page.params.uuid}/">Overview</a>
 			</li>
 			<li class="border-2 rounded-lg px-2 border-primary">
-				<a href="/admin/server/{page.params.uuid}/console">Console</a>
+				<a href="/admin/servers/{page.params.uuid}/console">Console</a>
 			</li>
 			<li class="border-2 rounded-lg px-2 border-primary">
-				<a href="/admin/server/{page.params.uuid}/mods">Mods</a>
+				<a href="/admin/servers/{page.params.uuid}/mods">Mods</a>
 			</li>
 			<li class="border-2 rounded-lg px-2 border-primary">
-				<a href="/admin/server/{page.params.uuid}/files">Files</a>
+				<a href="/admin/servers/{page.params.uuid}/files">Files</a>
 			</li>
 		</ul>
 	</div>

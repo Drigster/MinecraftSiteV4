@@ -5,6 +5,7 @@
 	"type": "module",
 	"pnpm": {
 		"onlyBuiltDependencies": [
+			"better-sqlite3",
 			"esbuild",
 			"sharp"
 		]
@@ -25,10 +26,12 @@
 		"@sveltejs/vite-plugin-svelte": "^6.1.1",
 		"autoprefixer": "^10.4.21",
 		"bcrypt": "^6.0.0",
+		"better-sqlite3": "^12.2.0",
 		"bits-ui": "^2.9.2",
 		"clsx": "^2.1.1",
 		"d3-scale": "^4.0.2",
 		"device-detector-js": "^3.0.3",
+		"dotenv": "^17.2.1",
 		"geoip-lite": "^1.4.10",
 		"highlight.js": "^11.11.1",
 		"image-size": "^2.0.2",
@@ -50,7 +53,7 @@
 		"tailwindcss": "^3.4.17",
 		"uuid": "^11.1.0",
 		"vite": "^7.1.2",
-		"zod": "^4.0.17"
+		"zod": "^4.0.0"
 	},
 	"devDependencies": {
 		"@types/bcrypt": "^6.0.0",

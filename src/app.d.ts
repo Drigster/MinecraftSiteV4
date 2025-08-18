@@ -18,13 +18,6 @@ declare global {
 			const content: string;
 			export default content;
 		}
-		namespace Superforms {
-			type Message = {
-				type: "info" | "success" | "error";
-				title?: string;
-				text: string;
-			};
-		}
 	}
 }
 

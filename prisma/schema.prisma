@@ -63,10 +63,13 @@ model Server {
   id            String    @id
   uuid          String    @unique
   name          String
+  codename      String
   description   String
   configHash    String
   ip            String
   port          Int
+  localIp       String
+  localPort     Int
   mods          ModFile[]
   owner         User?     @relation("ServerOwner", fields: [ownerId], references: [id])
   ownerId       String?

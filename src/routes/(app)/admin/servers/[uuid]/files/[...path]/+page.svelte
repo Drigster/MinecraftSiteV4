@@ -10,6 +10,6 @@
 </svelte:head>
 
 <div>
-	<a href="/admin/servers"><button>Назад</button></a>
+	<a href="/admin/serverss"><button>Назад</button></a>
 	<FileBrowser files={data.files} />
 </div>

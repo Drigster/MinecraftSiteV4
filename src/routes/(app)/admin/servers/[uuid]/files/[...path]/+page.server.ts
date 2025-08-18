@@ -4,17 +4,17 @@ import { uploadFileSchema } from "$lib/components/FileBrowser/schema";
 import { zod } from "sveltekit-superforms/adapters";
 import type { FileType } from "$lib/apiTypes";
 
-export const load = async ({ params, locals }) => {
+export const load = async ({ params, locals, parent }) => {
 	if (locals.user?.role != "ADMIN") {
 		return error(404, "Not found");
 	}
 
-	console.log(params.path);
+    const server = (await parent()).server;
 
 	let response: Response;
 	try {
 		response = await fetch(
-			`http://localhost:3000/files/${params.path}`,
+			`http://${server.localIp}:${server.localPort}/files/${params.path}`,
 		);
 	} catch (err) {
 		console.log(err);
@@ -22,6 +22,13 @@ export const load = async ({ params, locals }) => {
 			503,
 			"Launcher manager seems to be down,\nplease contact the administrator!",
 		);
+	}
+
+	if (response.status != 200) {
+		return error(
+			response.status,
+			await response.text()
+		)
 	}
 
 	const files: FileType[] = await response.json();

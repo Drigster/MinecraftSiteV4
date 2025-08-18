@@ -4,6 +4,13 @@
 	import "highlight.js/styles/tokyo-night-dark.css";
 	import log4j from "./log4j";
 	import { ArrowRight, Loader } from "@o7/icon/lucide";
+	import { sendCommand } from "./console.remote";
+	import { page } from "$app/state";
+	import { getFlash } from "sveltekit-flash-message";
+	import { browser } from "$app/environment";
+	import { keyof } from "zod";
+
+	const flash = getFlash(page);
 
 	type WebSocketMessage =
 		| {
@@ -15,18 +22,28 @@
 		  };
 
 	type Status =
-		| "Loading"
+		| "Disconnected"
 		| "Connecting"
 		| "Connected"
-		| "Disconnected"
 		| "Error"
 		| "Reconnecting";
 
+	const statusColor: {
+		[K in Status]: string;
+	} = {
+		Disconnected: "red",
+		Connecting: "yellow",
+		Connected: "lightgreen",
+		Error: "red",
+		Reconnecting: "yellow",
+	};
+
 	hljs.registerLanguage("log4j", log4j);
 
-	let data = $state("");
-	let status: Status = $state("Loading");
-	let awaitingResponce = $state(false);
+	let { data: pageData } = $props();
+
+	let data = $state(pageData.log);
+	let status: Status = $state("Disconnected");
 	let pastCommands: string[] = $state([]);
 	let wsTimeout = $state(0);
 	let wsMaxTimeout = 60;
@@ -102,8 +119,6 @@
 
 				switch (response.type) {
 					case "ack":
-						formElement?.reset();
-						awaitingResponce = false;
 						break;
 
 					case "error":
@@ -116,7 +131,7 @@
 							hljs.highlight(response.message, {
 								language: "log4j",
 							}).value;
-						await tick(); // Wait for the DOM to update
+						await tick();
 						codeElement?.scrollTo({
 							top: codeElement.scrollHeight,
 							behavior: "smooth",
@@ -127,7 +142,7 @@
 						data = hljs.highlight(response.message, {
 							language: "log4j",
 						}).value;
-						await tick(); // Wait for the DOM to update
+						await tick();
 						codeElement?.scrollTo({
 							top: codeElement.scrollHeight,
 							behavior: "instant",
@@ -153,37 +168,16 @@
 			console.log("Error:", error);
 		};
 	}
-
-	function handleSublit(
-		e: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement },
-	) {
-		e.preventDefault();
-		const formData = new FormData(e.currentTarget);
-		if (formData.has("command")) {
-			let command = formData.get("command") as string;
-			if (command.trim() != "") {
-				sendCommand(command);
-				pastCommands.push(command);
-			}
-		}
-	}
-
-	function sendCommand(command: string) {
-		socket.send(JSON.stringify({ type: "command", message: command }));
-		awaitingResponce = true;
-	}
 </script>
 
 <div class="flex flex-col">
 	<div class="bg-slate-700 rounded-t-lg grid relative">
-		{#if status != "Connected"}
-			<div
-				class="grid place-content-center absolute inset-0 z-50 bg-black bg-opacity-75 text-xl"
-			>
-				{status}...
-			</div>
-		{/if}
-		{status}
+		<div
+			class="absolute top-0 right-0 text-center bg-gray-500 rounded-bl-lg rounded-tr-lg py-1 px-2"
+			style="color: {statusColor[status]};"
+		>
+			{status}
+		</div>
 		<pre class="overflow-auto m-0 text-xs"><code
 				class="log4j grid-area-1-1 h-[65vh] block overflow-x-auto p-2"
 				bind:this={codeElement}>{@html data}</code
@@ -191,21 +185,37 @@
 	</div>
 	<form
 		class="bg-slate-900 rounded-b-lg relative flex"
-		action=""
-		onsubmit={handleSublit}
-		bind:this={formElement}
+		{...sendCommand.enhance(async ({ form, data, submit }) => {
+			try {
+				await submit();
+				let command = data.get("command")?.toString();
+				if (command) {
+					let len = pastCommands.unshift(command);
+					if (len > 6) {
+						pastCommands.pop();
+					}
+				}
+				form.reset();
+			} catch (error) {
+				$flash = {
+					type: "success",
+					message: "Ошибка, попробуйте позже",
+				};
+				console.log(error);
+			}
+		})}
 	>
 		<span class="absolute left-0 top-0 p-2">$</span>
 		<input
 			name="command"
-			disabled={awaitingResponce}
+			disabled={sendCommand.pending > 0}
 			class="p-2 w-full bg-transparent pl-6 rounded-bl-lg"
 		/>
 		<button
 			type="submit"
 			class="aspect-square bg-slate-950 flex justify-center items-center rounded-br-lg border"
 		>
-			{#if awaitingResponce}
+			{#if sendCommand.pending > 0}
 				<Loader class="animate-spin" />
 			{:else}
 				<ArrowRight />
@@ -219,10 +229,22 @@
 			class="flex items-center justify-between bg-slate-800 p-2 rounded-lg"
 		>
 			<span class="truncate mr-2">{command}</span>
-			<button
-				class="p-2 flex-shrink-0"
-				onclick={() => sendCommand(command)}>Send</button
+			<form
+				{...sendCommand.enhance(async ({ form, submit }) => {
+					try {
+						await submit();
+					} catch (error) {
+						$flash = {
+							type: "success",
+							message: "Ошибка, попробуйте позже",
+						};
+						console.log(error);
+					}
+				})}
 			>
+				<input type="text" name="command" value={command} hidden />
+				<button class="p-2 flex-shrink-0" type="submit">Send</button>
+			</form>
 		</div>
 	{/each}
 </div>

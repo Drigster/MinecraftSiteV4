@@ -1,16 +1,18 @@
 import { error } from "@sveltejs/kit";
 
-export const load = async ({ params, locals }) => {
+export const load = async ({ params, locals, parent }) => {
 	if (locals.user?.role != "ADMIN") {
 		return error(404, "Not found");
 	}
+
+    const server = (await parent()).server;
 
 	params.path = params.path.replaceAll("+", "%2B");
 
 	let response: Response;
 	try {
 		response = await fetch(
-			`http://localhost:3000/file/${params.path}`,
+			`http://${server.localIp}:${server.localPort}/file/${params.path}`,
 		);
 	} catch (err) {
 		console.log(err);
@@ -20,8 +22,11 @@ export const load = async ({ params, locals }) => {
 		);
 	}
 
-	if (response.status == 404) {
-		return error(404, "File not found");
+	if (response.status != 200) {
+		return error(
+			response.status,
+			await response.text()
+		)
 	}
 	
 	const contentDisposition = response.headers.get("Content-Disposition");
