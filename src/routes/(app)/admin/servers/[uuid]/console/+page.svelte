@@ -7,8 +7,6 @@
 	import { sendCommand } from "./console.remote";
 	import { page } from "$app/state";
 	import { getFlash } from "sveltekit-flash-message";
-	import { browser } from "$app/environment";
-	import { keyof } from "zod";
 
 	const flash = getFlash(page);
 
@@ -49,7 +47,6 @@
 	let wsMaxTimeout = 60;
 
 	let codeElement = $state<HTMLElement>();
-	let formElement = $state<HTMLFormElement>();
 
 	let socket: WebSocket;
 
@@ -171,20 +168,20 @@
 </script>
 
 <div class="flex flex-col">
-	<div class="bg-slate-700 rounded-t-lg grid relative">
+	<div class="relative grid rounded-t-lg bg-slate-700">
 		<div
-			class="absolute top-0 right-0 text-center bg-gray-500 rounded-bl-lg rounded-tr-lg py-1 px-2"
+			class="absolute right-0 top-0 rounded-bl-lg rounded-tr-lg bg-gray-500 px-2 py-1 text-center"
 			style="color: {statusColor[status]};"
 		>
 			{status}
 		</div>
-		<pre class="overflow-auto m-0 text-xs"><code
-				class="log4j grid-area-1-1 h-[65vh] block overflow-x-auto p-2"
+		<pre class="m-0 overflow-auto text-xs"><code
+				class="log4j grid-area-1-1 block h-[65vh] overflow-x-auto p-2"
 				bind:this={codeElement}>{@html data}</code
 			></pre>
 	</div>
 	<form
-		class="bg-slate-900 rounded-b-lg relative flex"
+		class="relative flex rounded-b-lg bg-slate-900"
 		{...sendCommand.enhance(async ({ form, data, submit }) => {
 			try {
 				await submit();
@@ -209,11 +206,11 @@
 		<input
 			name="command"
 			disabled={sendCommand.pending > 0}
-			class="p-2 w-full bg-transparent pl-6 rounded-bl-lg"
+			class="w-full rounded-bl-lg bg-transparent p-2 pl-6"
 		/>
 		<button
 			type="submit"
-			class="aspect-square bg-slate-950 flex justify-center items-center rounded-br-lg border"
+			class="flex aspect-square items-center justify-center rounded-br-lg border bg-slate-950"
 		>
 			{#if sendCommand.pending > 0}
 				<Loader class="animate-spin" />
@@ -223,14 +220,14 @@
 		</button>
 	</form>
 </div>
-<div class="grid gap-2 mt-2">
-	{#each pastCommands as command}
+<div class="mt-2 grid gap-2">
+	{#each pastCommands as command (command)}
 		<div
-			class="flex items-center justify-between bg-slate-800 p-2 rounded-lg"
+			class="flex items-center justify-between rounded-lg bg-slate-800 p-2"
 		>
-			<span class="truncate mr-2">{command}</span>
+			<span class="mr-2 truncate">{command}</span>
 			<form
-				{...sendCommand.enhance(async ({ form, submit }) => {
+				{...sendCommand.enhance(async ({ submit }) => {
 					try {
 						await submit();
 					} catch (error) {
@@ -243,7 +240,7 @@
 				})}
 			>
 				<input type="text" name="command" value={command} hidden />
-				<button class="p-2 flex-shrink-0" type="submit">Send</button>
+				<button class="flex-shrink-0 p-2" type="submit">Send</button>
 			</form>
 		</div>
 	{/each}

@@ -3,7 +3,7 @@
 	import { Loader } from "@o7/icon/lucide";
 	import { getFlash } from "sveltekit-flash-message";
 	import { page } from "$app/state";
-	import { uploadCape } from "../functions.remote";
+	import { uploadCape } from "../profile.remote";
 
 	const flash = getFlash(page);
 
@@ -33,8 +33,8 @@
 		}
 	})}
 >
-	<input class="w-full button" type="file" name="cape" accept="image/png" />
-	<div class="flex gap-1 mx-1">
+	<input class="button w-full" type="file" name="cape" accept="image/png" />
+	<div class="mx-1 flex gap-1">
 		{#if uploadCape.pending > 0}
 			<button type="submit" disabled>
 				<Loader class="h-full w-full animate-spin" size="20" />

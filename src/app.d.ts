@@ -6,10 +6,10 @@ declare global {
 			session: import("lucia").Session | null;
 		}
 		interface PageData {
-			flash?: { 
-				type: "success" | "error",
-				message: string
-			}
+			flash?: {
+				type: "info" | "success" | "error";
+				message: string;
+			};
 		}
 		// interface Error {}
 		// interface Session {}

@@ -15,7 +15,7 @@
 <main class="content-grid flex-grow">
 	<div class="center authForm contentBlock full-top min-w-96">
 		<h2
-			class="text-center mx-auto uppercase text-3xl mb-4 text-accent font-bold"
+			class="mx-auto mb-4 text-center text-3xl font-bold uppercase text-accent"
 		>
 			{page.status}
 		</h2>

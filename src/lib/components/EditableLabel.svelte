@@ -52,16 +52,15 @@
 		})}
 	>
 		<input type="checkbox" id="{input}_{rand}" hidden checked={false} />
-		<div class="not-editing h-full flex items-center">
+		<div class="not-editing flex h-full items-center">
 			<span class="">
 				{value}
 			</span>
 		</div>
 		<div class="not-editing flex items-center">
 			<!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<label
-				class="text-xs text-text-muted m-1 hover:text-opacity-50"
+				class="m-1 text-xs text-text-muted hover:text-opacity-50"
 				role="button"
 				tabindex="0"
 				for="{input}_{rand}"
@@ -70,7 +69,7 @@
 			</label>
 		</div>
 
-		<div class="editing h-full flex items-center">
+		<div class="editing flex h-full items-center">
 			<input
 				class="px-0"
 				type="text"

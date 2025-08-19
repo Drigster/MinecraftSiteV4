@@ -7,8 +7,11 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		experimental: {
-			remoteFunctions: true
-		}
+			remoteFunctions: true,
+		},
+	},
+	compilerOptions: {
+		experimental: { async: true },
 	},
 };
 

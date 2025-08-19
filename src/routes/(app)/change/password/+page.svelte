@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { superForm } from "sveltekit-superforms";
-	import type { PageData } from "./$types";
 	import spiner from "$lib/assets/spiner.svg";
+	import { forgotPassword } from "../change.remote";
+	import { page } from "$app/state";
+	import { getFlash } from "sveltekit-flash-message";
 
-	export let data: PageData;
-
-	const { form, enhance, errors, message, delayed } = superForm(data.form);
+	const flash = getFlash(page);
 </script>
 
 <svelte:head>
@@ -14,43 +13,55 @@
 
 <div class="center authForm contentBlock full-top min-w-96">
 	<h2
-		class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
+		class="mx-auto mb-8 text-center text-3xl font-bold uppercase text-accent"
 	>
 		Восстановление пароля
 	</h2>
 
-	{#if $message}
+	{#if forgotPassword.result?.success}
 		<div class="text-center">
-			<p class="mb-8">{$message}</p>
+			<p class="mb-8">{forgotPassword.result?.message}</p>
 			<a href="/"
 				><button class="!p-2 !text-base">Вернутся на главную</button></a
 			>
 		</div>
 	{:else}
-		<form method="post" use:enhance>
+		<form
+			{...forgotPassword.enhance(async ({ form, submit }) => {
+				try {
+					await submit();
+					if (forgotPassword.result?.success == false) {
+						return;
+					}
+
+					form.reset();
+				} catch (error) {
+					$flash = {
+						type: "success",
+						message: "Ошибка, попробуйте позже",
+					};
+					console.log(error);
+				}
+			})}
+		>
 			<div>
 				<div class="inputBox">
-					<input
-						type="text"
-						name="login"
-						bind:value={$form.login}
-						required
-					/>
+					<input type="text" name="login" required />
 					<label for="login">Логин</label>
 				</div>
-				{#if $errors.login}
+				{#if forgotPassword.result?.error.login}
 					<span class="errorMessage"
-						>{$errors.login} {$errors.login}</span
+						>{forgotPassword.result?.error.login[0]}</span
 					>
 				{/if}
 			</div>
 
 			<button type="submit">
-				{#if $delayed}
+				{#if forgotPassword.pending > 0}
 					<span class="relative">
 						Подтвердить
 						<img
-							class="h-full mx-2 absolute left-full top-0"
+							class="absolute left-full top-0 mx-2 h-full"
 							width="20"
 							height="20"
 							src={spiner}

@@ -6,12 +6,12 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<div class="flex flex-col justify-between contentBlock p-4">
-	<div class="grid gap-2 grid-cols-5">
+<div class="contentBlock flex flex-col justify-between p-4">
+	<div class="grid grid-cols-5 gap-2">
 		<a class="contentBlock" href="./players">
-			<div class="p-4 grid grid-rows-3 text-center">
+			<div class="grid grid-rows-3 p-4 text-center">
 				<User class="text-secondary m-auto" size="56" />
-				<span class="text-6xl self-center">35</span>
+				<span class="self-center text-6xl">35</span>
 				<div class="flex flex-col justify-evenly">
 					<p class="text-secondary mb-1">Игроков</p>
 					<p class="text-green-400">+2 за неделю</p>
@@ -19,9 +19,9 @@
 			</div>
 		</a>
 		<a class="contentBlock" href="./servers">
-			<div class="p-4 grid grid-rows-3 text-center">
+			<div class="grid grid-rows-3 p-4 text-center">
 				<ServerStack class="text-secondary m-auto" size="56" />
-				<span class="text-6xl self-center"
+				<span class="self-center text-6xl"
 					><Counter bind:value={data.servers_count} /></span
 				>
 				<div class="flex flex-col justify-evenly">
@@ -29,9 +29,9 @@
 				</div>
 			</div>
 		</a>
-		<div class="p-4 contentBlock grid grid-rows-3 text-center">
+		<div class="contentBlock grid grid-rows-3 p-4 text-center">
 			<ChartBar class="text-secondary m-auto" size="56" />
-			<span class="text-6xl self-center"
+			<span class="self-center text-6xl"
 				><Counter bind:value={data.users_count} /></span
 			>
 			<div class="flex flex-col justify-evenly">
@@ -40,9 +40,9 @@
 			</div>
 		</div>
 		<div class="contentBlock col-span-2 row-span-2"></div>
-		<div class="p-4 contentBlock grid grid-rows-3 text-center">
+		<div class="contentBlock grid grid-rows-3 p-4 text-center">
 			<ServerStack class="text-secondary m-auto" size="56" />
-			<span class="text-6xl self-center">2</span>
+			<span class="self-center text-6xl">2</span>
 			<div class="flex flex-col justify-evenly">
 				<p class="text-secondary mb-1">Сервера</p>
 			</div>

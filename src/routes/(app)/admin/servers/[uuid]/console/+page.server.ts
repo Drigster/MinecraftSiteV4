@@ -7,7 +7,7 @@ export const load = async ({ parent, locals }) => {
 		return error(404, "Not found");
 	}
 
-    const server = (await parent()).server;
+	const server = (await parent()).server;
 
 	let response: Response;
 	try {
@@ -23,16 +23,13 @@ export const load = async ({ parent, locals }) => {
 	}
 
 	if (response.status != 200) {
-		return error(
-			response.status,
-			await response.text()
-		)
+		return error(response.status, await response.text());
 	}
 
 	hljs.registerLanguage("log4j", log4j);
-    let log = hljs.highlight(await response.text(), {
-        language: "log4j",
-    }).value;
+	const log = hljs.highlight(await response.text(), {
+		language: "log4j",
+	}).value;
 
 	return { log };
 };

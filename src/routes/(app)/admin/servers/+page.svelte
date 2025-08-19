@@ -87,7 +87,7 @@
 			</Table.Row>
 		</Table.Header>
 		<Table.Body>
-			{#each data.servers as server}
+			{#each data.servers as server (server.uuid)}
 				<Table.Row>
 					<Table.Cell
 						><a href="{page.url.pathname}/{server.uuid}"

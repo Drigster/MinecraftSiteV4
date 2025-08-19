@@ -1,6 +1,4 @@
 <script lang="ts">
-	import type { SuperValidated, Infer } from "sveltekit-superforms";
-	import { superForm } from "sveltekit-superforms";
 	import type { UploadFileSchema } from "./schema";
 	import { Label } from "../ui/label";
 	import { Input } from "../ui/input";
@@ -11,31 +9,11 @@
 
 	const flash = getFlash(page);
 
-	const { form, errors, enhance, reset } = superForm(data, {
-		resetForm: true,
-		onUpdated({ form }) {
-			if (form.message) {
-				isOpen = false;
-				$flash = {
-					type: form.message.type,
-					message: form.message.text,
-					title: form.message.title,
-				};
-			}
-		},
-	});
-
 	let isOpen = $state(false);
-
-	$effect(() => {
-		if (!isOpen) {
-			reset();
-		}
-	});
 </script>
 
 <Dialog.Root bind:open={isOpen}>
-	<Dialog.Trigger class="p-1 border-2 border-gray-500 rounded-md"
+	<Dialog.Trigger class="rounded-md border-2 border-gray-500 p-1"
 		>Загрузить файл</Dialog.Trigger
 	>
 	<Dialog.Content class="sm:max-w-[425px]">

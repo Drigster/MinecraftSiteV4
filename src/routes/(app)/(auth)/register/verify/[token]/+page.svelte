@@ -10,7 +10,7 @@
 
 <div class="center authForm contentBlock full-top min-w-96">
 	<h2
-		class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
+		class="mx-auto mb-8 text-center text-3xl font-bold uppercase text-accent"
 	>
 		Подтверждение почты
 	</h2>

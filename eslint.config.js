@@ -1,40 +1,69 @@
-import prettier from 'eslint-config-prettier';
-import { includeIgnoreFile } from '@eslint/compat';
-import js from '@eslint/js';
-import svelte from 'eslint-plugin-svelte';
-import globals from 'globals';
-import { fileURLToPath } from 'node:url';
-import ts from 'typescript-eslint';
-import svelteConfig from './svelte.config.js';
-
-const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
+import globals from "globals";
+import js from "@eslint/js";
+import prettier from "eslint-plugin-prettier/recommended";
+import svelte from "eslint-plugin-svelte";
+import ts from "typescript-eslint";
+import svelteConfig from "./svelte.config.js";
 
 export default ts.config(
-	includeIgnoreFile(gitignorePath),
 	js.configs.recommended,
 	...ts.configs.recommended,
 	...svelte.configs.recommended,
-	prettier,
 	...svelte.configs.prettier,
+	prettier,
 	{
 		languageOptions: {
-			globals: { ...globals.browser, ...globals.node }
+			globals: {
+				...globals.browser,
+				...globals.es2017,
+			},
 		},
-		rules: {
-			// typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
-			// see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
-			'no-undef': 'off'
-		}
+		linterOptions: {
+			reportUnusedDisableDirectives: "off",
+		},
 	},
 	{
-		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
+		files: ["**/*.cjs", "**/*.mjs"],
+		languageOptions: {
+			globals: {
+				...globals.node,
+			},
+		},
+	},
+	{
+		files: ["**/*.svelte", "**/*.svelte.ts", "**/*.svelte.js"],
 		languageOptions: {
 			parserOptions: {
 				projectService: true,
-				extraFileExtensions: ['.svelte'],
+				extraFileExtensions: [".svelte"],
 				parser: ts.parser,
-				svelteConfig
-			}
-		}
-	}
+				svelteConfig,
+			},
+		},
+	},
+	{
+		rules: {
+			"@typescript-eslint/no-unused-vars": [
+				"warn",
+				{
+					argsIgnorePattern: "^_",
+					caughtErrorsIgnorePattern: "^_",
+					varsIgnorePattern: "^_",
+				},
+			],
+		},
+	},
+	{
+		rules: {
+			"prettier/prettier": "warn",
+		},
+	},
+	{
+		ignores: [
+			"**/.svelte-kit",
+			"build/",
+			"dist/",
+			"src/lib/components/ui/",
+		],
+	},
 );

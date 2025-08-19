@@ -44,7 +44,7 @@
 			})}
 		>
 			<button
-				class="text-xs text-text-muted m-1 hover:text-opacity-50 disabled:line-through disabled:cursor-wait disabled:text-opacity-50"
+				class="m-1 text-xs text-text-muted hover:text-opacity-50 disabled:cursor-wait disabled:text-opacity-50 disabled:line-through"
 				disabled={change.pending > 0}
 			>
 				{buttonText}

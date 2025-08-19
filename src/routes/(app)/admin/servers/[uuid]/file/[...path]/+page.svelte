@@ -23,18 +23,18 @@
 	<title>Профиль | Foxy.town</title>
 </svelte:head>
 
-<div class="py-2 flex flex-col gap-1">
-	<div class="flex gap-1 justify-between">
+<div class="flex flex-col gap-1 py-2">
+	<div class="flex justify-between gap-1">
 		<a
 			href={`${page.url.searchParams.get("from") || "/server/" + page.params.uuid + "/files/"}`}
 			><button>Назад</button></a
 		>
 	</div>
 	<div
-		class="bg-background h-full text-sm border-2 border-gray-500 rounded-md flex flex-col"
+		class="flex h-full flex-col rounded-md border-2 border-gray-500 bg-background text-sm"
 	>
-		<div class="p-1 border-b-2 border-gray-500">
-			<div class="flex gap-1 justify-between">
+		<div class="border-b-2 border-gray-500 p-1">
+			<div class="flex justify-between gap-1">
 				{data.filename}
 				<a
 					href="/server/{page.params
@@ -48,10 +48,10 @@
 			</div>
 		</div>
 		{#await data.buffer}
-			<p class="p-2 text-xl text-center">Loading...</p>
+			<p class="p-2 text-center text-xl">Loading...</p>
 		{:then raw}
-			<pre class="overflow-auto max-h-full m-0 text-xs"><code
-					class="log4j grid-area-1-1 max-w-full block overflow-x-auto p-2"
+			<pre class="m-0 max-h-full overflow-auto text-xs"><code
+					class="log4j grid-area-1-1 block max-w-full overflow-x-auto p-2"
 					bind:this={codeBlock}>{new TextDecoder().decode(raw)}</code
 				></pre>
 			<!-- <pre class="overflow-auto h-full"><code

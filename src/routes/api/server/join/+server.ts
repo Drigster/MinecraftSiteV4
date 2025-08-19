@@ -18,20 +18,25 @@ export async function POST({ request }) {
 			error: "Bad Request",
 			code: 400,
 		};
-		if (requestData.uuid == undefined && requestData.username != undefined) {
-			error.error = "Bad Request, uuid not found!"
-		}
-		else if (requestData.username == undefined && requestData.uuid != undefined) {
-			error.error = "Bad Request, username not found!"
-		}
-		else if (requestData.username == undefined && requestData.uuid == undefined) {
-			error.error = "Bad Request, username and uuid not found"
-		}
-		else if (requestData.accessToken == undefined) {
-			error.error = "Bad Request, accessToken not found!"
-		}
-		else if (requestData.serverId == undefined) {
-			error.error = "Bad Request, serverId not found!"
+		if (
+			requestData.uuid == undefined &&
+			requestData.username != undefined
+		) {
+			error.error = "Bad Request, uuid not found!";
+		} else if (
+			requestData.username == undefined &&
+			requestData.uuid != undefined
+		) {
+			error.error = "Bad Request, username not found!";
+		} else if (
+			requestData.username == undefined &&
+			requestData.uuid == undefined
+		) {
+			error.error = "Bad Request, username and uuid not found";
+		} else if (requestData.accessToken == undefined) {
+			error.error = "Bad Request, accessToken not found!";
+		} else if (requestData.serverId == undefined) {
+			error.error = "Bad Request, serverId not found!";
 		}
 
 		return new Response(JSON.stringify(error), {
@@ -66,7 +71,7 @@ export async function POST({ request }) {
 		.updateTable("Session")
 		.where("id", "=", session.id)
 		.set({
-			serverId: requestData.serverId
+			serverId: requestData.serverId,
 		})
 		.execute();
 

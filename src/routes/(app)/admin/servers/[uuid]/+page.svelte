@@ -1,14 +1,12 @@
 <script lang="ts">
-	import { page } from "$app/state";
 	import EditableLabel from "$lib/components/EditableLabel.svelte";
-	import { da } from "zod/v4/locales";
-	import { changeUsername } from "../../../(authorized)/profile/[[id]]/functions.remote";
+	import { changeUsername } from "../../../(authorized)/profile/[[id]]/profile.remote";
 
 	let { data } = $props();
 </script>
 
 <h2 class="text-2xl">Сервера</h2>
-<div class="p-4 profileInfo">
+<div class="profileInfo p-4">
 	<EditableLabel
 		title="Название"
 		change={changeUsername}

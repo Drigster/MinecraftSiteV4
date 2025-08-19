@@ -6,22 +6,22 @@
 
 <div class="container gap-4">
 	<div class="contentBlock p-4">
-		<ul class="flex gap-2 flex-col">
-			<li class="border-2 rounded-lg px-2 border-primary">
+		<ul class="flex flex-col gap-2">
+			<li class="border-primary rounded-lg border-2 px-2">
 				<a href="/admin/servers/{page.params.uuid}/">Overview</a>
 			</li>
-			<li class="border-2 rounded-lg px-2 border-primary">
+			<li class="border-primary rounded-lg border-2 px-2">
 				<a href="/admin/servers/{page.params.uuid}/console">Console</a>
 			</li>
-			<li class="border-2 rounded-lg px-2 border-primary">
+			<li class="border-primary rounded-lg border-2 px-2">
 				<a href="/admin/servers/{page.params.uuid}/mods">Mods</a>
 			</li>
-			<li class="border-2 rounded-lg px-2 border-primary">
+			<li class="border-primary rounded-lg border-2 px-2">
 				<a href="/admin/servers/{page.params.uuid}/files">Files</a>
 			</li>
 		</ul>
 	</div>
-	<div class="contentBlock p-4 grid grid-rows-[auto_1fr] h-full">
+	<div class="contentBlock grid h-full grid-rows-[auto_1fr] p-4">
 		{@render children()}
 	</div>
 </div>

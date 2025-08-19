@@ -1,7 +1,4 @@
 import { error } from "@sveltejs/kit";
-import { fail, message, superValidate } from "sveltekit-superforms";
-import { uploadFileSchema } from "$lib/components/FileBrowser/schema";
-import { zod } from "sveltekit-superforms/adapters";
 import type { FileType } from "$lib/apiTypes";
 
 export const load = async ({ params, locals, parent }) => {
@@ -9,7 +6,7 @@ export const load = async ({ params, locals, parent }) => {
 		return error(404, "Not found");
 	}
 
-    const server = (await parent()).server;
+	const server = (await parent()).server;
 
 	let response: Response;
 	try {
@@ -25,10 +22,7 @@ export const load = async ({ params, locals, parent }) => {
 	}
 
 	if (response.status != 200) {
-		return error(
-			response.status,
-			await response.text()
-		)
+		return error(response.status, await response.text());
 	}
 
 	const files: FileType[] = await response.json();

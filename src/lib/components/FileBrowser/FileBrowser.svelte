@@ -13,7 +13,6 @@
 		FileCog,
 		House,
 	} from "@o7/icon/lucide";
-	import UploadFileModal from "./UploadFileModal.svelte";
 	import type { FileType } from "$lib/apiTypes";
 
 	let {
@@ -28,14 +27,14 @@
 <div>
 	{#if viewType == "dir"}
 		<div class="flex justify-between pb-1">
-			<div class="p-2 flex">
+			<div class="flex p-2">
 				<a
 					href={"/admin/servers/" + page.params.uuid + "/files/"}
 					class=" text-blue-400"
 				>
 					<House />
 				</a>
-				{#each path.split("/") as part, i}
+				{#each path.split("/") as part, i (i)}
 					{#if i != path.split("/").length - 1}
 						<a
 							href={"/server/" +
@@ -61,24 +60,24 @@
 		</div>
 		<div class="flex flex-col gap-1">
 			{#if path != "/"}
-				<div class="p-2 border-2 border-gray-500 rounded-md">
+				<div class="rounded-md border-2 border-gray-500 p-2">
 					<a
 						href={"/admin/servers/" +
 							page.params.uuid +
 							"/files" +
 							path.substring(0, path.lastIndexOf("/"))}
-						class=" text-blue-400 text-xl"
+						class=" text-xl text-blue-400"
 					>
 						..
 					</a>
 				</div>
 			{/if}
-			{#each files as file}
-				<div class="border-2 border-gray-500 rounded-md flex">
+			{#each files as file (file.path)}
+				<div class="flex rounded-md border-2 border-gray-500">
 					{#if file.type == "file"}
 						<a
 							data-sveltekit-preload-data="tap"
-							class="flex p-2 gap-1"
+							class="flex gap-1 p-2"
 							href="/admin/servers/{page.params
 								.uuid}/file{path.endsWith('/')
 								? path
@@ -105,18 +104,18 @@
 					{:else if file.type == "directory"}
 						<a
 							href={page.url.pathname + "/" + file.name}
-							class="p-2 text-blue-400 flex gap-1"
+							class="flex gap-1 p-2 text-blue-400"
 						>
 							<FolderOpen />
 							{file.name}
 						</a>
 					{:else}
-						<div class="flex p-2 gap-1">
+						<div class="flex gap-1 p-2">
 							<FileWarning />
 							<div>Error</div>
 						</div>
 					{/if}
-					<div class="px-2 ml-auto my-auto">
+					<div class="my-auto ml-auto px-2">
 						{#if file.size}
 							{formatBytes(file.size)}
 						{/if}

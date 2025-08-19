@@ -1,11 +1,6 @@
 <script lang="ts">
-	import { superForm } from "sveltekit-superforms";
-	import type { PageData } from "./$types";
 	import spiner from "$lib/assets/spiner.svg";
-
-	export let data: PageData;
-
-	const { enhance, message, delayed } = superForm(data.form);
+	import { verifyEmail } from "../(authorized)/profile/[[id]]/profile.remote";
 </script>
 
 <svelte:head>
@@ -14,7 +9,7 @@
 
 <div class="center authForm contentBlock full-top max-w-xl">
 	<h2
-		class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
+		class="mx-auto mb-8 text-center text-3xl font-bold uppercase text-accent"
 	>
 		Аккаунт не поддтверждён
 	</h2>
@@ -24,22 +19,19 @@
 			При регистрации на вашу почту было выслано сообщение с
 			подтверждением регистрации
 		</p>
-		<p class="mb-8 text-secondary">Сообщение могло попасть в спам</p>
-		{#if $message}
-			<p class="mb-8 text-accent">{$message}</p>
-		{/if}
+		<p class="text-secondary mb-8">Сообщение могло попасть в спам</p>
 		<div class="flex flex-wrap justify-center gap-2">
 			<a href="/"
 				><button class="!p-2 !text-base">Вернутся на главную</button></a
 			>
-			<form class="inline-block" method="post" use:enhance>
+			<form class="inline-block" {...verifyEmail}>
 				<input type="hidden" name="verify" value="verify" />
 				<button class="!p-2 !text-base">
-					{#if $delayed}
+					{#if verifyEmail.pending > 0}
 						<span class="relative">
 							Повторить сообщение
 							<img
-								class="h-full mx-1 absolute left-full top-0"
+								class="absolute left-full top-0 mx-1 h-full"
 								width="20"
 								height="20"
 								src={spiner}

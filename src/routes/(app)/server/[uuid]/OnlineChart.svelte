@@ -2,9 +2,10 @@
 	import { Axis, Chart, Spline, Svg, Tooltip, Highlight } from "layerchart";
 	import { scaleTime } from "d3-scale";
 	import { DateTime } from "luxon";
+	import { SvelteDate } from "svelte/reactivity";
 
-	const dateSeriesData: { date: Date; value: number }[] = [];
-	let startTime = new Date("2025-01-27T22:00:00.000Z");
+	const dateSeriesData: { date: SvelteDate; value: number }[] = [];
+	let startTime = new SvelteDate("2025-01-27T22:00:00.000Z");
 
 	let startValue = Math.floor(Math.random() * 5);
 
@@ -21,14 +22,14 @@
 		}
 
 		dateSeriesData.push({
-			date: new Date(startTime),
+			date: new SvelteDate(startTime),
 			value: value,
 		});
 		startTime.setMinutes(startTime.getMinutes() + 5);
 	}
 </script>
 
-<div class="h-full p-4 border rounded">
+<div class="h-full rounded border p-4">
 	<Chart
 		data={dateSeriesData}
 		x="date"
@@ -62,7 +63,7 @@
 					)}
 				rule
 			/>
-			<Spline class="stroke-[2] stroke-accent" />
+			<Spline class="stroke-accent stroke-[2]" />
 			<Highlight points lines={{ class: "stroke-secondary" }} />
 		</Svg>
 

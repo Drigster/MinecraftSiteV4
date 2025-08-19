@@ -2,26 +2,23 @@ import { form, getRequestEvent } from "$app/server";
 import { error } from "@sveltejs/kit";
 
 export const sendCommand = form(async (data) => {
-    const { locals, cookies } = getRequestEvent();
-    
-    if (locals.user == null || locals.user.role != "ADMIN") {
-        error(404);
-    }
+	const { locals } = getRequestEvent();
 
-    let command = data.get("command");
+	if (locals.user == null || locals.user.role != "ADMIN") {
+		error(404);
+	}
 
-    if(command == null) {
-        return {
-            success: false,
-            message: "Command not found"
-        }
-    }
+	const command = data.get("command");
 
-    let response: Response;
+	if (command == null) {
+		return {
+			success: false,
+			message: "Command not found",
+		};
+	}
+
 	try {
-		response = await fetch(
-			`http://localhost:3000/command?command=${command}`,
-		);
+		await fetch(`http://localhost:3000/command?command=${command}`);
 	} catch (err) {
 		console.log(err);
 		return error(
@@ -30,5 +27,5 @@ export const sendCommand = form(async (data) => {
 		);
 	}
 
-    return { success: true };
+	return { success: true };
 });

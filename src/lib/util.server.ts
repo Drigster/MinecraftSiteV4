@@ -480,9 +480,12 @@ export async function getServers() {
 						id: generateIdFromEntropySize(10),
 						uuid: serverDataFromApi.uuid,
 						name: serverDataFromApi.title,
+						codename: "",
 						description: serverDataFromApi.info,
 						ip: serverDataFromApi.servers[0]?.serverAddress || "",
 						port: serverDataFromApi.servers[0]?.serverPort || 25565,
+						localIp: "127.0.0.1",
+						localPort: 5775,
 						configHash: serverFromApi.hash,
 						status: "HIDDEN",
 					})

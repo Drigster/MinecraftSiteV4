@@ -228,7 +228,7 @@ export const load = async ({ locals, params }) => {
 // 				if (session.userId == locals.user!.id) {
 // 					await lucia.invalidateSession(form.data.sessionId);
 // 					if (form.data.sessionId == locals.session?.id) {
-// 						return redirect(302, "/login");
+// 						return redirect(303, "/login");
 // 					}
 // 				}
 // 			}

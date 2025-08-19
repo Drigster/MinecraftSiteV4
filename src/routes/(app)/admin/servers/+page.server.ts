@@ -1,9 +1,4 @@
 import { db } from "$lib/db";
-import { generateIdFromEntropySize } from "lucia";
-import { fail, message, superValidate } from "sveltekit-superforms";
-import { zod } from "sveltekit-superforms/adapters";
-import { z } from "zod/v4";
-import { v4 as uuidv4 } from "uuid";
 import { getServers } from "$lib/util.server";
 
 export const load = async () => {

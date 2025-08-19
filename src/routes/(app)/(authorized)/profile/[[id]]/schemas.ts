@@ -4,8 +4,8 @@ import sizeOf from "image-size";
 export const skinSchema = z.object({
 	skin: z
 		.instanceof(File, {
-            error: "Please upload a file."
-        })
+			error: "Please upload a file.",
+		})
 		.refine((f) => f.type == "image/png", "Файл должен быть в PNG формате.")
 		.refine(async (f) => {
 			const file = (await f.stream().getReader().read()).value;
@@ -23,8 +23,8 @@ export type SkinSchema = typeof skinSchema;
 export const capeSchema = z.object({
 	cape: z
 		.instanceof(File, {
-            error: "Please upload a file."
-        })
+			error: "Please upload a file.",
+		})
 		.refine(
 			(f) => f.type == "image/png",
 			"Файл должен быть в PNG формате.",
@@ -40,7 +40,10 @@ export const sessionRemoveSchema = z.object({
 export const usernameChangeSchema = z.object({
 	username: z
 		.string()
-		.regex(/^[a-zA-Z0-9_]+$/, "Никнейм имеет недопустимые символы, разрещены только английские буквы, цыфры и _")
+		.regex(
+			/^[a-zA-Z0-9_]+$/,
+			"Никнейм имеет недопустимые символы, разрещены только английские буквы, цыфры и _",
+		)
 		.min(1, "Никнейм не может быть пустым")
 		.max(16, "Никнейм не может быть длинее 16 символов"),
 });

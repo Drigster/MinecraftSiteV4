@@ -11,7 +11,7 @@
 	let sidenavClosed = $state(false);
 </script>
 
-<aside class="z-20 h-svh sticky">
+<aside class="sticky z-20 h-svh">
 	<sidenav class="sidenav text-xl">
 		<input
 			id="sidenav-toggle"

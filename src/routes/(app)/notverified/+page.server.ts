@@ -1,13 +1,4 @@
-import { setMessage, superValidate } from "sveltekit-superforms";
-import { fail, redirect } from "@sveltejs/kit";
-import { zod } from "sveltekit-superforms/adapters";
-import { z } from "zod/v4";
-import { sendVerificationEmail } from "$lib/util.server";
-import { db } from "$lib/db/index.js";
-
-const schema = z.object({
-	verify: z.string(),
-});
+import { redirect } from "@sveltejs/kit";
 
 export const load = async ({ url, locals }) => {
 	if (locals.user!.verified) {
@@ -16,36 +7,4 @@ export const load = async ({ url, locals }) => {
 			return redirect(303, redirectTo);
 		}
 	}
-
-	const form = await superValidate(zod(schema));
-
-	return { form };
-};
-
-export const actions = {
-	default: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(schema));
-
-		if (!form.valid) {
-			return fail(400, { form });
-		}
-
-		const user = await db
-			.selectFrom("User")
-			.selectAll()
-			.where("id", "=", locals.user!.id)
-			.executeTakeFirstOrThrow();
-
-		if (await sendVerificationEmail(user)) {
-			return setMessage(form, {
-				type: "info",
-				text: "Сообщение с подтверждением было отправлено повторно",
-			});
-		} else {
-			return setMessage(form, {
-				type: "error",
-				text: "Ошибка при отправке сообщения попробуйте позже",
-			});
-		}
-	},
 };

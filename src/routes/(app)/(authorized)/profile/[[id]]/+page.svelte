@@ -18,7 +18,7 @@
 		removeCape,
 		removeSkin,
 		verifyEmail,
-	} from "./functions.remote";
+	} from "./profile.remote";
 	import SkinEditForm from "./forms/SkinEditForm.svelte";
 
 	const flash = getFlash(page);
@@ -37,9 +37,9 @@
 
 <div class="flex flex-col gap-4">
 	{#if !data.isSelf && data.userRole == "ADMIN"}
-		<div class="contentBlock flex items-center place-content-center">
+		<div class="contentBlock flex place-content-center items-center">
 			<ExclamationCircle class="text-error" size="48" />
-			<h2 class="text-xl text-center text-error p-4">
+			<h2 class="text-error p-4 text-center text-xl">
 				Вы просматриваете профиль игрока <span class="text-white"
 					>{data.user!.username}</span
 				>!
@@ -48,12 +48,12 @@
 		</div>
 	{/if}
 	<div class="flex gap-4">
-		<div class="contentBlock p-4 overflow-hidden w-1/4 flex flex-col">
-			<div class="w-full aspect-square mb-4" bind:clientWidth={w}>
+		<div class="contentBlock flex w-1/4 flex-col overflow-hidden p-4">
+			<div class="mb-4 aspect-square w-full" bind:clientWidth={w}>
 				<noscript>
-					<div class="w-full aspect-square">
+					<div class="aspect-square w-full">
 						<img
-							class="h-full w-auto m-auto"
+							class="m-auto h-full w-auto"
 							src="/api/skin/body/{data.user
 								.username}?{Date.now()}"
 							alt=""
@@ -74,7 +74,7 @@
 			{:else}
 				<div class="skin-buttons mb-1 gap-1">
 					<button
-						class="button w-full h-full"
+						class="button h-full w-full"
 						onclick={() => {
 							skinEditing = true;
 						}}>Изменить скин</button
@@ -107,7 +107,7 @@
 			{:else}
 				<div class="skin-buttons mb-1 gap-1">
 					<button
-						class="button w-full h-full"
+						class="button h-full w-full"
 						onclick={() => {
 							capeEditing = true;
 						}}>Изменить плащ</button
@@ -133,7 +133,7 @@
 				</div>
 			{/if}
 		</div>
-		<div class="contentBlock p-4 profileInfo grow">
+		<div class="contentBlock profileInfo grow p-4">
 			<EditableLabel
 				title="Никнейм"
 				change={changeUsername}
@@ -202,7 +202,7 @@
 			</TextLabel>
 		</div>
 	</div>
-	<div class="contentBlock p-4 w-full">
+	<div class="contentBlock w-full p-4">
 		<div class="">
 			<h2 class="text-2xl">Активные сессии</h2>
 			<h2 class="text-secondary text-[0.9rem]">
@@ -222,7 +222,7 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each data.sessions as session}
+					{#each data.sessions as session (session.id)}
 						<Table.Row>
 							<Table.Cell>{session.type}</Table.Cell>
 							<Table.Cell>{session.device}</Table.Cell>

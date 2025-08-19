@@ -1,22 +1,12 @@
 <script lang="ts">
-	import { goto, invalidate } from "$app/navigation";
 	import logo from "$lib/assets/logo.svg";
 	import type { User } from "lucia/dist/core";
-
-	let h = $state(0);
+	import { logout } from "../../routes/(app)/(auth)/auth.remote";
 
 	let { user }: { user: User | null } = $props();
-
-	async function logout() {
-		await fetch("/logout", {
-			method: "POST",
-		});
-		await invalidate("locals:user");
-		goto("/");
-	}
 </script>
 
-<header class="fixed w-full z-50">
+<header class="fixed z-50 w-full">
 	<nav class="navbar">
 		<a class="nav-logo" href="/">
 			<img class="h-8 w-8" src={logo} alt="" />
@@ -34,23 +24,22 @@
 				</li>
 			{/if}
 			{#if user?.username != undefined}
-				<li
-					class="nav-item ml-auto text-white !my-0 flex"
-					bind:clientHeight={h}
-				>
-					<span class="nav-link mt-5 mb-4 mr-8"
-						><button onclick={logout}>Выйти</button></span
-					>
+				<li class="nav-item !my-0 ml-auto flex text-white">
+					<span class="nav-link mb-4 mr-8 mt-5">
+						<form {...logout}>
+							<button type="submit">Выйти</button>
+						</form>
+					</span>
 					<a class="flex" href="/profile">
 						<img
-							class="m-auto border-2 border-accent rounded-full"
+							class="m-auto rounded-full border-2 border-accent"
 							src="/api/skin/head/{user.username}?{Date.now()}"
 							height="32"
 							width="32"
 							alt="Player's skin head"
 						/>
 						<!-- height={h-16} width={h-16} -->
-						<span class="nav-link mt-5 mb-4">{user.username}</span>
+						<span class="nav-link mb-4 mt-5">{user.username}</span>
 					</a>
 				</li>
 			{:else}

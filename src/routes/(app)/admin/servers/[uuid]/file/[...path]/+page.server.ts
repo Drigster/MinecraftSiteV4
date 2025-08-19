@@ -5,7 +5,7 @@ export const load = async ({ params, locals, parent }) => {
 		return error(404, "Not found");
 	}
 
-    const server = (await parent()).server;
+	const server = (await parent()).server;
 
 	params.path = params.path.replaceAll("+", "%2B");
 
@@ -23,12 +23,9 @@ export const load = async ({ params, locals, parent }) => {
 	}
 
 	if (response.status != 200) {
-		return error(
-			response.status,
-			await response.text()
-		)
+		return error(response.status, await response.text());
 	}
-	
+
 	const contentDisposition = response.headers.get("Content-Disposition");
 	let filename = "unknown";
 

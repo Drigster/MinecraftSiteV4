@@ -14,7 +14,7 @@
 			<span>Дата регистрации</span>
 			<span>Последний вход</span>
 		</li>
-		{#each data.users as user}
+		{#each data.users as user (user.uuid)}
 			<li>
 				<span>{user.username}</span>
 				<span>
