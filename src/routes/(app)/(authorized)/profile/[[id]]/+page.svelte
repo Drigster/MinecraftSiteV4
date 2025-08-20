@@ -108,6 +108,7 @@
 				<div class="skin-buttons mb-1 gap-1">
 					<button
 						class="button h-full w-full"
+						disabled
 						onclick={() => {
 							capeEditing = true;
 						}}>Изменить плащ</button
@@ -126,7 +127,7 @@
 							}
 						})}
 					>
-						<button class="button aspect-square h-full">
+						<button class="button aspect-square h-full" disabled>
 							<Trash class="m-auto" size="20" />
 						</button>
 					</form>

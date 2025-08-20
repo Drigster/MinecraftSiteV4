@@ -78,6 +78,11 @@ body {
 	border: solid 2px hsl(216 89% 93% / 0.6);
 }
 
+.button:disabled {
+	color: hsl(216 89% 93% / 0.6);
+	border: solid 2px hsl(216 89% 93% / 0.6);
+}
+
 .content-grid {
 	--padding-inline: 1rem;
 	--content-max-width: 1200px;
