@@ -372,7 +372,7 @@ export async function createLauncherUserSession(
 			Interval.fromDateTimes(
 				DateTime.now(),
 				session.expires_at
-					? DateTime.fromSQL(session.expires_at)
+					? DateTime.fromSeconds(parseInt(session.expires_at))
 					: DateTime.fromJSDate(session.expiresAt!),
 			).length("seconds"),
 		),
@@ -497,7 +497,7 @@ export async function getServers() {
 		if (
 			dataChanged ||
 			serversFromApi.length !=
-				servers.filter((obj) => obj.status != "ARCHIVED").length
+			servers.filter((obj) => obj.status != "ARCHIVED").length
 		) {
 			const uuidSet = new Set(serversFromApi.map((s) => s.uuid));
 			const difference = servers
