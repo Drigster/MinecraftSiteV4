@@ -37,11 +37,11 @@
 	<div class="mx-1 flex gap-1">
 		{#if uploadCape.pending > 0}
 			<button type="submit" disabled>
-				<Loader class="h-full w-full animate-spin" size="20" />
+				<Loader class="animate-spin" size="20" />
 			</button>
 		{:else}
 			<button type="submit">
-				<Check class="h-full w-full" size="20" />
+				<Check size="20" />
 			</button>
 		{/if}
 		<button
@@ -50,7 +50,7 @@
 				idEditing = false;
 			}}
 		>
-			<XMark class="h-full w-full" size="20" /></button
+			<XMark size="20" /></button
 		>
 	</div>
 </form>
