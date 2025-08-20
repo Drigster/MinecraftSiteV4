@@ -60,5 +60,5 @@ export async function POST({ request }) {
 		.where("id", "=", session.user_id)
 		.executeTakeFirstOrThrow();
 
-	return json(createLauncherUserSession(session, user));
+	return json(await createLauncherUserSession(session, user));
 }

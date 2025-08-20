@@ -69,5 +69,5 @@ export async function POST({ request }) {
 		"LAUNCHER",
 	);
 
-	return json(createLauncherUserSession(session, user));
+	return json(await createLauncherUserSession(session, user));
 }

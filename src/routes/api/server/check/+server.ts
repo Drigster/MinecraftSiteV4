@@ -75,5 +75,5 @@ export async function POST({ request }) {
 		})
 		.execute();
 
-	return json(createLauncherUser(user));
+	return json(await createLauncherUser(user));
 }
