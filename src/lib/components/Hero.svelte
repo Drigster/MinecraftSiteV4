@@ -2,7 +2,7 @@
 	<div class="text-center">
 		<h1 class="pb-4 text-5xl">foxy.town</h1>
 		<h3 class="pb-8 text-3xl">Приватные сервера сделаные с душой.</h3>
-		<a class="heroButton text-xs" href="/getting-started"> ИГРАТЬ! </a>
+		<a class="heroButton text-xs" href="/register"> ИГРАТЬ! </a>
 	</div>
 </div>
 
