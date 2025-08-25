@@ -347,6 +347,9 @@ export async function createLauncherUser(user: Selectable<User>) {
 			SKIN: {
 				url: skinUrl,
 				digest: createHash("sha256").update(skin).digest("hex"),
+				metadata: user.isSkinSlim ? {
+					model: "slim"
+				} : undefined
 			},
 		},
 	};

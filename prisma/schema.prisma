@@ -26,6 +26,9 @@ model User {
   role       String    @default("PLAYER")
   lastPlayed DateTime?
 
+  /// @kyselyType(boolean)
+  isSkinSlim Boolean @default(false)
+
   sessions        Session[]
   securityActions SecurityAction[]
   owned_servers   Server[]         @relation("ServerOwner")

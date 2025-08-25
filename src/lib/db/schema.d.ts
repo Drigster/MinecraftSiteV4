@@ -112,6 +112,10 @@ export type User = {
      */
     role: Generated<'PLAYER' | 'MODERATOR' | 'ADMIN'>;
     lastPlayed: string | null;
+    /**
+     * @kyselyType(boolean)
+     */
+    isSkinSlim: Generated<boolean>;
 };
 export type DB = {
     _ModConflict: ModConflict;
