@@ -1,6 +1,6 @@
 <footer>
 	<div
-		class="flex py-1 px-2 justify-between w-full text-md text-secondary bg-gray-900"
+		class="text-md text-secondary flex w-full justify-between bg-gray-900 px-2 py-1"
 	>
 		<span>© {new Date().getFullYear()} Drigster</span>
 		<div></div>

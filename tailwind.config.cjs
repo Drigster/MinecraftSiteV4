@@ -1,17 +1,15 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
+	darkMode: ["class"],
 	content: ["./src/**/*.{html,js,svelte,ts}"],
 	theme: {
 		extend: {
 			colors: {
-				transparent: "transparent",
-				current: "currentColor",
-				primary: "rgb(221, 234, 253)",
-				secondary: "rgb(163, 163, 163)",
-				accent: "#FC6F53",
-				background: "white",
-				error: "red",
-				notify: "yellow",
+				text: "hsl(var(--text))",
+				"text-muted": "hsl(var(--text-muted))",
+				background: "hsl(var(--background))",
+				accent: "hsl(var(--accent))",
+				border: "hsl(var(--border))",
 			},
 		},
 	},

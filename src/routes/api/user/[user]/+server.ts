@@ -1,9 +1,8 @@
-import { db } from "$lib/db";
+import { createLauncherUser } from "$lib/server/api_utils";
 import { json } from "@sveltejs/kit";
-import { createLauncherUser } from "$lib/util.server.js";
 
-export async function GET({ params }) {
-	const user = await db
+export async function GET({ params, locals }) {
+	const user = await locals.db
 		.selectFrom("User")
 		.selectAll()
 		.where((eb) =>

@@ -1,88 +1,64 @@
 <script lang="ts">
-	import { superForm } from "sveltekit-superforms";
-	import type { PageData } from "./$types";
-	import spiner from "$lib/assets/spiner.svg";
-
-	export let data: PageData;
-
-	const { form, enhance, errors, delayed } = superForm(data.form);
+	import { loginSchema } from "$lib/schemas";
+	import { login } from "$lib/auth.remote";
+	import SubmitButton from "$lib/components/SubmitButton.svelte";
+	import { resolve } from "$app/paths";
+	import InputBox from "$lib/components/InputBox.svelte";
 </script>
 
 <svelte:head>
 	<title>Вход | Foxy.town</title>
 </svelte:head>
 
-<div class="center authForm contentBlock full-top min-w-96">
-	{#if data.user?.username != undefined}
-		<h2
-			class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
-		>
-			Вы уже залогинены
-		</h2>
-		<div class="flex justify-between px-4">
-			<a href="/profile">В профиль</a> <a href="/logout">Выйти</a>
+<div class="bg-blur m-auto min-w-96 rounded-lg bg-background/60 p-10">
+	<h2
+		class="mx-auto mb-8 text-center text-3xl font-bold uppercase text-accent"
+	>
+		Вход
+	</h2>
+	<form
+		class="flex flex-col"
+		{...login.preflight(loginSchema).enhance(async (form) => {
+			try {
+				if (await form.submit()) {
+					form.element.reset();
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		})}
+	>
+		<InputBox
+			id="login"
+			title="Логин"
+			field={login.fields.login}
+			autocomplete="username"
+		/>
+		<InputBox
+			id="password"
+			title="Пароль"
+			field={login.fields._password}
+			autocomplete="current-password"
+			isPassword={true}
+		/>
+
+		<div class="-mt-2 mb-3 flex justify-between">
+			<a
+				class="text-accent hover:text-accent/60"
+				href={resolve("/forgotPassword")}
+			>
+				<button>Забыл пароль</button>
+			</a>
+			<a
+				class="text-accent hover:text-accent/60"
+				href={resolve("/register")}
+			>
+				<button>Регистрация</button>
+			</a>
 		</div>
-	{:else}
-		<h2
-			class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
-		>
-			Вход
-		</h2>
 
-		<form method="post" use:enhance>
-			<div>
-				<div class="inputBox">
-					<input
-						type="text"
-						name="login"
-						bind:value={$form.login}
-						required
-					/>
-					<label for="login">Логин</label>
-				</div>
-				{#if $errors.login}
-					<span class="errorMessage">{$errors.login}</span>
-				{/if}
-			</div>
-
-			<div>
-				<div class="inputBox">
-					<input
-						type="password"
-						name="password"
-						bind:value={$form.password}
-						required
-					/>
-					<label for="password">Пароль</label>
-				</div>
-				{#if $errors.password}
-					<span class="errorMessage">{$errors.password}</span>
-				{/if}
-			</div>
-
-			<div class="flex justify-between">
-				<a href="/recovery">Забыл пароль</a><a
-					class="text-accent"
-					href="/register">Регистрация</a
-				>
-			</div>
-
-			<button type="submit">
-				{#if $delayed}
-					<span class="relative">
-						Войти
-						<img
-							class="h-full mx-2 absolute left-full top-0"
-							width="20"
-							height="20"
-							src={spiner}
-							alt="Spiner icon"
-						/>
-					</span>
-				{:else}
-					Войти
-				{/if}
-			</button>
-		</form>
-	{/if}
+		<SubmitButton disabled={login.pending > 0} loading={login.pending > 0}>
+			Войти
+		</SubmitButton>
+	</form>
 </div>

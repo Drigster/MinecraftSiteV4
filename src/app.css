@@ -2,31 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-	--primary: rgb(221, 234, 253);
-	--secondary: rgb(163, 163, 163);
-	--accent: rgb(252, 111, 83);
-	--background: rgb(0, 0, 0, 0.6);
-	--error: red;
-	--notify: yellow;
+@layer utilities {
+    .bg-blur {
+        backdrop-filter: blur(0.35rem);
+    }
 }
 
-html {
-	font-family: Roboto, sans-serif;
-	color-scheme: dark;
-	background-color: var(--background);
-	color: var(--primary);
-}
-
-html,
-body {
-	background-color: #222;
-	min-height: 100vh;
-	min-height: 100svh;
+@layer base {
+    :root {
+        --text: 216deg 89% 93%;
+        --text-muted: 0deg 0% 64%;
+        --background: 0deg 0% 0%;
+        --accent: 10deg 96% 66%;
+    }
 }
 
 body {
-	background-image: url('/src/lib/assets/bg.jpg');
+    min-block-size: 100vh;
+    min-block-size: 100svh;
+
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+
+    background: hsl(var(--background) / 0.6);
+    color: hsl(var(--text));
+
+	background-image: url("/src/lib/assets/bg.jpg");
 	background-position: top center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -35,134 +36,44 @@ body {
 		fill 1;
 }
 
-.button {
-	padding: 0.25rem;
-	margin-inline: auto;
-	border: solid 2px var(--primary);
-	border-radius: 0.75rem;
-}
-
 .content-grid {
-	--padding-inline: 1rem;
-	--content-max-width: 1200px;
-	--breakout-max-width: 1400px;
+    --padding-inline: 1rem;
+    --content-max-width: 1200px;
+    --breakout-max-width: 1400px;
 
-	--breakout-size: calc(
-		(var(--breakout-max-width) - var(--content-max-width)) / 2
-	);
+    --breakout-size: calc(
+        (var(--breakout-max-width) - var(--content-max-width)) / 2
+    );
 
-	display: grid;
-	grid-template-columns:
-		[full-width-start] minmax(
-			var(--padding-inline),
-			1fr
-		) [breakout-start] minmax(0, var(--breakout-size))
-		[content-start] min(
-			100% - (var(--padding-inline) * 2),
-			var(--content-max-width)
-		)
-		[content-end] minmax(0, var(--breakout-size)) [breakout-end] minmax(
-			var(--padding-inline),
-			1fr
-		)
-		[full-width-end];
+    display: grid;
+    grid-template-columns:
+        [full-width-start] minmax(var(--padding-inline), 1fr)
+        [breakout-start] minmax(0, var(--breakout-size))
+        [content-start] min(
+            100% - (var(--padding-inline) * 2),
+            var(--content-max-width)
+        )
+        [content-end]
+        minmax(0, var(--breakout-size)) [breakout-end]
+        minmax(var(--padding-inline), 1fr) [full-width-end];
 }
+
 .content-grid:has(> *:not(.full-top):first-child) {
-	padding-top: 4rem;
+	padding-top: 4.5rem;
 }
 
 .content-grid > :not(.breakout, .full-width),
 .full-width > :not(.breakout, .full-width) {
-	grid-column: content;
+    grid-column: content;
 }
 
 .content-grid > .breakout {
-	grid-column: breakout;
+    grid-column: breakout;
 }
 
 .content-grid > .full-width {
-	grid-column: full-width;
+    grid-column: full-width;
 
-	display: grid;
-	grid-template-columns: inherit;
-}
-
-.contentBlock {
-	background-color: color-mix(
-		in oklab,
-		var(--background) 100%,
-		transparent 20%
-	);
-	border-radius: 0.5rem;
-	backdrop-filter: blur(0.35rem);
-}
-
-.center {
-	margin: auto;
-}
-
-.errorMessage {
-	color: var(--error);
-}
-
-.notifyMessage {
-	color: var(--notify);
-}
-
-.authForm {
-	padding: 2.5rem;
-}
-
-.authForm > form {
-	display: flex;
-	flex-direction: column;
-	gap: 2rem;
-}
-
-.authForm button {
-	background-color: var(--accent);
-	color: black;
-	font-size: 1.25rem;
-	padding: 0.75rem;
-	border-radius: 0.25rem;
-}
-
-.authForm button:active {
-	background-color: color-mix(in oklab, var(--accent) 80%, black 20%);
-}
-
-.inputBox {
-	position: relative;
-}
-
-.inputBox > input {
-	padding-inline: 0.75rem;
-	padding-top: 1.4rem;
-	padding-bottom: 0.35rem;
-	margin-inline: auto;
-	background-color: var(--background);
-	border-radius: 0.25rem;
-	width: 100%;
-}
-.inputBox ~ .errorMessage {
-	position: absolute;
-	font-size: 0.9rem;
-	padding-left: 0.25rem;
-}
-
-.inputBox > label {
-	position: absolute;
-	left: 0;
-	padding-left: 0.75rem;
-	margin-block: 0.87rem;
-	color: var(--secondary);
-	transition: 0.5s;
-	pointer-events: none;
-}
-
-.inputBox input:valid ~ label,
-.inputBox input:focus ~ label {
-	transform: translateY(-0.5rem);
-	font-size: 0.8em;
-	color: var(--primary);
+    display: grid;
+    grid-template-columns: inherit;
 }

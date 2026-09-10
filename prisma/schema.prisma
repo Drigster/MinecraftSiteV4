@@ -6,98 +6,57 @@ datasource db {
 generator kysely {
   provider = "prisma-kysely"
 
-  output   = "../src/lib/db"
+  output   = "../src/lib/server/db"
   fileName = "schema.d.ts"
 }
 
 model User {
-  id         String    @id
-  uuid       String    @unique
-  username   String    @unique
-  email      String    @unique
-  password   String
-  /// @kyselyType(boolean)
-  salted     Boolean   @default(false)
-  salt       String
+  /// @kyselyType(`u_${string}`)
+  id       String @id
+  uuid     String @unique
+  username String @unique
+  email    String @unique
+  password String
+
   /// @kyselyType(boolean)
   verified   Boolean   @default(false)
-  regDate    DateTime  @default(now()) //  @default(dbgenerated("(strftime('%FT%R:%fZ'))"))
+  regDate    DateTime
   /// @kyselyType('PLAYER' | 'MODERATOR' | 'ADMIN')
   role       String    @default("PLAYER")
   lastPlayed DateTime?
 
-  sessions        Session[]
-  securityActions SecurityAction[]
-  owned_servers   Server[]         @relation("ServerOwner")
-  servers         Server[]         @relation("ServerUser")
+  sessions           Session[]
+  changeEmailRequest ChangeEmailRequest?
+}
+
+model ChangeEmailRequest {
+  /// @kyselyType(`cef_${string}`)
+  id String @id
+
+  new_email  String
+  code_hash  String
+  expires_at Int
+
+  user    User   @relation(fields: [user_id], references: [id])
+  user_id String
+
+  @@unique([user_id])
 }
 
 model Session {
-  id           String   @id
-  token        String
-  refreshToken String
-  serverId     String?
-  device       String
-  location     String
+  id         String @id
+  expires_at Int
+
+  server_id String?
+
+  device     String?
+  location   String?
+  ip         String?
   /// @kyselyType("SITE" | "LAUNCHER")
-  type         String
-  last_login   DateTime @default(now()) //  @default(dbgenerated("(strftime('%FT%R:%fZ'))"))
-  expires_at   DateTime
-  user         User     @relation(fields: [user_id], references: [id])
-  user_id      String
-}
+  type       String
+  last_login DateTime
 
-model SecurityAction {
-  id        String   @id
-  user      User     @relation(fields: [user_id], references: [id])
-  user_id   String
-  timestamp DateTime @default(now()) //  @default(dbgenerated("(strftime('%FT%R:%fZ'))"))
-  /// @kyselyType('LOGIN' | "SERVER_JOIN")
-  type      String
-  /// @kyselyType('SITE' | 'LAUNCHER' | 'SERVER')
-  location  String
-  ip        String
-}
-
-model Server {
-  id            String    @id
-  uuid          String    @unique
-  name          String
-  description   String
-  icon          String
-  ip            String
-  port          Int
-  mods          ModFile[]
-  owner         User      @relation("ServerOwner", fields: [ownerId], references: [id])
-  ownerId       String
-  createdAt     DateTime  @default(now()) //  @default(dbgenerated("(strftime('%FT%R:%fZ'))"))
-  users         User[]    @relation("ServerUser")
-  /// @kyselyType('ACTIVE' | 'HIDDEN' | 'ARCHIVED')
-  status        String
-  /// @kyselyType(boolean)
-  hasLinkAccess Boolean   @default(false)
-}
-
-model Mod {
-  id      String    @id
-  name    String
-  link    String
-  type    String
-  ModFile ModFile[]
-}
-
-model ModFile {
-  id           String    @id
-  mod          Mod       @relation(fields: [mod_id], references: [id])
-  mod_id       String
-  version      String
-  filename     String
-  /// @kyselyType(boolean)
-  isOptional   Boolean   @default(false)
-  dependencies ModFile[] @relation("ModDependency")
-  conflicts    ModFile[] @relation("ModConflict")
-  Server       Server?   @relation(fields: [serverId], references: [id])
-  serverId     String?
-  dependants   ModFile[] @relation("ModDependency")
-  conflicters  ModFile[] @relation("ModConflict")
+  user    User   @relation(fields: [user_id], references: [id])
+  /// @kyselyType(`u_${string}`)
+  user_id String
 }

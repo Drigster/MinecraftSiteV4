@@ -1,24 +1,22 @@
 <script lang="ts">
-	import type { PageData } from "./$types";
+	import Button from "$lib/components/Button.svelte";
 
-	export let data: PageData;
+	let { data } = $props();
 </script>
 
 <svelte:head>
 	<title>Подтверждение почты | Foxy.town</title>
 </svelte:head>
 
-<div class="center authForm contentBlock full-top min-w-96">
+<div class="bg-blur m-auto min-w-96 rounded-lg bg-background/60 p-10">
 	<h2
-		class="text-center mx-auto uppercase text-3xl mb-8 text-accent font-bold"
+		class="mx-auto mb-8 text-center text-3xl font-bold uppercase text-accent"
 	>
 		Подтверждение почты
 	</h2>
 
 	<div class="text-center">
 		<p class="mb-8">{data.message}</p>
-		<a href="/"
-			><button class="!p-2 !text-base">Вернутся на главную</button></a
-		>
+		<Button href="/">Вернутся на главную</Button>
 	</div>
 </div>

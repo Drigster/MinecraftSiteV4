@@ -1,61 +1,57 @@
 <script lang="ts">
-	import { goto, invalidate } from "$app/navigation";
 	import logo from "$lib/assets/logo.svg";
-	import type { User } from "lucia/dist/core";
-
-	let h = $state(0);
+	import type { User } from "$lib/server/auth";
+	import { logout } from "$lib/auth.remote";
+	import { resolve } from "$app/paths";
 
 	let { user }: { user: User | null } = $props();
-
-	async function logout() {
-		await fetch("/logout", {
-			method: "POST",
-		});
-		await invalidate("locals:user");
-		goto("/");
-	}
 </script>
 
-<header class="fixed w-full">
-	<nav class="navbar">
-		<a class="nav-logo" href="/">
+<header class="fixed z-50 w-full">
+	<nav class="flex capitalize text-text-muted">
+		<a class="m-4" href={resolve("/")}>
 			<img class="h-8 w-8" src={logo} alt="" />
 		</a>
-		<ul class="nav-list">
-			<li class="nav-item"><a class="nav-link" href="/">Главная</a></li>
-			<li class="nav-item line-through">Правила</li>
-			<li class="nav-item line-through">Сервера</li>
-			<li class="nav-item rainbow">
-				<a class="nav-link" href="/download">Скачать лаунчер</a>
+		<ul class="flex flex-grow place-items-center gap-2 px-2">
+			<li class="mb-4 mt-5">
+				<a class="px-2 hover:text-text" href={resolve("/")}>Главная</a>
+			</li>
+			<li class="mb-4 mt-5 line-through">Правила</li>
+			<li class="mb-4 mt-5 line-through">Сервера</li>
+			<li class="rainbow mb-4 mt-5">
+				<a class="px-2" href={resolve("/")}>Скачать лаунчер</a>
 			</li>
 			{#if user?.role == "ADMIN"}
-				<li class="nav-item">
-					<a class="nav-link" href="/admin">Админка</a>
+				<li class="mb-4 mt-5">
+					<a class="px-2 hover:text-text" href={resolve("/")}
+						>Админка</a
+					>
 				</li>
 			{/if}
 			{#if user?.username != undefined}
-				<li
-					class="nav-item ml-auto text-white !my-0 flex"
-					bind:clientHeight={h}
-				>
-					<span class="nav-link mt-5 mb-4 mr-8"
-						><button onclick={logout}>Выйти</button></span
-					>
-					<a class="flex" href="/profile">
+				<li class="ml-auto flex">
+					<span class="mb-4 mr-8 mt-5 px-2">
+						<form {...logout}>
+							<button class="hover:text-text" type="submit"
+								>Выйти</button
+							>
+						</form>
+					</span>
+					<a class="flex hover:text-text" href={resolve("/profile")}>
 						<img
-							class="m-auto border-2 border-accent rounded-full"
+							class="m-auto rounded-md border-2 border-accent"
 							src="/api/skin/head/{user.username}?{Date.now()}"
 							height="32"
 							width="32"
-							alt="Player's skin head"
+							alt="Head"
 						/>
 						<!-- height={h-16} width={h-16} -->
-						<span class="nav-link mt-5 mb-4">{user.username}</span>
+						<span class="mb-4 mt-5 px-2">{user.username}</span>
 					</a>
 				</li>
 			{:else}
-				<li class="nav-item ml-auto text-white">
-					<a class="nav-link" href="/login">Войти</a>
+				<li class="nav-item ml-auto hover:text-text">
+					<a class="px-2" href={resolve("/login")}>Войти</a>
 				</li>
 			{/if}
 		</ul>
@@ -63,34 +59,6 @@
 </header>
 
 <style>
-	.navbar {
-		display: flex;
-		text-transform: capitalize;
-		color: var(--secondary);
-	}
-
-	.nav-list {
-		display: flex;
-		flex-grow: 1;
-		padding-inline: 0.5rem;
-		gap: 0.5rem;
-		place-items: center;
-	}
-
-	.nav-item {
-		margin-top: 1.25rem;
-		margin-bottom: 1rem;
-	}
-
-	.nav-link {
-		padding-inline: 0.5rem;
-	}
-
-	.nav-logo {
-		margin-block: 1rem;
-		margin-left: 1rem;
-	}
-
 	.rainbow {
 		background-image: linear-gradient(
 			to right,
@@ -116,10 +84,6 @@
 		-webkit-text-fill-color: transparent;
 		animation: move 80s linear infinite;
 		display: inline-block;
-	}
-
-	.text-white {
-		color: white;
 	}
 
 	@keyframes move {

@@ -1,14 +1,12 @@
+import { createLauncherUser } from "$lib/server/api_utils";
 import { json } from "@sveltejs/kit";
-import { createLauncherUser } from "$lib/util.server.js";
-import { db } from "$lib/db/index.js";
-import { DateTime } from "luxon";
 
 interface Request {
 	username: string;
 	serverId: string;
 }
 
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
 	const requestData: Request = await request.json();
 	if (
 		requestData.username == undefined ||
@@ -27,10 +25,10 @@ export async function POST({ request }) {
 		});
 	}
 
-	const session = await db
+	const session = await locals.db
 		.selectFrom("Session")
 		.selectAll()
-		.where("serverId", "=", requestData.serverId)
+		.where("server_id", "=", requestData.serverId)
 		.executeTakeFirst();
 
 	if (session == null) {
@@ -47,7 +45,7 @@ export async function POST({ request }) {
 		});
 	}
 
-	const user = await db
+	const user = await locals.db
 		.selectFrom("User")
 		.selectAll()
 		.where("id", "=", session.user_id)
@@ -67,13 +65,13 @@ export async function POST({ request }) {
 		});
 	}
 
-	await db
+	await locals.db
 		.updateTable("User")
 		.where("id", "=", user.id)
 		.set({
-			lastPlayed: DateTime.now().toSQL(),
+			lastPlayed: new Date().toISOString(),
 		})
 		.execute();
 
-	return json(createLauncherUser(user));
+	return json(await createLauncherUser(user));
 }

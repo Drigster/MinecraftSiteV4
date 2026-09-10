@@ -1,10 +1,7 @@
-import { db } from "$lib/db";
-import {
-	createLauncherUserSession,
-	createLuciaSession,
-} from "$lib/util.server.js";
+import { createLauncherUserSession } from "$lib/server/api_utils";
+import { create_session, generate_session_token } from "$lib/server/auth";
 import { json } from "@sveltejs/kit";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 interface Request {
 	login: string;
@@ -12,7 +9,7 @@ interface Request {
 	totpCode?: string;
 }
 
-export async function POST({ request }) {
+export async function POST({ request, locals, getClientAddress }) {
 	const requestData: Request = await request.json();
 	if (requestData.login == undefined || requestData.password == undefined) {
 		const error = {
@@ -28,7 +25,7 @@ export async function POST({ request }) {
 		});
 	}
 
-	const user = await db
+	const user = await locals.db
 		.selectFrom("User")
 		.selectAll()
 		.where("username", "=", requestData.login)
@@ -46,9 +43,7 @@ export async function POST({ request }) {
 			},
 			status: error.code,
 		});
-	} else if (
-		!bcrypt.compareSync(requestData.password + user.salt, user.password)
-	) {
+	} else if (!bcrypt.compareSync(requestData.password, user.password)) {
 		const error = {
 			error: "Пароль не верен!",
 			code: 403,
@@ -62,12 +57,11 @@ export async function POST({ request }) {
 		});
 	}
 
-	const session = await createLuciaSession(
-		request.headers.get("X-Real-IP"),
-		user.id,
-		request.headers.get("User-Agent")!,
-		"LAUNCHER",
-	);
+	const token = generate_session_token();
+	const session = await create_session(token, user.id, {
+		ip: getClientAddress(),
+		user_agent: request.headers.get("User-Agent") || null,
+	});
 
-	return json(createLauncherUserSession(session, user));
+	return json(await createLauncherUserSession(token, session, user));
 }

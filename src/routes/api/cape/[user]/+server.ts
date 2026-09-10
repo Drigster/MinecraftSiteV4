@@ -1,10 +1,9 @@
-import { db } from "$lib/db";
 import fs from "fs";
 
-export async function GET({ params }) {
+export async function GET({ params, locals }) {
 	params.user = params.user.replace(".png", "");
 
-	const user = await db
+	const user = await locals.db
 		.selectFrom("User")
 		.select("id")
 		.where((eb) =>
