@@ -1,0 +1,119 @@
+<h1 class="sm-leading-8" style="
+            margin: 0;
+            margin-bottom: 20px;
+            font-size: 24px;
+            line-height: 32px;
+            font-weight: 700;
+            color: #fc7155;
+        ">
+    Привет, {{username}}
+</h1>
+
+<p class="text-main" style="
+            margin: 0 0 16px 0;
+            color: #ddeafd;
+            font-size: 16px;
+            line-height: 25px;
+        ">
+    {{body}}
+</p>
+
+<!-- CTA Button -->
+<div style="
+            line-height: 100%;
+            margin: 24px 0 16px 0;
+        ">
+    <!--[if mso]>
+            <v:roundrect
+                xmlns:v="urn:schemas-microsoft-com:vml"
+                xmlns:w="urn:schemas-microsoft-com:office:word"
+                href="{{url}}"
+                style="
+                    height: 46px;
+                    v-text-anchor: middle;
+                    width: 200px;
+                "
+                arcsize="15%"
+                strokecolor="#fc7155"
+                fillcolor="#fc7155"
+            >
+                <w:anchorlock/>
+                <center
+                    style="
+                        color: #000000;
+                        font-family: 'Segoe UI', Arial, sans-serif;
+                        font-size: 16px;
+                        font-weight: 700;
+                    "
+                >
+                    {{buttonText}}
+                </center>
+            </v:roundrect>
+        <![endif]-->
+    <!--[if !mso]><!-->
+    <a href="{{url}}" class="btn-link sm-btn-block"
+        style="display: inline-block; text-decoration: none; color: #000000 !important; border: 1px solid #fc7155; border-radius: 6px; padding: 12px 24px; background-color: #fc7155; font-weight: 700; cursor: pointer; mso-hide: all;">
+        {{buttonText}}
+    </a>
+    <!--<![endif]-->
+</div>
+
+<p class="text-muted" style="
+            margin: 28px 0 0 0;
+            color: #a3a3a3;
+            font-size: 14px;
+            line-height: 22px;
+        ">
+    {{body2}}
+</p>
+
+<p style="
+            margin: 16px 0 0 0;
+            color: #fc7155;
+            font-weight: 600;
+            font-size: 15px;
+        ">
+    — {{sender}}
+</p>
+
+<!-- Separator -->
+<table role="presentation" aria-hidden="true" style="width: 100%" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td style="
+                    padding-top: 28px;
+                    padding-bottom: 24px;
+                    font-size: 0;
+                    line-height: 0;
+                    mso-line-height-rule: exactly;
+                ">
+            <div style="
+                        height: 1px;
+                        background-color: #18212e;
+                        line-height: 1px;
+                        font-size: 1px;
+                        mso-line-height-rule: exactly;
+                    ">
+                &zwnj;
+            </div>
+        </td>
+    </tr>
+</table>
+
+<p class="text-muted" style="
+            color: #a3a3a3;
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            line-height: 20px;
+        ">
+    В случае проблем с кнопкой используйте данную ссылку:
+</p>
+<p style="
+            margin: 0;
+            font-size: 13px;
+            line-height: 20px;
+            overflow-wrap: break-word;
+            word-break: break-all;
+        ">
+    <a href="{{url}}"
+        style="color: #fc7155; text-decoration: underline; word-break: break-all;">{{url}}</a>
+</p>

@@ -1,5 +1,5 @@
 import { form, getRequestEvent } from "$app/server";
-import { error, invalid, redirect } from "@sveltejs/kit";
+import { invalid, redirect } from "@sveltejs/kit";
 import bcrypt from "bcryptjs";
 import { dev } from "$app/environment";
 import {
@@ -13,11 +13,13 @@ import {
 import {
 	sendChangeEmailEmail,
 	sendChangePasswordEmail,
+	sendEmailChangedEmail,
+	sendPassordChangedEmail,
 	sendVerificationEmail,
 } from "$lib/server/mailer";
 import { verifyEmailDetailed } from "@devmehq/email-validator-js";
 import { nanoid } from "nanoid";
-import { generateOneTimeCode } from "./server/auth";
+import { generateOneTimeCode, getDevice, getLocation } from "./server/auth";
 import { sha256 } from "@oslojs/crypto/sha2";
 import { encodeHexLowerCase } from "@oslojs/encoding";
 import { resolve } from "$app/paths";
@@ -26,10 +28,6 @@ import { JWT_SECRET } from "$env/static/private";
 
 export const sendForgotPassword = form(forgotPasswordSchema, async (data) => {
 	const { locals } = getRequestEvent();
-
-	if (locals.user != null) {
-		return redirect(303, "/profile");
-	}
 
 	const user = await locals.db
 		.selectFrom("User")
@@ -61,19 +59,19 @@ export const sendForgotPassword = form(forgotPasswordSchema, async (data) => {
 });
 
 export const changePassword = form(changePasswordSchema, async (data) => {
-	const { locals } = getRequestEvent();
+	const { locals, request, getClientAddress } = getRequestEvent();
 
 	if (locals.user == null) {
-		error(404);
+		redirect(303, "/login");
 	}
 
 	const user = await locals.db
 		.selectFrom("User")
-		.select(["password"])
+		.select(["password", "email", "username"])
 		.where("id", "=", locals.user.id)
-		.executeTakeFirst();
+		.executeTakeFirstOrThrow();
 
-	if (!(await bcrypt.compare(data._current_password, user!.password))) {
+	if (!(await bcrypt.compare(data._current_password, user.password))) {
 		invalid({
 			path: ["_current_password"],
 			message: "Пароль не верен!",
@@ -93,11 +91,29 @@ export const changePassword = form(changePasswordSchema, async (data) => {
 		.where("user_id", "=", locals.user.id)
 		.execute();
 
+	const device = getDevice(request.headers.get("User-Agent") || null);
+
+	let ip = getClientAddress();
+
+	if (ip.startsWith("::ffff:")) {
+		ip = ip.slice(7);
+	}
+
+	const location = getLocation(ip);
+
+	sendPassordChangedEmail({
+		email: user.email,
+		username: user.username,
+		device: device || "Неизвестно",
+		ipAddress: ip,
+		location: location || "Неизвестно",
+	});
+
 	redirect(303, resolve("/login"));
 });
 
 export const recoverPassword = form(recoverPasswordSchema, async (data) => {
-	const { locals } = getRequestEvent();
+	const { locals, request, getClientAddress } = getRequestEvent();
 
 	let payload: jose.JWTPayload | undefined;
 	try {
@@ -118,7 +134,7 @@ export const recoverPassword = form(recoverPasswordSchema, async (data) => {
 
 	const user = await locals.db
 		.selectFrom("User")
-		.select("id")
+		.select(["id", "email", "username"])
 		.where("email", "=", payload.email as string)
 		.executeTakeFirst();
 
@@ -139,6 +155,24 @@ export const recoverPassword = form(recoverPasswordSchema, async (data) => {
 		.where("user_id", "=", user.id)
 		.execute();
 
+	const device = getDevice(request.headers.get("User-Agent") || null);
+
+	let ip = getClientAddress();
+
+	if (ip.startsWith("::ffff:")) {
+		ip = ip.slice(7);
+	}
+
+	const location = getLocation(ip);
+
+	sendPassordChangedEmail({
+		email: user.email,
+		username: user.username,
+		device: device || "Неизвестно",
+		ipAddress: ip,
+		location: location || "Неизвестно",
+	});
+
 	redirect(303, resolve("/login"));
 });
 
@@ -146,9 +180,21 @@ export const changeEmail = form(changeEmailSchema, async (data) => {
 	const { locals } = getRequestEvent();
 
 	if (locals.user == null) {
-		error(404);
+		redirect(303, "/login");
 	}
 
+	const user = await locals.db
+		.selectFrom("User")
+		.select("email")
+		.where("id", "=", locals.user.id)
+		.executeTakeFirstOrThrow();
+
+	if (user.email == data.email) {
+		invalid({
+			path: ["email"],
+			message: "Новая почта не может совпадать со старой",
+		});
+	}
 	if (!dev) {
 		const result = await verifyEmailDetailed({
 			emailAddress: data.email,
@@ -218,10 +264,10 @@ export const changeEmail = form(changeEmailSchema, async (data) => {
 export const confirmEmailChange = form(
 	confirmEmailChangeSchema,
 	async (data) => {
-		const { locals } = getRequestEvent();
+		const { locals, getClientAddress, request: req } = getRequestEvent();
 
 		if (locals.user == null) {
-			error(404);
+			redirect(303, "/login");
 		}
 
 		const request = await locals.db
@@ -255,6 +301,12 @@ export const confirmEmailChange = form(
 			});
 		}
 
+		const user = await locals.db
+			.selectFrom("User")
+			.select(["email", "username"])
+			.where("id", "=", locals.user.id)
+			.executeTakeFirstOrThrow();
+
 		await locals.db
 			.deleteFrom("ChangeEmailRequest")
 			.where("user_id", "=", locals.user.id)
@@ -267,7 +319,25 @@ export const confirmEmailChange = form(
 			})
 			.execute();
 
-		return { message: "Почта успешно изменена!" };
+		const device = getDevice(req.headers.get("User-Agent") || null);
+
+		let ip = getClientAddress();
+
+		if (ip.startsWith("::ffff:")) {
+			ip = ip.slice(7);
+		}
+
+		const location = getLocation(ip);
+
+		sendEmailChangedEmail({
+			email: user.email,
+			username: user.username,
+			device: device || "Неизвестно",
+			ipAddress: ip,
+			location: location || "Неизвестно",
+		});
+
+		redirect(303, resolve("/profile"));
 	},
 );
 
@@ -275,7 +345,7 @@ export const changeUsername = form(changeUsernameSchema, async (data) => {
 	const { locals } = getRequestEvent();
 
 	if (locals.user == null) {
-		error(404);
+		redirect(303, "/login");
 	}
 
 	const existing = await locals.db

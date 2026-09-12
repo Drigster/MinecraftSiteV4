@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { changePassword, recoverPassword } from "$lib/change.remote.js";
+	import { recoverPassword } from "$lib/change.remote.js";
 	import { recoverPasswordSchema } from "$lib/schemas.js";
 	import SubmitButton from "$lib/components/SubmitButton.svelte";
 	import Button from "$lib/components/Button.svelte";
@@ -52,7 +52,7 @@
 			<InputBox
 				id="password"
 				title="Пароль"
-				field={changePassword.fields._password}
+				field={recoverPassword.fields._password}
 				autocomplete="email"
 				isPassword={true}
 				noIssues={true}
@@ -61,18 +61,18 @@
 				id="password2"
 				class="mt-2"
 				title="Повторить пароль"
-				field={changePassword.fields._password2}
+				field={recoverPassword.fields._password2}
 				autocomplete="email"
 				isPassword={true}
 				noIssues={true}
 			/>
 			<div class="min-h-4">
-				{#each changePassword.fields._password.issues() as issue (issue.message + issue.path)}
+				{#each recoverPassword.fields._password.issues() as issue (issue.message + issue.path)}
 					<span class="absolute ml-2 text-sm text-red-500"
 						>{issue.message}</span
 					>
 				{/each}
-				{#each changePassword.fields._password2.issues() as issue (issue.message + issue.path)}
+				{#each recoverPassword.fields._password2.issues() as issue (issue.message + issue.path)}
 					<span class="absolute ml-2 text-sm text-red-500"
 						>{issue.message}</span
 					>
@@ -81,8 +81,8 @@
 
 			<SubmitButton
 				class="mt-3"
-				disabled={changePassword.pending > 0}
-				loading={changePassword.pending > 0}>Подтвердить</SubmitButton
+				disabled={recoverPassword.pending > 0}
+				loading={recoverPassword.pending > 0}>Подтвердить</SubmitButton
 			>
 		</form>
 	{/if}

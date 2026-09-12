@@ -30,22 +30,18 @@
 	const oninput: FormEventHandler<HTMLInputElement> = (e) => {
 		if (!pattern) return;
 		let regex = new RegExp(pattern);
-		let input = e.currentTarget.value as string;
-		console.log(input);
+		let input = (e.currentTarget.value as string).trim();
 		if (regex.test(input)) {
 			goodValue = input;
-			console.log("good");
+			value = input;
 			return;
 		} else {
 			input = input.substring(0, 6);
-			console.log(input, " 2");
 			if (regex.test(input)) {
 				goodValue = input;
 				value = input;
-				console.log("good2");
 				return;
 			} else {
-				console.log("bad", goodValue);
 				value = goodValue;
 			}
 		}

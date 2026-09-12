@@ -1,0 +1,141 @@
+<table cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom: 20px;">
+    <tr>
+        <td style="
+                    background-color: #21120f;
+                    border: 1px solid #4a1e16;
+                    border-radius: 16px;
+                    padding: 5px 14px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #fc7155;
+                    letter-spacing: 0.5px;
+                    text-transform: uppercase;
+                ">
+            &#128737;&#65039; Безопасность аккаунта
+        </td>
+    </tr>
+</table>
+
+<h1 class="sm-leading-8" style="
+            margin: 0 0 16px 0;
+            font-size: 24px;
+            line-height: 32px;
+            font-weight: 700;
+            color: #ffffff;
+        ">
+    {{heading}}
+</h1>
+
+<p class="text-main" style="
+            margin: 0 0 16px 0;
+            color: #ddeafd;
+            font-size: 16px;
+            line-height: 25px;
+        ">
+    Привет, <strong style="color: #ffffff;">{{username}}</strong>!
+</p>
+
+<p class="text-main" style="
+            margin: 0 0 24px 0;
+            color: #c4d3e8;
+            font-size: 15px;
+            line-height: 24px;
+        ">
+    {{body}}
+</p>
+
+<!-- Event Details Card -->
+<table class="bg-details" cellpadding="0" cellspacing="0" role="presentation" width="100%" bgcolor="#0b121d" style="
+            width: 100%;
+            background-color: #0b121d;
+            border: 1px solid #1a2434;
+            border-radius: 6px;
+            margin: 0 0 24px 0;
+        ">
+    <tr>
+        <td style="padding: 18px 20px;">
+            <div style="
+                        font-size: 12px;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        color: #768499;
+                        margin-bottom: 12px;
+                    ">
+                Детали изменения
+            </div>
+            <table cellpadding="0" cellspacing="0" role="presentation" width="100%"
+                style="width: 100%; font-size: 14px; line-height: 22px;">
+                <tr>
+                    <td class="sm-stack-col"
+                        style="padding: 5px 0; color: #8899ac; width: 140px; vertical-align: top; font-size: 13px;">
+                        Дата и время:
+                    </td>
+                    <td class="sm-stack-val code-text"
+                        style="padding: 5px 0; color: #ddeafd; font-weight: 600; font-size: 13px; text-align: right;">
+                        {{changeTime}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="sm-stack-col"
+                        style="padding: 5px 0; color: #8899ac; width: 140px; vertical-align: top; font-size: 13px;">
+                        Устройство:
+                    </td>
+                    <td class="sm-stack-val"
+                        style="padding: 5px 0; color: #ddeafd; font-weight: 600; font-size: 13px; text-align: right;">
+                        {{device}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="sm-stack-col"
+                        style="padding: 5px 0; color: #8899ac; width: 140px; vertical-align: top; font-size: 13px;">
+                        IP-адрес:
+                    </td>
+                    <td class="sm-stack-val code-text"
+                        style="padding: 5px 0; color: #ddeafd; font-weight: 600; font-size: 13px; text-align: right;">
+                        {{ipAddress}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="sm-stack-col"
+                        style="padding: 5px 0; color: #8899ac; width: 140px; vertical-align: top; font-size: 13px;">
+                        Местоположение:
+                    </td>
+                    <td class="sm-stack-val"
+                        style="padding: 5px 0; color: #ddeafd; font-weight: 600; font-size: 13px; text-align: right;">
+                        {{location}}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<!-- Alert Callout for Unauthorized Change -->
+<table class="bg-alert" cellpadding="0" cellspacing="0" role="presentation" width="100%" bgcolor="#170f0d" style="
+            width: 100%;
+            background-color: #170f0d;
+            border-left: 3px solid #fc7155;
+            border-radius: 0 6px 6px 0;
+            margin: 0 0 24px 0;
+        ">
+    <tr>
+        <td style="padding: 16px 18px;">
+            <p style="margin: 0 0 6px 0; font-size: 14px; line-height: 20px; font-weight: 700; color: #fc7155;">
+                Не совершали это действие?
+            </p>
+            <p style="margin: 0; font-size: 13px; line-height: 21px; color: #f2cfca;">
+                Если это не вы — ваш аккаунт под угрозой. Немедленно обратитесь к администрации для восстановления доступа.
+            </p>
+        </td>
+    </tr>
+</table>
+
+<p style="
+            margin: 28px 0 0 0;
+            color: #fc7155;
+            font-weight: 600;
+            font-size: 15px;
+        ">
+    — {{sender}}
+</p>

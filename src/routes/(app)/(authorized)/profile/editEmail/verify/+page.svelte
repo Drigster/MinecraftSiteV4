@@ -22,41 +22,34 @@
 			<h3 class="text-3xl font-bold tracking-tight text-accent">
 				Смена почты
 			</h3>
-			{#if confirmEmailChange.result?.message}
-				<p class="mb-4 max-w-[36ch] text-sm text-text-muted">
-					{confirmEmailChange.result?.message}
-				</p>
-				<Button href="/profile">Вернутся к профилю</Button>
-			{:else}
-				<p class="mb-4 max-w-[36ch] text-sm text-text-muted">
-					Введите получный код чтобы подтвердить изменение почты
-				</p>
-				<form
-					{...confirmEmailChange.enhance(async (form) => {
-						try {
-							if (await form.submit()) {
-								form.element.reset();
-							}
-						} catch (error) {
-							console.log(error);
+			<p class="mb-4 max-w-[36ch] text-sm text-text-muted">
+				Введите получный код чтобы подтвердить изменение почты
+			</p>
+			<form
+				{...confirmEmailChange.enhance(async (form) => {
+					try {
+						if (await form.submit()) {
+							form.element.reset();
 						}
-					})}
-					enctype="multipart/form-data"
-				>
-					<InputBox
-						id="code"
-						title="Код"
-						field={confirmEmailChange.fields.code}
-						pattern="^[0-9]{'{0,6}'}$"
-					/>
+					} catch (error) {
+						console.log(error);
+					}
+				})}
+				enctype="multipart/form-data"
+			>
+				<InputBox
+					id="code"
+					title="Код"
+					field={confirmEmailChange.fields.code}
+					pattern="^[0-9]{'{0,6}'}$"
+				/>
 
-					<SubmitButton
-						class="mt-2 w-full !bg-accent !text-black hover:!bg-accent/60"
-					>
-						Сохранить
-					</SubmitButton>
-				</form>
-			{/if}
+				<SubmitButton
+					class="mt-2 w-full !bg-accent !text-black hover:!bg-accent/60"
+				>
+					Сохранить
+				</SubmitButton>
+			</form>
 		</div>
 		<div class="absolute right-4 top-4">
 			<Button

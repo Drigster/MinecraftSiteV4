@@ -49,20 +49,9 @@ export async function create_session(
 		metadata.ip = metadata.ip.slice(7);
 	}
 
-	let device: string | null = null;
-	if (metadata.user_agent != null) {
-		const deviceDetector = new DeviceDetector();
-		const parsed = deviceDetector.parse(metadata.user_agent);
-		device = `${parsed.os?.name} ${parsed.os?.version} - ${parsed.client?.name} ${parsed.client?.version}`;
-	}
+	const device = getDevice(metadata.user_agent);
 
-	let location: string | null = null;
-	if (metadata.ip != null) {
-		const city = geoip.lookup(metadata.ip);
-		if (city != null) {
-			location = `${city.country}${city.city != "" ? `, ${city.city}` : ""}`;
-		}
-	}
+	const location = getLocation(metadata.ip);
 
 	await locals.db
 		.insertInto("Session")
@@ -130,20 +119,9 @@ export async function validate_session_token(
 		metadata.ip = metadata.ip.slice(7);
 	}
 
-	let device: string | null = null;
-	if (metadata.user_agent != null) {
-		const deviceDetector = new DeviceDetector();
-		const parsed = deviceDetector.parse(metadata.user_agent);
-		device = `${parsed.os?.name} ${parsed.os?.version} - ${parsed.client?.name} ${parsed.client?.version}`;
-	}
+	const device = getDevice(metadata.user_agent);
 
-	let location: string | null = null;
-	if (metadata.ip != null) {
-		const city = geoip.lookup(metadata.ip);
-		if (city != null) {
-			location = `${city.country}${city.city != "" ? `, ${city.city}` : ""}`;
-		}
-	}
+	const location = getLocation(metadata.ip);
 
 	let expires_at = undefined;
 
@@ -203,4 +181,25 @@ export function generateOneTimeCode(): string {
 		).toString();
 	} while (/(.)\1\1/.test(code));
 	return code;
+}
+
+export function getDevice(user_agent: string | null): string | null {
+	let device: string | null = null;
+	if (user_agent != null) {
+		const deviceDetector = new DeviceDetector();
+		const parsed = deviceDetector.parse(user_agent);
+		device = `${parsed.os?.name} ${parsed.os?.version} - ${parsed.client?.name} ${parsed.client?.version}`;
+	}
+	return device;
+}
+
+export function getLocation(ip: string | null): string | null {
+	let location: string | null = null;
+	if (ip != null) {
+		const city = geoip.lookup(ip);
+		if (city != null) {
+			location = `${city.country}${city.city != "" ? `, ${city.city}` : ""}`;
+		}
+	}
+	return location;
 }
