@@ -128,23 +128,6 @@ export function createLauncherUserSession(
 	session: Session,
 	user: Selectable<User>,
 ) {
-	console.log(session.access_token_expires_at);
-	console.log(DateTime.fromSeconds(session.access_token_expires_at!));
-	console.log(
-		Interval.fromDateTimes(
-			DateTime.now(),
-			DateTime.fromSeconds(session.access_token_expires_at!),
-		).length("seconds")!,
-	);
-	console.log(
-		Math.floor(
-			Interval.fromDateTimes(
-				DateTime.now(),
-				DateTime.fromSeconds(session.access_token_expires_at!),
-			).length("seconds"),
-		),
-	);
-
 	const sessionData: LauncherUserSession = {
 		id: session.id,
 		accessToken: session.access_token!,
