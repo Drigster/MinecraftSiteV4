@@ -98,3 +98,4 @@ prisma/temp.sql
 
 static/img/*
 files/*
+build

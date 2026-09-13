@@ -15,7 +15,6 @@
         "@o7/icon": "^0.3.93",
         "@oslojs/crypto": "^1.0.1",
         "@oslojs/encoding": "^1.1.0",
-        "@tanstack/svelte-table": "^9.2.4",
         "bcryptjs": "^3.0.3",
         "device-detector-js": "^3.0.3",
         "dotenv": "^17.4.2",
@@ -29,13 +28,13 @@
         "nodemailer": "^10.0.1",
         "sharp": "^0.35.3",
         "skin3d": "^0.2.0",
-        "svelte-check": "^4.7.6",
         "uuid": "^14.0.2",
         "valibot": "^1.4.2"
     },
     "devDependencies": {
+        "svelte-check": "^4.7.6",
         "@eslint/js": "^10.0.1",
-        "@sveltejs/adapter-auto": "^7.0.1",
+        "@sveltejs/adapter-node": "^5.5.7",
         "@sveltejs/kit": "^2.69.1",
         "@sveltejs/vite-plugin-svelte": "^7.1.2",
         "@types/better-sqlite3": "^7.6.13",
