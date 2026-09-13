@@ -44,15 +44,15 @@ export type LauncherUserHardware = {
 
 export type LauncherHardwareInfo = {
 	hwDiskId: string;
-	baseboardSerialNumber: string;
-	displayId: string[];
+	baseboardSerialNumber?: string;
+	displayId?: string[];
 	bitness: number;
 	totalMemory: number;
 	logicalProcessors: number;
 	physicalProcessors: number;
 	processorMaxFreq: number;
 	battery: boolean;
-	oemId: string;
+	oemId?: string;
 };
 
 export type LauncherError = {
@@ -152,17 +152,19 @@ export function createLauncherUserHardware(
 		publicKey: hardware.public_key,
 		hardwareInfo: {
 			hwDiskId: hardware.hw_disk_id,
-			baseboardSerialNumber: hardware.baseboard_serial_number,
-			displayId: hardware.display_ids.split(";"),
+			baseboardSerialNumber:
+				hardware.baseboard_serial_number || undefined,
+			displayId: hardware.display_ids?.split(";"),
 			bitness: hardware.bitness,
 			totalMemory: hardware.total_memory,
 			logicalProcessors: hardware.logical_processors,
 			physicalProcessors: hardware.physical_processors,
 			processorMaxFreq: hardware.processor_max_freq,
-			battery: hardware.battery,
-			oemId: hardware.oem_id,
+			battery:
+				(hardware.battery as unknown as number) == 0 ? false : true,
+			oemId: hardware.oem_id || undefined,
 		},
-		banned: hardware.banned,
+		banned: (hardware.banned as unknown as number) == 0 ? false : true,
 	};
 
 	return hardware_data;

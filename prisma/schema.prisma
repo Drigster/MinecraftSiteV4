@@ -58,8 +58,8 @@ model Hardware {
   public_key String
 
   hw_disk_id              String
-  baseboard_serial_number String
-  display_ids             String
+  baseboard_serial_number String?
+  display_ids             String?
   bitness                 Int
   total_memory            Int
   logical_processors      Int
@@ -67,9 +67,9 @@ model Hardware {
   processor_max_freq      Int
   /// @kyselyType(boolean)
   battery                 Boolean
-  oem_id                  String
-  /// @kyselyType(boolean)
+  oem_id                  String?
 
+  /// @kyselyType(boolean)
   banned              Boolean @default(false)
   internal_ban_reason String?
 

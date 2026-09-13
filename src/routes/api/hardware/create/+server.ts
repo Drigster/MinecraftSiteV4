@@ -7,7 +7,7 @@ type Request = {
 	info: {
 		hwDiskId: string;
 		baseboardSerialNumber: string;
-		displayId: string[];
+		displayId?: string[];
 		bitness: number;
 		totalMemory: number;
 		logicalProcessors: number;
@@ -49,8 +49,13 @@ export async function POST({ request, locals }) {
 			id: `h_${nanoid()}`,
 			public_key: requestData.publicKey,
 			hw_disk_id: requestData.info.hwDiskId,
-			baseboard_serial_number: requestData.info.baseboardSerialNumber,
-			display_ids: requestData.info.displayId.join(";"),
+			baseboard_serial_number:
+				requestData.info.baseboardSerialNumber != "unknown"
+					? requestData.info.baseboardSerialNumber
+					: null,
+			display_ids: requestData.info.displayId
+				? requestData.info.displayId.join(";")
+				: null,
 			bitness: requestData.info.bitness,
 			total_memory: requestData.info.totalMemory,
 			logical_processors: requestData.info.logicalProcessors,

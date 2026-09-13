@@ -1,6 +1,6 @@
 import { API_BEARER } from "$env/static/private";
 import { createLauncherUserHardware } from "$lib/server/api_utils";
-import { json, text } from "@sveltejs/kit";
+import { json } from "@sveltejs/kit";
 
 type Request = {
 	publicKey: string;
@@ -37,9 +37,14 @@ export async function POST({ request, locals }) {
 		.executeTakeFirst();
 
 	if (hardware == null) {
-		return text("No Content", {
-			status: 204,
-		});
+		if (hardware == null) {
+			const error = {
+				error: "No Content",
+				code: 404,
+			};
+
+			return json(error, { status: 404 });
+		}
 	}
 
 	return json(createLauncherUserHardware(hardware));
