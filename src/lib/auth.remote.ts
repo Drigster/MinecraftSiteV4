@@ -13,6 +13,7 @@ import {
 import { nanoid } from "nanoid";
 import { sendVerificationEmail } from "./server/mailer";
 import { loginSchema, registerSchema } from "./schemas";
+import { DateTime } from "luxon";
 
 export const login = form(loginSchema, async (data) => {
 	const { locals, cookies, request, getClientAddress, url } =
@@ -48,15 +49,20 @@ export const login = form(loginSchema, async (data) => {
 	}
 
 	const token = generate_session_token();
-	const session = await create_session(token, user.id, {
-		ip: getClientAddress(),
-		user_agent: request.headers.get("User-Agent") || null,
+	const session = await create_session({
+		token,
+		user_id: user.id,
+		type: "SITE",
+		metadata: {
+			ip: getClientAddress(),
+			user_agent: request.headers.get("User-Agent") || null,
+		},
 	});
 
 	cookies.set("session", token, {
 		path: "/",
 		httpOnly: true,
-		expires: session.expires_at,
+		expires: DateTime.fromSeconds(session.expires_at).toJSDate(),
 		secure: !dev,
 	});
 

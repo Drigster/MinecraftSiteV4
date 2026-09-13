@@ -25,8 +25,17 @@ model User {
   role       String    @default("PLAYER")
   lastPlayed DateTime?
 
-  sessions           Session[]
-  changeEmailRequest ChangeEmailRequest?
+  banned              Boolean @default(false)
+  internal_ban_reason String?
+
+  skin_digest  String?
+  /// @kyselyType(boolean)
+  skin_is_slim Boolean @default(false)
+  cape_digest  String?
+
+  sessions             Session[]
+  hardwares            Hardware[]
+  change_email_request ChangeEmailRequest?
 }
 
 model ChangeEmailRequest {
@@ -43,11 +52,38 @@ model ChangeEmailRequest {
   @@unique([user_id])
 }
 
+model Hardware {
+  /// @kyselyType(`h_${string}`)
+  id         String @id
+  public_key String
+
+  hw_disk_id              String
+  baseboard_serial_number String
+  display_ids             String
+  bitness                 Int
+  total_memory            Int
+  logical_processors      Int
+  physical_processors     Int
+  processor_max_freq      Int
+  /// @kyselyType(boolean)
+  battery                 Boolean
+  oem_id                  String
+  /// @kyselyType(boolean)
+
+  banned              Boolean @default(false)
+  internal_ban_reason String?
+
+  users User[]
+}
+
 model Session {
   id         String @id
   expires_at Int
 
-  server_id String?
+  refresh_token           String?
+  access_token            String?
+  access_token_expires_at Int?
+  server_id               String?
 
   device     String?
   location   String?

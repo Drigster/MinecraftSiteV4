@@ -1,13 +1,27 @@
-import { createLauncherUserSession } from "$lib/server/api_utils";
-import { sha256 } from "@oslojs/crypto/sha2";
-import { encodeHexLowerCase } from "@oslojs/encoding";
+import { API_BEARER } from "$env/static/private";
+import {
+	createLauncherUserSession,
+	type LauncherError,
+} from "$lib/server/api_utils";
 import { json } from "@sveltejs/kit";
+import { DateTime } from "luxon";
 
-interface Request {
+type Request = {
 	accessToken: string;
-}
+};
 
 export async function POST({ request, locals }) {
+	if (request.headers.get("Authorization") !== `Bearer ${API_BEARER}`) {
+		const error = {
+			error: "Unauthorized",
+			code: 401,
+		};
+
+		return json(error, {
+			status: error.code,
+		});
+	}
+
 	const requestData: Request = await request.json();
 	if (requestData.accessToken == undefined) {
 		const error = {
@@ -15,36 +29,45 @@ export async function POST({ request, locals }) {
 			code: 400,
 		};
 
-		return new Response(JSON.stringify(error), {
-			headers: {
-				"Content-Type": "application/json",
-			},
+		return json(error, {
 			status: error.code,
 		});
 	}
 
-	const session_id = encodeHexLowerCase(
-		sha256(new TextEncoder().encode(requestData.accessToken)),
-	);
-
 	const session = await locals.db
 		.selectFrom("Session")
 		.selectAll()
-		.where("id", "=", session_id)
+		.where("access_token", "=", requestData.accessToken)
 		.executeTakeFirst();
 
 	if (session == null) {
-		const error = {
-			error: "Пользователь не найден!",
-			code: 404,
+		const error: LauncherError = {
+			error: "auth.tokenexpired",
+			code: 1001,
 		};
 
-		return new Response(JSON.stringify(error), {
-			headers: {
-				"Content-Type": "application/json",
-			},
-			status: error.code,
-		});
+		return json(error);
+	} else if (DateTime.now() >= DateTime.fromSeconds(session.expires_at)) {
+		await locals.db
+			.deleteFrom("Session")
+			.where("id", "=", session.id)
+			.execute();
+
+		const error: LauncherError = {
+			error: "auth.tokenexpired",
+			code: 1001,
+		};
+
+		return json(error);
+	} else if (
+		DateTime.now() >= DateTime.fromSeconds(session.access_token_expires_at!)
+	) {
+		const error: LauncherError = {
+			error: "auth.tokenexpired",
+			code: 1001,
+		};
+
+		return json(error);
 	}
 
 	const user = await locals.db
@@ -53,14 +76,5 @@ export async function POST({ request, locals }) {
 		.where("id", "=", session.user_id)
 		.executeTakeFirstOrThrow();
 
-	return json(
-		await createLauncherUserSession(
-			requestData.accessToken,
-			{
-				...session,
-				expires_at: new Date(session.expires_at * 1000),
-			},
-			user,
-		),
-	);
+	return json(await createLauncherUserSession(session, user));
 }

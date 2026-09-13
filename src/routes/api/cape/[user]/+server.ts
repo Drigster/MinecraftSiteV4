@@ -5,7 +5,7 @@ export async function GET({ params, locals }) {
 
 	const user = await locals.db
 		.selectFrom("User")
-		.select("id")
+		.select("cape_digest")
 		.where((eb) =>
 			eb.or([
 				eb("username", "=", params.user),
@@ -18,9 +18,9 @@ export async function GET({ params, locals }) {
 
 	if (
 		user !== undefined &&
-		fs.existsSync("./files/capes/" + user.id + ".png")
+		fs.existsSync("./files/capes/" + user.cape_digest + ".png")
 	) {
-		skin = fs.readFileSync("./files/capes/" + user.id + ".png");
+		skin = fs.readFileSync("./files/capes/" + user.cape_digest + ".png");
 	} else {
 		return new Response("Cape not found", {
 			status: 404,

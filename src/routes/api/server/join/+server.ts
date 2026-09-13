@@ -1,17 +1,19 @@
-import { sha256 } from "@oslojs/crypto/sha2";
-import { encodeHexLowerCase } from "@oslojs/encoding";
+import type { LauncherError } from "$lib/server/api_utils";
+import { json } from "@sveltejs/kit";
+import { DateTime } from "luxon";
 
-interface Request {
-	username?: string;
-	uuid?: string;
+type Request = {
+	username: string;
+	uuid: string;
 	accessToken: string;
 	serverId: string;
-}
+};
 
 export async function POST({ request, locals }) {
 	const requestData: Request = await request.json();
 	if (
-		(requestData.uuid == undefined && requestData.username == undefined) ||
+		requestData.username == undefined ||
+		requestData.uuid == undefined ||
 		requestData.accessToken == undefined ||
 		requestData.serverId == undefined
 	) {
@@ -19,56 +21,70 @@ export async function POST({ request, locals }) {
 			error: "Bad Request",
 			code: 400,
 		};
-		if (
-			requestData.uuid == undefined &&
-			requestData.username != undefined
-		) {
-			error.error = "Bad Request, uuid not found!";
-		} else if (
-			requestData.username == undefined &&
-			requestData.uuid != undefined
-		) {
-			error.error = "Bad Request, username not found!";
-		} else if (
-			requestData.username == undefined &&
-			requestData.uuid == undefined
-		) {
-			error.error = "Bad Request, username and uuid not found";
-		} else if (requestData.accessToken == undefined) {
-			error.error = "Bad Request, accessToken not found!";
-		} else if (requestData.serverId == undefined) {
-			error.error = "Bad Request, serverId not found!";
-		}
 
-		return new Response(JSON.stringify(error), {
-			headers: {
-				"Content-Type": "application/json",
-			},
+		return json(error, {
 			status: error.code,
 		});
 	}
 
-	const session_id = encodeHexLowerCase(
-		sha256(new TextEncoder().encode(requestData.accessToken)),
-	);
 	const session = await locals.db
 		.selectFrom("Session")
 		.selectAll()
-		.where("id", "=", session_id)
+		.where("access_token", "=", requestData.accessToken)
 		.executeTakeFirst();
 
 	if (session == null) {
 		const error = {
-			error: "Пользователь не найден!",
+			error: "session not found",
 			code: 404,
 		};
 
-		return new Response(JSON.stringify(error), {
-			headers: {
-				"Content-Type": "application/json",
-			},
+		return json(error, {
 			status: error.code,
 		});
+	} else if (DateTime.now() >= DateTime.fromSeconds(session.expires_at)) {
+		await locals.db
+			.deleteFrom("Session")
+			.where("id", "=", session.id)
+			.execute();
+
+		const error = {
+			error: "session not found",
+			code: 404,
+		};
+
+		return json(error);
+	} else if (
+		DateTime.now() >= DateTime.fromSeconds(session.access_token_expires_at!)
+	) {
+		const error: LauncherError = {
+			error: "accessToken incorrect",
+			code: 403,
+		};
+
+		return json(error);
+	}
+
+	const user = await locals.db
+		.selectFrom("User")
+		.select(["username", "uuid"])
+		.where("id", "=", session.user_id)
+		.executeTakeFirstOrThrow();
+
+	if (user.username != requestData.username) {
+		const error: LauncherError = {
+			error: "username incorrect",
+			code: 403,
+		};
+
+		return json(error);
+	} else if (user.uuid != requestData.uuid) {
+		const error: LauncherError = {
+			error: "username incorrect",
+			code: 403,
+		};
+
+		return json(error);
 	}
 
 	await locals.db
@@ -79,15 +95,10 @@ export async function POST({ request, locals }) {
 		})
 		.execute();
 
-	const message = {
-		message: "OK",
-		code: 200,
-	};
-
-	return new Response(JSON.stringify(message), {
-		headers: {
-			"Content-Type": "application/json",
+	return json(
+		{},
+		{
+			status: 200,
 		},
-		status: message.code,
-	});
+	);
 }

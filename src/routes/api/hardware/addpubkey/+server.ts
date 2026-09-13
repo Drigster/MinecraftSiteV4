@@ -1,10 +1,11 @@
 import { API_BEARER } from "$env/static/private";
-import { createLauncherUser } from "$lib/server/api_utils";
 import { json } from "@sveltejs/kit";
 
 type Request = {
-	username: string;
-	serverId: string;
+	hardware: {
+		id: `h_${string}`;
+	};
+	publicKey: string;
 };
 
 export async function POST({ request, locals }) {
@@ -21,8 +22,8 @@ export async function POST({ request, locals }) {
 
 	const requestData: Request = await request.json();
 	if (
-		requestData.username == undefined ||
-		requestData.serverId == undefined
+		requestData.hardware?.id == undefined ||
+		requestData.publicKey == undefined
 	) {
 		const error = {
 			error: "Bad Request",
@@ -34,17 +35,15 @@ export async function POST({ request, locals }) {
 		});
 	}
 
-	const user = await locals.db
-		.selectFrom("User")
-		.innerJoin("Session", "Session.user_id", "User.id")
-		.selectAll(["User"])
-		.where("User.username", "=", requestData.username)
-		.where("Session.server_id", "=", requestData.serverId)
+	const hardware = await locals.db
+		.selectFrom("Hardware")
+		.select("id")
+		.where("id", "=", requestData.hardware.id)
 		.executeTakeFirst();
 
-	if (user == null) {
+	if (hardware == null) {
 		const error = {
-			error: "session not found",
+			error: "hardware not found",
 			code: 404,
 		};
 
@@ -54,12 +53,18 @@ export async function POST({ request, locals }) {
 	}
 
 	await locals.db
-		.updateTable("User")
-		.where("id", "=", user.id)
+		.updateTable("Hardware")
 		.set({
-			lastPlayed: new Date().toISOString(),
+			public_key: requestData.publicKey,
 		})
 		.execute();
 
-	return json(await createLauncherUser(user));
+	return json(
+		{
+			message: "success",
+		},
+		{
+			status: 200,
+		},
+	);
 }

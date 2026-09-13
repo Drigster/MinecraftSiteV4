@@ -9,8 +9,11 @@ import { error } from "@sveltejs/kit";
 import DeviceDetector from "device-detector-js";
 import geoip from "geoip-lite";
 import type { DB } from "$lib/server/db/schema";
+import type { Session as DBSession } from "$lib/server/db/schema";
 
 import type { RandomReader } from "@oslojs/crypto/random";
+import type { Insertable } from "kysely";
+import { DateTime } from "luxon";
 
 const random: RandomReader = {
 	read(bytes) {
@@ -27,14 +30,19 @@ export function generate_session_token(): string {
 	return token;
 }
 
-export async function create_session(
-	token: string,
-	user_id: `u_${string}`,
+export async function create_session(args: {
+	token: string;
+	user_id: `u_${string}`;
+	type: Insertable<DB["Session"]>["type"];
 	metadata: {
 		ip: string;
 		user_agent: string | null;
-	},
-): Promise<Session> {
+		accessToken?: string;
+		refreshToken?: string;
+	};
+}): Promise<DBSession> {
+	const { token, user_id, type, metadata } = args;
+
 	const { locals } = getRequestEvent();
 	const session_id = encodeHexLowerCase(
 		sha256(new TextEncoder().encode(token)),
@@ -53,7 +61,7 @@ export async function create_session(
 
 	const location = getLocation(metadata.ip);
 
-	await locals.db
+	const created_session = await locals.db
 		.insertInto("Session")
 		.values({
 			id: session.id,
@@ -62,11 +70,27 @@ export async function create_session(
 			device: device,
 			location: location,
 			ip: metadata.ip,
-			type: "SITE",
+			type: type,
 			last_login: new Date().toISOString(),
+
+			access_token: metadata.accessToken
+				? encodeHexLowerCase(
+						sha256(new TextEncoder().encode(metadata.accessToken)),
+					)
+				: null,
+			access_token_expires_at: metadata.accessToken
+				? Math.floor(DateTime.now().plus({ hour: 1 }).toSeconds())
+				: null,
+			refresh_token: metadata.refreshToken
+				? encodeHexLowerCase(
+						sha256(new TextEncoder().encode(metadata.refreshToken)),
+					)
+				: null,
 		})
-		.execute();
-	return session;
+		.returningAll()
+		.executeTakeFirstOrThrow();
+
+	return created_session;
 }
 
 export async function validate_session_token(

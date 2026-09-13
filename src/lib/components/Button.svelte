@@ -29,7 +29,10 @@
 {/snippet}
 
 {#if href != undefined}
-	<a class="w-fit" href={resolve(href)}>{@render button()}</a>
+	<!-- eslint-disable-next-line @typescript-eslint/no-explicit-any -->
+	<a class="w-fit" href={resolve(href as string as any)}>
+		{@render button()}
+	</a>
 {:else}
 	{@render button()}
 {/if}

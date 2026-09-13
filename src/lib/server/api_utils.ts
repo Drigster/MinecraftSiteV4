@@ -1,17 +1,7 @@
 import type { Selectable } from "kysely";
-import type { Session } from "./auth";
-import type { User } from "./db/schema";
+import type { User, Session, DB } from "./db/schema";
 import { DateTime, Interval } from "luxon";
-import fs from "fs";
 import { ORIGIN } from "$env/static/private";
-import { createHash } from "crypto";
-
-export type LauncherUserSession = {
-	id: number | string;
-	accessToken: string;
-	expire: number;
-	user: LauncherUser;
-};
 
 export type LauncherUser = {
 	username: string;
@@ -22,31 +12,102 @@ export type LauncherUser = {
 		SKIN: {
 			url: string;
 			digest: string;
-			metadata?: {
-				model: "slim";
+			metadata: {
+				model?: "slim";
 			};
 		};
 		CAPE?: {
 			url: string;
 			digest: string;
+			// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+			metadata: {};
 		};
 	};
 };
 
-export async function createLauncherUser(user: Selectable<User>) {
-	const skinUrl = ORIGIN + "/api/skin/" + user.username;
+export type LauncherUserSession = {
+	id: string;
+	accessToken: string;
+	refreshToken: string;
+	expire: number;
+	user: LauncherUser;
+	hardwareId?: string;
+	userHardware?: LauncherUserHardware;
+};
 
-	let skin;
-	if (fs.existsSync("./files/skins/" + user.id.toString() + ".png")) {
-		skin = fs.readFileSync("./files/skins/" + user.id.toString() + ".png");
-	} else {
-		skin = fs.readFileSync("./files/default.png");
-	}
+export type LauncherUserHardware = {
+	id: string;
+	publicKey: string;
+	hardwareInfo: LauncherHardwareInfo;
+	banned: boolean;
+};
 
+export type LauncherHardwareInfo = {
+	hwDiskId: string;
+	baseboardSerialNumber: string;
+	displayId: string[];
+	bitness: number;
+	totalMemory: number;
+	logicalProcessors: number;
+	physicalProcessors: number;
+	processorMaxFreq: number;
+	battery: boolean;
+	oemId: string;
+};
+
+export type LauncherError = {
+	error:
+		| (
+				| "auth.usernotfound"
+				| "auth.wrongpassword"
+				| "auth.require2fa"
+				| "auth.wrongtotp"
+				| "session not found"
+				| "accessToken incorrect"
+				| "username incorrect"
+				| "uuid incorrect"
+				| "serverId incorrect"
+		  )
+		| (string & {});
+	/// 1001 - токен истёк (auth.tokenexpired)
+	/// 1002 - неверный refresh токен (auth.invalidtoken)
+	code?: 1001 | 1002 | number;
+};
+
+export function createLauncherUser(user: Selectable<DB["User"]>) {
 	const permissions: string[] = [];
 
 	if (user.role == "ADMIN") {
 		permissions.push("*");
+	}
+
+	let skin;
+	if (user.skin_digest) {
+		const skinUrl = ORIGIN + "/api/skin/" + user.skin_digest;
+		skin = {
+			url: skinUrl,
+			digest: user.skin_digest,
+			metadata: {
+				model: user.skin_is_slim ? ("slim" as const) : undefined,
+			},
+		};
+	} else {
+		const skinUrl = ORIGIN + "/api/skin/default.png";
+		skin = {
+			url: skinUrl,
+			digest: "default.png",
+			metadata: {},
+		};
+	}
+
+	let cape;
+	if (user.cape_digest) {
+		const capeUrl = ORIGIN + "/api/cape/" + user.cape_digest;
+		cape = {
+			url: capeUrl,
+			digest: user.cape_digest,
+			metadata: {},
+		};
 	}
 
 	const userData: LauncherUser = {
@@ -55,36 +116,71 @@ export async function createLauncherUser(user: Selectable<User>) {
 		permissions: permissions,
 		roles: [user.role],
 		assets: {
-			SKIN: {
-				url: skinUrl,
-				digest: createHash("sha256").update(skin).digest("hex"),
-				// metadata: false //TODO: user.isSkinSlim
-				//     ? {
-				//           model: "slim",
-				//       }
-				//     : undefined,
-			},
+			SKIN: skin,
+			CAPE: cape,
 		},
 	};
 
 	return userData;
 }
 
-export async function createLauncherUserSession(
-	session_token: string,
+export function createLauncherUserSession(
 	session: Session,
 	user: Selectable<User>,
 ) {
+	console.log(session.access_token_expires_at);
+	console.log(DateTime.fromSeconds(session.access_token_expires_at!));
+	console.log(
+		Interval.fromDateTimes(
+			DateTime.now(),
+			DateTime.fromSeconds(session.access_token_expires_at!),
+		).length("seconds")!,
+	);
+	console.log(
+		Math.floor(
+			Interval.fromDateTimes(
+				DateTime.now(),
+				DateTime.fromSeconds(session.access_token_expires_at!),
+			).length("seconds"),
+		),
+	);
+
 	const sessionData: LauncherUserSession = {
 		id: session.id,
-		accessToken: session_token,
+		accessToken: session.access_token!,
+		refreshToken: session.refresh_token!,
 		expire: Math.floor(
-			Interval.fromDateTimes(DateTime.now(), session.expires_at).length(
-				"seconds",
-			),
+			Interval.fromDateTimes(
+				DateTime.now(),
+				DateTime.fromSeconds(session.access_token_expires_at!),
+			).length("seconds"),
 		),
-		user: await createLauncherUser(user),
+		user: createLauncherUser(user),
 	};
 
 	return sessionData;
+}
+
+export function createLauncherUserHardware(
+	hardware: Selectable<DB["Hardware"]>,
+) {
+	const hardware_data: LauncherUserHardware = {
+		id: hardware.id,
+		publicKey: hardware.public_key,
+		hardwareInfo: {
+			hwDiskId: hardware.hw_disk_id,
+			baseboardSerialNumber: hardware.baseboard_serial_number,
+			displayId: hardware.display_ids.split(";"),
+			bitness: hardware.bitness,
+			totalMemory: hardware.total_memory,
+			logicalProcessors: hardware.logical_processors,
+			physicalProcessors: hardware.physical_processors,
+			processorMaxFreq: hardware.processor_max_freq,
+			battery: hardware.battery,
+			oemId: hardware.oem_id,
+		},
+		banned: hardware.banned,
+	};
+
+	return hardware_data;
 }

@@ -99,20 +99,20 @@
 		<section
 			class="bg-blur relative flex aspect-[2/3] w-1/4 flex-col rounded-lg bg-background/60"
 		>
-			<noscript class="h-full w-full">
-				<img
-					class="m-auto h-full w-auto"
-					src="/api/skin/body/{data.user.username}?{Date.now()}"
-					alt=""
-					width="32"
-					height="48"
-				/>
-			</noscript>
 			<div
 				class="h-full w-full"
 				bind:clientWidth={w}
 				bind:clientHeight={h}
 			>
+				<noscript class="h-full w-full">
+					<img
+						class="m-auto h-full w-auto p-4"
+						src="/api/skin/body/{data.user.username}?{Date.now()}"
+						alt=""
+						width="32"
+						height="48"
+					/>
+				</noscript>
 				<canvas bind:this={canvas} width={w} height={h}></canvas>
 			</div>
 			<div class="absolute bottom-4 left-4 right-4 flex gap-1">

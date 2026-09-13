@@ -6,7 +6,7 @@ export async function GET({ params, locals }) {
 
 	const user = await locals.db
 		.selectFrom("User")
-		.select("id")
+		.select("skin_digest")
 		.where((eb) =>
 			eb.or([
 				eb("username", "=", params.user),
@@ -18,10 +18,12 @@ export async function GET({ params, locals }) {
 	let skin;
 
 	if (
-		user !== undefined &&
-		fs.existsSync("./files/skins/" + user.id + "_body.png")
+		user?.skin_digest &&
+		fs.existsSync("./files/skins/" + user.skin_digest + "_body.png")
 	) {
-		skin = fs.readFileSync("./files/skins/" + user.id + "_body.png");
+		skin = fs.readFileSync(
+			"./files/skins/" + user.skin_digest + "_body.png",
+		);
 	} else {
 		skin = Buffer.from(defaultBody, "hex");
 	}
