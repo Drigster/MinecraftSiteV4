@@ -1,4 +1,4 @@
-import { redirect } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 import { form, getRequestEvent } from "$app/server";
 import {
 	deleteCape,
@@ -110,7 +110,10 @@ export const uploadCape = form(uploadCapeSchema, async (data) => {
 		redirect(303, "/login");
 	} else if (!locals.user.verified) {
 		redirect(303, "/notverified");
+	} else if (locals.user.role != "ADMIN") {
+		return error(404);
 	}
+
 	const user = await locals.db
 		.selectFrom("User")
 		.select(["id", "cape_digest"])

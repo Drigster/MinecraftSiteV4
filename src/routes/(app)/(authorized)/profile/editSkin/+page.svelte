@@ -7,6 +7,8 @@
 		uploadSkin,
 	} from "$lib/skin.remote";
 	import { Download, Trash, X } from "@o7/icon/lucide";
+
+	const { data } = $props();
 </script>
 
 <div
@@ -17,7 +19,7 @@
 >
 	<div class="flex items-start justify-between gap-3">
 		<div>
-			<div class="mb-4">
+			<div>
 				<h3 class="text-xl font-bold tracking-tight">Скин</h3>
 				<p class="mb-4 max-w-[36ch] text-sm text-text-muted">
 					Поддерживаются скины в размере 64x64 пикселя и форматы PNG и
@@ -76,65 +78,67 @@
 					</form>
 				</div>
 			</div>
-			<div>
-				<h3 class="text-xl font-bold tracking-tight">Плащ</h3>
-				<p class="mb-4 max-w-[36ch] text-sm text-text-muted">
-					Поддерживаются плащи в размере 64x32 пикселя и форматы PNG и
-					JPEG
-				</p>
-				<div class="flex gap-1">
-					<form
-						{...uploadCape.enhance(async (form) => {
-							try {
-								if (await form.submit()) {
-									form.element.reset();
+			{#if data.user?.role == "ADMIN"}
+				<div class="mt-4">
+					<h3 class="text-xl font-bold tracking-tight">Плащ</h3>
+					<p class="mb-4 max-w-[36ch] text-sm text-text-muted">
+						Поддерживаются плащи в размере 64x32 пикселя и форматы
+						PNG и JPEG
+					</p>
+					<div class="flex gap-1">
+						<form
+							{...uploadCape.enhance(async (form) => {
+								try {
+									if (await form.submit()) {
+										form.element.reset();
+									}
+								} catch (error) {
+									console.log(error);
 								}
-							} catch (error) {
-								console.log(error);
-							}
-						})}
-						enctype="multipart/form-data"
-					>
-						<label
-							class="peer inline-block cursor-pointer rounded-md bg-accent px-[1em] pb-[0.5em] pt-[0.5em] align-middle leading-4 text-black transition-colors hover:bg-accent/60 disabled:cursor-default disabled:bg-accent/60"
+							})}
+							enctype="multipart/form-data"
 						>
-							Загрузить
-							<input
-								class="hidden"
-								{...uploadCape.fields.cape.as("file")}
-								accept="image/png,image/jpeg"
-								onchange={(e) =>
-									e.currentTarget.form?.requestSubmit()}
-								required
-							/>
-						</label>
-						<noscript>
-							<Button class="hidden" type="submit"
-								>Сохранить</Button
+							<label
+								class="peer inline-block cursor-pointer rounded-md bg-accent px-[1em] pb-[0.5em] pt-[0.5em] align-middle leading-4 text-black transition-colors hover:bg-accent/60 disabled:cursor-default disabled:bg-accent/60"
 							>
-						</noscript>
-					</form>
-					<Button class="!p-1.5">
-						<Download size="20" />
-					</Button>
-					<form
-						{...removeCape.enhance(async (form) => {
-							try {
-								if (await form.submit()) {
-									form.element.reset();
-								}
-							} catch (error) {
-								console.log(error);
-							}
-						})}
-						enctype="multipart/form-data"
-					>
-						<Button class="!p-1.5" type="submit">
-							<Trash size="20" />
+								Загрузить
+								<input
+									class="hidden"
+									{...uploadCape.fields.cape.as("file")}
+									accept="image/png,image/jpeg"
+									onchange={(e) =>
+										e.currentTarget.form?.requestSubmit()}
+									required
+								/>
+							</label>
+							<noscript>
+								<Button class="hidden" type="submit"
+									>Сохранить</Button
+								>
+							</noscript>
+						</form>
+						<Button class="!p-1.5">
+							<Download size="20" />
 						</Button>
-					</form>
+						<form
+							{...removeCape.enhance(async (form) => {
+								try {
+									if (await form.submit()) {
+										form.element.reset();
+									}
+								} catch (error) {
+									console.log(error);
+								}
+							})}
+							enctype="multipart/form-data"
+						>
+							<Button class="!p-1.5" type="submit">
+								<Trash size="20" />
+							</Button>
+						</form>
+					</div>
 				</div>
-			</div>
+			{/if}
 		</div>
 		<div class="absolute right-4 top-4">
 			<Button
