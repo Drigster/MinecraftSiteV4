@@ -422,7 +422,7 @@ export async function sendEmailChangedEmail({
 			title: "Почта изменена",
 			preheader: `Привет, ${username}. На вашем аккаунте была изменена привязанная почта.`,
 			username,
-			body: 'На вашем аккаунте была изменена привязанная почта. Новая почта: <span style="color: #fc7155; font-weight: bold;">${newEmail}</span>. Если это были вы — никаких действий не требуется.',
+			body: 'На вашем аккаунте была изменена привязанная почта. Новая почта: <span style="color: #fc6f53; font-weight: bold;">${newEmail}</span>. Если это были вы — никаких действий не требуется.',
 			heading: "Почта была успешно изменена",
 			changeTime: DateTime.now()
 				.setLocale("ru")
