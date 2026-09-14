@@ -13,6 +13,7 @@
 	import { page } from "$app/state";
 	import { resolve } from "$app/paths";
 	import { untrack } from "svelte";
+	import { deauthSession } from "$lib/auth.remote";
 
 	let { data, children } = $props();
 	const modal_open = $derived(page.route.id != "/(app)/(authorized)/profile");
@@ -226,7 +227,7 @@
 				Сессии автоматически удаляются после месяца неактивности.
 			</h2>
 		</div>
-		<form method="post">
+		<form {...deauthSession} method="post">
 			<table
 				class="mt-4 grid grid-cols-[2fr_2fr_1fr_1fr_2fr_auto] gap-x-4 rounded-lg text-sm"
 			>
@@ -266,7 +267,13 @@
 							</td>
 							<td>
 								{#if session.id != data.current_session_id}
-									<button class="text-text">Удалить</button>
+									<button
+										{...deauthSession.fields.session_id.as(
+											"submit",
+											session.id,
+										)}
+										class="text-text">Удалить</button
+									>
 								{/if}
 							</td>
 						</tr>

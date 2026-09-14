@@ -12,7 +12,7 @@ import {
 } from "./server/auth";
 import { nanoid } from "nanoid";
 import { sendVerificationEmail } from "./server/mailer";
-import { loginSchema, registerSchema } from "./schemas";
+import { deauthSessionSchema, loginSchema, registerSchema } from "./schemas";
 import { DateTime } from "luxon";
 
 export const login = form(loginSchema, async (data) => {
@@ -174,4 +174,22 @@ export const logout = form(async () => {
 	cookies.delete("session", { path: "/" });
 
 	redirect(303, resolve("/"));
+});
+
+export const deauthSession = form(deauthSessionSchema, async (data) => {
+	const { locals } = getRequestEvent();
+	if (locals.user == null) {
+		return redirect(303, "/login");
+	}
+
+	const session = await locals.db
+		.selectFrom("Session")
+		.select("id")
+		.where("user_id", "=", locals.user.id)
+		.where("id", "=", data.session_id)
+		.executeTakeFirst();
+
+	if (session != undefined) {
+		await invalidate_session(data.session_id);
+	}
 });

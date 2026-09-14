@@ -104,3 +104,7 @@ export const changeUsernameSchema = v.object({
 		),
 	),
 });
+
+export const deauthSessionSchema = v.object({
+	session_id: v.pipe(v.string(), v.nonEmpty()),
+});
