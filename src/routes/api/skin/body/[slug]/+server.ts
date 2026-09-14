@@ -3,7 +3,7 @@ import defaultBody from "$lib/assets/default_body.png?hex";
 import sanitize from "sanitize-filename";
 
 export async function GET({ params, locals }) {
-	let slug = sanitize(params.slug.replace(".png", ""));
+	const slug = sanitize(params.slug.replace(".png", ""));
 	let skin;
 
 	if (fs.existsSync("./files/skins/" + slug + "_body.png")) {
