@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from "$app/paths";
 	import Button from "$lib/components/Button.svelte";
 	import {
 		removeCape,
@@ -57,9 +58,16 @@
 							>
 						</noscript>
 					</form>
-					<Button class="!p-1.5" type="submit">
-						<Download size="20" />
-					</Button>
+					<a
+						href={resolve("/api/skin/[slug]", {
+							slug: data.user!.username,
+						})}
+						download={`${data.user!.username}.png`}
+					>
+						<Button class="!p-1.5">
+							<Download size="20" />
+						</Button></a
+					>
 					<form
 						{...removeSkin.enhance(async (form) => {
 							try {
@@ -117,9 +125,16 @@
 								>
 							</noscript>
 						</form>
-						<Button class="!p-1.5">
-							<Download size="20" />
-						</Button>
+						<a
+							href={resolve("/api/skin/[slug]", {
+								slug: data.user!.username,
+							})}
+							download={`${data.user!.username}_cape.png`}
+						>
+							<Button class="!p-1.5">
+								<Download size="20" />
+							</Button></a
+						>
 						<form
 							{...removeCape.enhance(async (form) => {
 								try {
