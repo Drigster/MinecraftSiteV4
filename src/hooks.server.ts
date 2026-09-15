@@ -5,6 +5,8 @@ import { validate_session_token } from "$lib/server/auth";
 export async function handle({ event, resolve }) {
 	event.locals.db = init_db();
 
+	console.log(event.request.method, event.request.url);
+
 	const sessionToken = event.cookies.get("session");
 	if (!sessionToken) {
 		event.locals.user = null;

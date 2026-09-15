@@ -13,7 +13,6 @@ export async function POST({ request, locals }) {
 	const requestData: Request = await request.json();
 	if (
 		requestData.username == undefined ||
-		requestData.uuid == undefined ||
 		requestData.accessToken == undefined ||
 		requestData.serverId == undefined
 	) {
@@ -78,9 +77,9 @@ export async function POST({ request, locals }) {
 		};
 
 		return json(error);
-	} else if (user.uuid != requestData.uuid) {
+	} else if (requestData.uuid && user.uuid != requestData.uuid) {
 		const error: LauncherError = {
-			error: "username incorrect",
+			error: "uuid incorrect",
 			code: 403,
 		};
 
