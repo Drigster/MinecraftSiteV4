@@ -61,7 +61,9 @@ export async function POST({ request, locals }) {
 			code: 403,
 		};
 
-		return json(error);
+		return json(error, {
+			status: error.code,
+		});
 	}
 
 	const user = await locals.db
@@ -76,14 +78,18 @@ export async function POST({ request, locals }) {
 			code: 403,
 		};
 
-		return json(error);
+		return json(error, {
+			status: error.code,
+		});
 	} else if (requestData.uuid && user.uuid != requestData.uuid) {
 		const error: LauncherError = {
 			error: "uuid incorrect",
 			code: 403,
 		};
 
-		return json(error);
+		return json(error, {
+			status: error.code,
+		});
 	}
 
 	await locals.db

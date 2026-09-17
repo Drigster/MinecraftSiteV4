@@ -46,7 +46,7 @@ export async function POST({ request, locals }) {
 			code: 1001,
 		};
 
-		return json(error);
+		return json(error, { status: 401 });
 	} else if (DateTime.now() >= DateTime.fromSeconds(session.expires_at)) {
 		await locals.db
 			.deleteFrom("Session")
@@ -58,7 +58,7 @@ export async function POST({ request, locals }) {
 			code: 1001,
 		};
 
-		return json(error);
+		return json(error, { status: 401 });
 	} else if (
 		DateTime.now() >= DateTime.fromSeconds(session.access_token_expires_at!)
 	) {
@@ -67,7 +67,7 @@ export async function POST({ request, locals }) {
 			code: 1001,
 		};
 
-		return json(error);
+		return json(error, { status: 401 });
 	}
 
 	const user = await locals.db
