@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
+	import { resolve } from "$app/paths";
 	import { DateTime } from "luxon";
 	import { onMount } from "svelte";
 
@@ -40,7 +41,7 @@
 			seconds = Math.floor(interval.seconds);
 
 			if (target <= DateTime.now()) {
-				goto("/");
+				goto(resolve("/"));
 			}
 		}, 1000);
 	});
