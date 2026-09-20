@@ -42,7 +42,7 @@ export async function POST({ request, locals }) {
 
 	if (session == null) {
 		const error: LauncherError = {
-			error: "auth.tokenexpired",
+			error: "Token expired",
 			code: 1001,
 		};
 
@@ -54,7 +54,7 @@ export async function POST({ request, locals }) {
 			.execute();
 
 		const error: LauncherError = {
-			error: "auth.tokenexpired",
+			error: "Token expired",
 			code: 1001,
 		};
 
@@ -63,7 +63,7 @@ export async function POST({ request, locals }) {
 		DateTime.now() >= DateTime.fromSeconds(session.access_token_expires_at!)
 	) {
 		const error: LauncherError = {
-			error: "auth.tokenexpired",
+			error: "Token expired",
 			code: 1001,
 		};
 

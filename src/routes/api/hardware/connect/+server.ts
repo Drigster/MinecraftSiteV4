@@ -77,7 +77,8 @@ export async function POST({ request, locals }) {
 			A: hardware.id,
 			B: session.user_id,
 		})
-		.executeTakeFirstOrThrow();
+		.onConflict((oc) => oc.columns(["A", "B"]).doNothing())
+		.execute();
 
 	return json(
 		{
