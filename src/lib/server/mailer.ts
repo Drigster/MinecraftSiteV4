@@ -5,8 +5,8 @@ import {
 	SMTP_PASSWORD,
 	SMTP_PORT,
 	SMTP_USER,
+	SMTP_SECURE,
 } from "$env/static/private";
-import logo from "$lib/assets/logo.svg";
 import nodemailer, { type Transporter } from "nodemailer";
 import { dev } from "$app/environment";
 import * as jose from "jose";
@@ -33,13 +33,10 @@ try {
 		transporter = nodemailer.createTransport({
 			host: SMTP_HOST,
 			port: parseInt(SMTP_PORT),
-			secure: false,
+			secure: SMTP_SECURE == "true",
 			auth: {
 				user: SMTP_USER,
 				pass: SMTP_PASSWORD,
-			},
-			tls: {
-				ciphers: "SSLv3",
 			},
 		});
 	}
@@ -72,7 +69,7 @@ function buildBase({
 	file = file.replaceAll("{{title}}", title);
 	file = file.replaceAll("{{preheader}}", preheader);
 	file = file.replaceAll("{{homeUrl}}", ORIGIN);
-	file = file.replaceAll("{{logoUrl}}", logo);
+	file = file.replaceAll("{{logoUrl}}", ORIGIN + "/logo.svg");
 	file = file.replaceAll("{{sender}}", "Foxy.town");
 	file = file.replaceAll("{{footerText}}", footerText);
 
